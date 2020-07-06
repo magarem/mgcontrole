@@ -31,124 +31,143 @@
 </style>
 <template>
   <div class="app-container">
-    <el-row >
-      <el-col :span="12">
-        <!-- <div class="filter-container" style="height: 500px; "> -->
-          <el-form :inline="true" class="demo-form-inline">
-            <span class="grid-content bg-red" justify="center" style="font-family: tahoma; font-size: 30px;" :style="{color: msgMain.color}">
+    <el-row :gutter=40>
+      <el-col :span="17">
+        <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
+          <el-col :span="24">
+             <span class="grid-content bg-red" justify="center" style="font-family: tahoma; font-size: 30px;" :style="{color: msgMain.color}">
               {{ msgMain.txt }}
-            </span>
-            <h4>Cliente</h4>
-            <el-form-item label="">
-              <input ref="clienteBusca" placeholder="Código" v-model="cliente.id" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="getCliente({id: cliente.id})">
-              <input ref="clienteBusca" placeholder="Nome" v-model="cliente.busca" class="el-input__inner" style="width: 250px; height: 33px;" @keyup.enter="getCliente({nome: cliente.busca})">
-            </el-form-item>
-            <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" @click="getCliente({nome: cliente.busca})">
-              >>
-            </el-button>
-           
-            <h1 v-if="cliente.nome" style="margin-top: 0px;">{{ cliente.nome }}</h1>
-            <h4>Produto</h4>
-            <el-form-item label="Quantidade">
-              <input v-model="qnt"  _style="width: 120px;" class="el-input__inner" @keyup="qnt = qnt.replace(',','.')"/>
-            </el-form-item><br>
-            <el-form-item label="Código ou nome">
-              <input ref="ean" v-model="listQuery.ean" class="el-input__inner" style="width: 170px; height: 33px;" autofocus @keyup.enter="addList(listQuery.ean)" />
-            </el-form-item>
-            <el-button v-waves  class="filter-item" type="primary" icon="el-icon-download" @click="searchProductByDesc(listQuery.ean)">
-              Procurar
-            </el-button>
-            <br>
-            <el-form-item label="Diversos">
-              <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
-              <money ref="diversos.valor" v-model="diversos.valor" v-bind="money" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="addDiversos()"/>
-            </el-form-item>
-            <el-form-item>
-              <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="addDiversos()">
-                Incluir
-              </el-button>
-            </el-form-item>
-            <br>
-            <span v-show="itemAdd_descricao" style="font-size: 30px;">{{ itemAdd_descricao }}</span><br><br>
-            <span v-show="itemAdd_descricao" style="font-size: 17px;">Preço unitário:</span><br>
-            <span v-show="itemAdd_descricao" style="font-size: 24px;">{{ itemAdd_pco_venda | money }}</span><br>
-          </el-form>
-        <!-- </div> -->
-      </el-col>
-      <el-col :span="12">
-        <!-- compra itens table -->
-        <el-row type="flex" class="row-bg" justify="center" style="background-color: #112940">
-          <el-col :span="24">
-            <div class="grid-content bg-red"  style="font-family: tahoma; font-size: 22px; _padding: 16px; color: white; text-align: center">
+             </span>
+             <div class="grid-content bg-red"  style="font-family: tahoma; font-size: 22px; _padding: 16px; color: white; text-align: center">
               Cupom
-            </div>
+             </div>
           </el-col>
         </el-row>
-        <el-row type="flex" class="row-bg" justify="center" style="background-color: #112940">
+
+        <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
           <el-col :span="24">
+            <el-table
+              :data="list"
+              stripe
+              height="200"
+              style="width: 100%; font-size: 18px;">
+              <el-table-column
+                type="index"
+                label="#"
+                width="40">
+              </el-table-column>
+              <el-table-column
+                prop="descricao"
+                label="Produto"
+                width="180">
+              </el-table-column>
+              <el-table-column
+                prop="unidade"
+                label="Un"
+                width="100">
+              </el-table-column>
+              <el-table-column
+                prop="qnt"
+                label="Qnt">
+              </el-table-column>
+              <el-table-column
+                prop="pco_venda"
+                label="Preço">
+              </el-table-column>
 
-<el-table
-    :data="list"
-    stripe
-    height="500"
-    style="width: 100%">
-    <el-table-column
-      type="index"
-      label="#"
-      width="40">
-    </el-table-column>
-    <el-table-column
-      prop="descricao"
-      label="Produto"
-      width="180">
-    </el-table-column>
-    <el-table-column
-      prop="unidade"
-      label="Un"
-      width="100">
-    </el-table-column>
-    <el-table-column
-      prop="qnt"
-      label="Qnt">
-    </el-table-column>
-    <el-table-column
-      prop="pco_venda"
-      label="Preço">
-    </el-table-column>
-
-    <el-table-column label="subtotal" >
-      <template slot-scope="scope">
-        {{ scope.row.subtotal | money }}
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="X"
-      width="80">
-      <template slot-scope="scope">
-        <el-button @click="handleDelete(scope.row)" type="text" size="small">X</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
-
-           
+              <el-table-column label="subtotal" >
+                <template slot-scope="scope">
+                  {{ scope.row.subtotal | money }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                label="X"
+                width="80">
+                <template slot-scope="scope">
+                  <el-button @click="handleDelete(scope.row)" type="text" size="small">X</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
           </el-col>
         </el-row>
-      
-        <!-- TOTAL -->
-        <el-row type="flex" class="row-bg" _justify="center" style="background-color: #112940">
-          <el-col :span="12">
-            <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="primary" icon="el-icon-check" @click="vendaClose()">
-              Finalizar venda
-            </el-button>
-          </el-col>
-          <el-col :span="12">
-            <div class="grid-content bg-red" justify="right" style="font-family: tahoma; font-size: 30px; _padding: 16px; color: white; _text-align: right">
+
+      </el-col>
+      <el-col :span="7" style="background-color: #F0F8FF; height: 260px">
+        <el-row type="flex" class="row-bg" _justify="center" style="padding-top: 10px;">
+          <el-col :span="24" >
+              <el-button  v-waves :loading="downloadLoading" class="filter-item" type="primary" @click="clientesListFlg = true" icon=el-icon-search>
+              Cliente
+              </el-button>
+              <span v-if="cliente.nome" style="margin-right: 10px; font-size: 25px;">
+                <br>{{cliente.id}}<span v-if="cliente.id"> - </span>
+                {{ cliente.nome }}
+              </span>
+              
+            
+             <div  style="font-family: tahoma; font-size: 30px;">
                Total: {{ totalGeral | money }}
-            </div>
+            </div><br>
+
+            <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="warning" icon="el-icon-cancel" @click="vendaCancel()">
+              Cancelar
+            </el-button>
+            <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="success" icon="el-icon-check" @click="vendaClose()">
+              Pagar
+            </el-button>
           </el-col>
         </el-row>
       </el-col>
-    </el-row>
+    </el-row >
+
+
+    <el-row :gutter=40 >
+      <el-col :span="17">
+        <el-form :inline="true" label-position="right" label-width="100px"  class="demo-form-inline">
+          <!-- <el-form-item label="Nome">
+            <input ref="clienteBusca" placeholder="Nome" v-model="cliente.busca" class="el-input__inner" style="width: 250px; height: 33px;" @keyup.enter="getCliente({nome: cliente.busca})">
+          </el-form-item> -->
+          <h4>Defina os produtos</h4>
+          <el-form-item label="Produto">
+            <input ref="produto.id" placeholder="Código" v-model="item.id" class="el-input__inner" style="width: 80px; _height: 33px;" autofocus @keyup.enter="productSetById()" />
+          </el-form-item>
+          <el-button v-waves  class="filter-item" type="primary" icon="el-icon-search" @click="produtosListFlg = true">
+            Procurar pelo nome
+          </el-button>
+        
+          <!-- <br>
+          <el-form-item label="Diversos">
+            <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
+            <money ref="diversos.valor" v-model="diversos.valor" v-bind="money" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="addDiversos()"/>
+          </el-form-item> -->
+          <!-- <el-form-item>
+            <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="addDiversos()">
+              Incluir
+            </el-button>
+          </el-form-item> -->
+          <br>
+        </el-form>
+      </el-col>
+      <el-col :span="7" style="padding-top: 10px; height: 300px; background-color: #FFF8DC;">
+          Produto:<br>
+          <span v-show="item.descricao" style="font-size: 30px; _margin-left: 10px">{{ item.id }}</span><br>
+          <span v-show="item.descricao" style="font-size: 45px; _margin-left: 10px">{{ item.descricao }}</span><br>
+          <span v-show="item.descricao" style="font-size: 35px; _margin-left: 10px">{{ item.pco_venda | money }}</span> - 
+          <span v-show="item.descricao" style="font-size: 35px; _margin-left: 10px">{{ item.unidade }}</span><br><br>
+          <el-form :inline="true" label-position="left" label-width="100px"  class="demo-form-inline">
+            <el-form-item label="Quantidade">
+              <input v-model="qnt"  style="width: 150px; font-size: 30px;" class="el-input__inner" @keyup="qnt = qnt.replace(',','.')"/>
+            </el-form-item><br>
+            <el-button v-waves  class="filter-item" type="primary" _icon="el-icon-search" @click="addList()">
+              Registra item
+            </el-button>
+          </el-form>
+      </el-col>
+    </el-row >
+    
+    
+    
+    
+   
     
     <!-- /TOTAL -->
 
@@ -293,12 +312,13 @@
 
     <!-- Products list -->
     <el-dialog :visible.sync="produtosListFlg" title="Busca de produto" width="70%">
+        <input ref="nome" placeholder="Nome" v-model="listQuery.descricao" class="el-input__inner" style="width: 170px; height: 33px;" autofocus @keyup.enter="searchProduct({descricao: listQuery.descricao})" />
       <el-table :data="produtosList" border fit highlight-current-row style="width: 100%">
-        <!-- <el-table-column label="ID" prop="ID" sortable="custom" align="center" width="10">
+        <el-table-column label="ID" prop="ID" sortable="custom" align="center" width="80">
           <template slot-scope="scope">
             <span>{{ scope.row.id }}</span>
           </template>
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column label="Descricao" prop="descricao" sortable="custom" align="center" width="350">
           <template slot-scope="scope">
             <span>{{ scope.row.descricao | capitalize }}</span>
@@ -317,8 +337,8 @@
 
         <el-table-column label="Incluir" align="center" width="100" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button size="mini" type="success" @click="addList(row.id)">
-              Incluir
+            <el-button size="mini" type="success" @click="productSet(row); produtosListFlg=false">
+              Selecionar
             </el-button>
           </template>
         </el-table-column>
@@ -332,6 +352,7 @@
 
     <!-- Clientes busca lista -->
     <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
+      <input ref="clienteBusca" placeholder="Nome" v-model="cliente.busca" class="el-input__inner" style="width: 250px; height: 33px; margin-bottom:10px;" @keyup.enter="getCliente({nome: cliente.busca})">
       <el-table :data="clientesList" border fit highlight-current-row style="width: 100%">
         <el-table-column label="Código" prop="id" sortable="custom" align="center" width="100">
           <template slot-scope="scope">
@@ -392,11 +413,10 @@ export default {
       if (typeof value !== "number") {
           return value;
       }
-      var formatter = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 0
-      });
+      var formatter = new Intl.NumberFormat([], {
+        style: 'currency',
+        currency: 'BRL'
+      })
       return formatter.format(value);
      },
     money2(value) {
@@ -435,7 +455,12 @@ export default {
         operacao: 'abertura',
         valor: 0
       },
-      //server: (process.env.VUE_APP_BASE_API == '/dev-api') ? '/dev-api' : '/prod-api',
+      busca: {
+        produto: {
+          id: null,
+          nome: null
+        }
+      },
       msgMain: { txt: 'Caixa livre', color: 'green' },
       subtotal: 0,
       diversos: {
@@ -452,6 +477,7 @@ export default {
       clientesList: [],
       list2: [],
       dialogFormProductUpdateVisible: false,
+      item: {},
       itemAdd_qnt: '',
       itemAdd_descricao: '',
       itemAdd_pco_venda: '',
@@ -497,6 +523,8 @@ export default {
       listLoading: true,
       qnt: 1,
       listQuery: {
+        id: null,
+        descricao: null,
         page: 1,
         limit: 20,
         // importance: undefined,
@@ -746,6 +774,17 @@ export default {
 
       return sums
     },
+    productSetById() {
+      console.log(this.busca.produto.id);
+      this.item = this.produtos.find(x => parseInt(x.id) === parseInt(this.busca.produto.id))
+      console.log(this.item);
+      // itemAdd_descricao = item.descricao
+    },
+    productSet(row) {
+      this.item = this.produtos.find(x => parseInt(x.id) === parseInt(row.id))
+      // itemAdd_descricao = item.descricao
+      
+    },
     produtoIncluir(ean) {
       this.addList(ean)
       this.produtosListFlg = false
@@ -896,11 +935,12 @@ export default {
       // EAN input focus to get ready to next product EAN enter
       this.$refs.ean.focus()
     },
-    addList(id) {
+    addList() {
+      var id = this.item.id
+      console.log('id:>', id);
       
       if (id > 0){
-        // console.log('ean:',ean);
-        // this.lastEan = ean
+
         this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
         this.produtosListFlg = false
         this.listLoading = true
@@ -975,18 +1015,14 @@ export default {
         // })
       }
     },
-    searchProductByDesc(desc) {
-      // Get out empty spaces id desc
-      const descricao = desc.trim()
-      console.log('|' + descricao + '|')
-
+    searchProduct(obj) {
       // If search word have more than 2 chars execute block
-      if (descricao.length > 2) {
+      if (true) {
         this.produtosListFlg = true // Open products window
         this.listLoading = true // Open listLoading
 
-        // Search desc in databank
-        fetchList('produtos', {find: {descricao: descricao}}).then(response => {
+        // Search obj in databank
+        fetchList('produtos', {find: obj}).then(response => {
           console.log('response.data.items:', response.data.items)
           this.produtosList = response.data.items
           this.total2 = response.data.total

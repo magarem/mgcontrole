@@ -274,7 +274,7 @@ export default {
       vendaNumero: 0,
       vendaTotal: 0,
       vendaID: '',
-      // faturado: null,
+      faturado: null,
       money: {
         decimal: ',',
         thousands: '.',
@@ -344,7 +344,7 @@ export default {
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 1.5 * 0)
       })
     },
     getList_vendaItens(row) {

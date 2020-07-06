@@ -1,10 +1,8 @@
 import request from '@/utils/request'
 
-var server = "/dev-api"
-
 export function fetchList(query) {
   return request({
-    url: server + '/vendas',
+    url: '/vendas',
     method: 'get',
     params: query
   })
@@ -12,7 +10,7 @@ export function fetchList(query) {
 
 export function fetchList_vendaItens(query) {
   return request({
-    url: server + '/vendaItens',
+    url: '/vendaItens',
     method: 'get',
     params: query
   })
@@ -20,7 +18,7 @@ export function fetchList_vendaItens(query) {
 
 export function createItem(data) {
   return request({
-    url: server + '/produto',
+    url: '/produto',
     method: 'post',
     data
   })
@@ -28,7 +26,7 @@ export function createItem(data) {
 
 export function updateItem(data) {
   return request({
-    url: server + '/produto',
+    url: '/produto',
     method: 'patch',
     data
   })

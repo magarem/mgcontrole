@@ -17,18 +17,10 @@ const sqlite3 = require('sqlite3').verbose();
 
 // Load Databank
 async function db_open(name){
-  return await new sqlite3.Database(name, sqlite3.OPEN_READWRITE, (err) => {
-    if (err) return console.error(err.message);
+  return new sqlite3.Database(name, sqlite3.OPEN_READWRITE, (err) => {
+    if (err)
+      return console.error(err.message);
     console.log('Connected to the in-memory SQlite database.');
-    // db.run('CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY AUTOINCREMENT, username CHAR(15), password CHAR(15), token CHAR(20), roles CHAR(200), name CHAR(200), introduce CHAR(100), avatar CHAR(200), disabled CHAR(1))');
-    // //Create vendas table
-    // db.run('CREATE TABLE IF NOT EXISTS vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, vendaID CHAR(20), cliente int, subtotal int, desconto int, acrescimo int, total int, dinheiro int, debito int, credito int, totalpago int, troco int)');
-    // //Create vendas_itens table
-    // db.run('CREATE TABLE IF NOT EXISTS vendas_itens (id INTEGER PRIMARY KEY AUTOINCREMENT, vendaID CHAR(20), vendaItem INTEGER, ean CHAR(10), descricao CHAR(200), unidade CHAR(10), pco_venda CHAR(10), qnt INTEGER, subtotal INTEGER)');
-    // //Create fornecedor
-    // db.run('CREATE TABLE  IF NOT EXISTS "fornecedores" ("id"	INTEGER PRIMARY KEY AUTOINCREMENT, "nome"	char(50), "tipo"	char(15), "doc"	char(25), "contato"	char(30),"fone"	char(100),"fone2"	TEXT,"email"	char(100),"endereco"	TEXT,"obs"	text)');
-    //Create compras
-    //db.run('CREATE TABLE IF NOT EXISTS compras (id INTEGER PRIMARY KEY AUTOINCREMENT, fornecedor int, data char(100), tipo char(15), cnpjcpf char(25), contato char(30), fone char(100), email char(100), obs text)');
   });
 }
 
@@ -74,7 +66,7 @@ function eansearch(ean){
      });
 }
 
-const environment = '/dev-api' // '/dev-api' || '/prod-api'
+const environment = '/api' // '/dev-api' || '/prod-api'
 var sess;
 // Init app
 const app = express();
