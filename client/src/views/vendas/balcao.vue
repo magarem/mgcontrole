@@ -35,117 +35,164 @@
       <el-col :span="17">
         <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
           <el-col :span="24">
-             <!-- <span class="grid-content bg-red" justify="center" style="font-family: tahoma; font-size: 25px;" :style="{color: msgMain.color}">
-              {{ msgMain.txt }}
-             </span> -->
-             <!-- <div class="grid-content bg-red"  style="font-family: tahoma; font-size: 22px; _padding: 16px; color: white; text-align: center">
-              Cupom
-             </div> -->
-          </el-col>
-        </el-row>
-        <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
-          <el-col :span="24">
             <el-table
               :data="list"
-              border  highlight-current-row
-              stripe
-              height="255"
-              cell-style="padding:0px;"
-              header-cell-style="padding:3px;"
-              empty-text="Caixa livre"
+              border highlight-current-row stripe
+              height="255" 
+               empty-text="Caixa livre"
               style="width: 100%; font-size: 14px;">
               <el-table-column align=center label="CUPOM">
-              <el-table-column
-                align=center
-                type="index"
-                label="#"
-                width="40">
-              </el-table-column>
-              <el-table-column
-                align=center
-                prop="descricao"
-                label="Produto"
-                width="250">
-              </el-table-column>
-              <el-table-column
-                align=center
-                prop="unidade"
-                label="Unidade"
-                width="100">
-              </el-table-column>
-              <el-table-column
-                align=center
-                prop="qnt"
-                label="Quantidade">
-              </el-table-column>
-              <el-table-column
-                align=center
-                prop="pco_venda"
-                label="Preço">
-                <template slot-scope="scope">
-                  {{ scope.row.pco_venda | money }}
-                </template>
-              </el-table-column>
-
-              <el-table-column label="Sub-total"  align="center">
-                <template slot-scope="scope">
-                  {{ scope.row.subtotal | money }}
-                </template>
-              </el-table-column>
-              <el-table-column
-                align="center" label="Excluir">
-                <template slot-scope="scope">
-                  <el-button @click="handleDelete(scope.row)" type="text" size="small">Excluir</el-button>
-                </template>
-              </el-table-column>
+                <el-table-column
+                  align=center
+                  type="index"
+                  label="#"
+                  width="40"
+                  style="background-color: red;">
+                </el-table-column>
+                <el-table-column
+                  align=center
+                  prop="descricao"
+                  label="Produto"
+                  width="250">
+                </el-table-column>
+                <el-table-column
+                  align=center
+                  prop="unidade"
+                  label="Unidade"
+                  width="100">
+                </el-table-column>
+                <el-table-column
+                  align=center
+                  prop="qnt"
+                  label="Quantidade">
+                </el-table-column>
+                <el-table-column
+                  align=center
+                  prop="pco_venda"
+                  label="Preço">
+                  <template slot-scope="scope">
+                    {{ scope.row.pco_venda | money }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="Sub-total"  align="center">
+                  <template slot-scope="scope">
+                    {{ scope.row.subtotal | money }}
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  align="center" label="Excluir">
+                  <template slot-scope="scope">
+                    <el-button @click="handleDelete(scope.row)" type="text" size="small">Excluir</el-button>
+                  </template>
+                </el-table-column>
               </el-table-column>
             </el-table>
           </el-col>
         </el-row>
-
       </el-col>
       <el-col :span="7" style="background-color: #F0F8FF; height: 255px">
         <el-row type="flex" class="row-bg" _justify="center" style="padding-top: 10px;">
           <el-col :span="24" >
-              <el-button  v-waves :loading="downloadLoading" class="filter-item" type="primary" @click="clientesListFlg = true" icon=el-icon-search>
+            <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" @click="clientesListFlg = true" icon=el-icon-search>
               Cliente
-              </el-button>
-              <span v-if="cliente.nome" style="margin-right: 10px; font-size: 25px;">
-                <br>{{cliente.id}}<span v-if="cliente.id"> - </span>
-                {{ cliente.nome }}
-              </span>
-              
-            
-             <div  style="font-family: tahoma; font-size: 30px;">
-               Total: {{ totalGeral | money }}
-            </div><br>
-
+            </el-button>
+            <span v-if="cliente.nome" style="margin-right: 10px; font-size: 25px;">
+              <br>{{cliente.id}}<span v-if="cliente.id"> - </span>
+              {{ cliente.nome }}
+            </span>
+            <div  style="font-family: verdana; font-size: 25px; margin-top:10px;">
+              Itens: {{ list.length }}
+            </div>
+            <div  style="font-family: tahoma; font-size: 25px;">
+              Total: {{ totalGeral | money }}
+            </div>
+            <br>
+             <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="success" icon="el-icon-check" @click="vendaClose()">
+              Pagar
+            </el-button>
             <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="warning" icon="el-icon-cancel" @click="vendaCancel()">
               Cancelar
-            </el-button>
-            <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="success" icon="el-icon-check" @click="vendaClose()">
-              Pagar
             </el-button>
           </el-col>
         </el-row>
       </el-col>
-    </el-row >
-
+    </el-row>
     <br>
     <el-row :gutter=40 >
       <el-col :span="17">
         <el-form :inline="true" label-position="right" label-width="100px"  class="demo-form-inline">
-          <!-- <el-form-item label="Nome">
-            <input ref="clienteBusca" placeholder="Nome" v-model="cliente.busca" class="el-input__inner" style="width: 250px; height: 33px;" @keyup.enter="getCliente({nome: cliente.busca})">
-          </el-form-item> -->
-          <h4>Defina os produtos</h4>
-          <el-form-item label="Produto">
+          <h4>Produtos</h4>
+          <!-- <el-form-item label="Produto">
             <input ref="produto.id" placeholder="Código" v-model="item.id" class="el-input__inner" style="width: 80px; _height: 33px;" autofocus @keyup.enter="productSetById()" />
           </el-form-item>
           <el-button v-waves  class="filter-item" type="primary" icon="el-icon-search" @click="produtosListFlg = true">
             Procurar pelo nome
-          </el-button>
+          </el-button> -->
+
+
+
+
+
+  <!-- Products list -->
+        <!-- <input ref="nome" placeholder="Nome" v-model="listQuery.descricao" class="el-input__inner" style="width: 170px; height: 33px;" autofocus @keyup.enter="searchProduct({descricao: listQuery.descricao})" /> -->
+     
+      <el-table 
+      height="300"
+        :data="produtos.filter(data => !search || data.descricao.toLowerCase().includes(search.toLowerCase()))"
+        border fit highlight-current-row style="width: 100%">
         
+        <el-table-column label="ID" prop="ID" sortable="custom" align="center" width="80">
+          <template slot-scope="scope">
+            <span>{{ scope.row.id }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column>
+          <template slot="header" slot-scope="scope">
+              <el-input
+                v-model="search"
+                size="mini"
+                placeholder="Procurar pelo nome"/>
+            </template>
+          <el-table-column label="Descricao" prop="descricao" sortable="custom" align="center" width="350">
+            <template slot-scope="scope">
+              <span>{{ scope.row.descricao | capitalize }}</span>
+            </template>
+          </el-table-column>
+        </el-table-column>
+
+        <el-table-column label="unidade" prop="unidade" sortable="custom" align="center" width="100">
+          <template slot-scope="scope">
+            <span>{{ scope.row.unidade }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Preço" prop="pco_venda" sortable="custom" align="center" width="130">
+          <template slot-scope="scope">
+            <span>{{ scope.row.pco_venda | money }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column  align="center" width="200" class-name="small-padding fixed-width">
+ 
+               
+          <template slot-scope="{row}">
+            <el-button size="mini" type="success" @click="productSet(row); produtosListFlg=false">
+              Selecionar
+            </el-button>
+          </template>
+        </el-table-column>
+
+      </el-table>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="produtosListFlg = false">Fechar</el-button>
+      </span>
+
+
+
+
+
+          
           <!-- <br>
           <el-form-item label="Diversos">
             <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
@@ -160,18 +207,21 @@
         </el-form>
       </el-col>
       <el-col :span="7" style="padding-top: 10px; height: 350px; background-color: #FFF8DC;">
-          Produto:<br>
-          <div v-show="item.descricao">
-            <span style="font-size: 35px; _margin-left: 10px">{{ item.id }}</span><br>
-            <span style="font-size: 40px; _margin-left: 10px">{{ item.descricao }}</span><br>
-            <span style="font-size: 35px; _margin-left: 10px">{{ item.pco_venda | money }}</span><br>
-            <span style="font-size: 35px; _margin-left: 10px">{{ item.unidade }}</span><br><br>
-            Quantidade:<br>
-            <input v-model="qnt"  style="width: 125px; margin-top: 5px; font-size: 30px;" class="el-input__inner" @keyup="qnt = qnt.replace(',','.')" @keyup.enter="addList()" /><br><br>
-            <el-button v-waves  class="filter-item" type="primary" _icon="el-icon-search" @click="addList()">
-              Registra item
-            </el-button>
-          </div>
+        <!-- Produto:<br> -->
+        <div v-show="item.descricao">
+          <span style="font-size: 25px; _margin-left: 10px">{{ item.id }}</span><br>
+          <span style="font-size: 40px; _margin-left: 10px">{{ item.descricao }}</span><br>
+          <span style="font-size: 35px; _margin-left: 10px">{{ item.pco_venda | money }}</span><br>
+          <span style="font-size: 35px; _margin-left: 10px">{{ item.unidade }}</span><br><br>
+          Quantidade:<br>
+          <input ref=qnt v-model="qnt"  style="width: 125px; margin-top: 5px; font-size: 30px;" class="el-input__inner" @keyup="qnt = qnt.replace(',','.')" @keyup.enter="addList()" /><br><br>
+          <el-button v-waves  class="filter-item" type="success" _icon="el-icon-search" @click="addList()">
+            Registra item
+          </el-button>
+           <el-button v-waves  class="filter-item" type="warning" _icon="el-icon-search" @click="item = {}">
+            cancela item
+          </el-button>
+        </div>
       </el-col>
     </el-row >
     
@@ -881,6 +931,7 @@ export default {
               type: 'success',
               duration: 2000
             })
+        this.cliente = {}
       })
 
 
@@ -936,10 +987,10 @@ export default {
       this.itemAdd_subTotal = this.subtotal
 
       // Itens sum
-      this.totalItens = 0
-      for (let t = 0; t < this.list.length; t++) {
-        this.totalItens += this.list[t].qnt
-      }
+      // this.totalItens = 0
+      // for (let t = 0; t < this.list.length; t++) {
+      //   this.totalItens += this.list[t].qnt
+      // }
 
       // Total Calc
       this.totalGeral += (parseFloat(this.qnt) * parseFloat(this.diversos.valor))
@@ -964,89 +1015,67 @@ export default {
       // EAN input focus to get ready to next product EAN enter
       this.$refs.ean.focus()
     },
-    addList() {
-      var id = this.item.id
-      console.log('id:>', id);
-      
-      if (id > 0){
+    cupom_add(id) {
+      this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
+      this.produtosListFlg = false
+      var item = null
+      // Procura produto pelo ID
+      var item = this.produtos.find(x => parseInt(x.id) === parseInt(id))
+      // Caso encontre o código de barra no banco executa bloco
+      if (item) {
+        this.vendaItemId++ // add one in venda ID
+        var subtotal = (parseFloat(this.qnt) * parseFloat(item.pco_venda)) // Calc row subtotal
+        // Add in list array
+        this.itemN++
+        this.list.unshift({id: this.vendaItemId, itemN: this.itemN, id_produto: item.id, vendaID: this.vendaID, ean: item.ean||0, descricao: item.descricao, pco_venda: item.pco_venda, unidade: item.unidade, qnt: this.qnt, subtotal: subtotal})
+        this.total = 1 // Rows total
 
-        this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
-        this.produtosListFlg = false
-        this.listLoading = true
+        // this.itemAdd_ean = item.ean
+        // this.itemAdd_id = item.id
+        // this.itemAdd_qnt = item.qnt
+        // this.itemAdd_descricao = item.descricao
+        // this.itemAdd_unidade = item.unidade
+        // this.itemAdd_pco_venda = item.pco_venda
+        // this.itemAdd_subTotal = subtotal
 
-        console.log('this.produtos:', this.produtos);
-        
-
-        // Search product EAN code in produtos
-        console.log('id:', parseInt(id))
-        var item = null
-        // for (var t=0; t<this.produtos.length; t++){
-        //   console.log(parseInt(this.produtos[t].id), parseInt(id), parseInt(this.produtos[t].id) == parseInt(id));
-          
-        //   if (parseInt(this.produtos[t].id) == parseInt(id)){
-        //     console.log('!!');
-            
-        //     item = this.produtos[t] 
-        //   }
+        // Itens sum
+        // this.totalItens = this.list.length
+        // for (let t = 0; t < this.list.length; t++) {
+        //   this.totalItens += this.list[t].qnt
         // }
-        var item = this.produtos.find(x => parseInt(x.id) === parseInt(id))
-        console.log('item:', item);
-        // fetchList({ ean: ean }).then(response => {
-          // Caso encontre o código de barra no banco executa bloco
-        if (item) {
-          this.vendaItemId++ // add one in venda ID
-          // var item = response.data.items[0] // Aux var
-          // var item = produto // Aux var
-          var subtotal = (parseFloat(this.qnt) * parseFloat(item.pco_venda)) // Calc row subtotal
-          // console.log('item:', item.ean);
-          // Add in list array
-          this.itemN++
-          // this.list.unshift({ id: this.vendaItemId, itemN: this.itemN, id_produto: item.id, vendaID: this.vendaID, ean: item.ean||0, descricao: item.descricao, pco_venda: item.pco_venda, unidade: item.unidade, qnt: this.qnt, subtotal: subtotal })
-          this.list.unshift({ id: this.vendaItemId, itemN: this.itemN, id_produto: item.id, vendaID: this.vendaID, ean: item.ean||0, descricao: item.descricao, pco_venda: item.pco_venda, unidade: item.unidade, qnt: this.qnt, subtotal: subtotal })
-          this.total = 1 // Rows total
 
+        // Total Calc
+        this.totalGeral += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
 
-          this.itemAdd_ean = item.ean
-          this.itemAdd_id = item.id
-          this.itemAdd_qnt = item.qnt
-          this.itemAdd_descricao = item.descricao
-          this.itemAdd_unidade = item.unidade
-          this.itemAdd_pco_venda = item.pco_venda
-          this.itemAdd_subTotal = subtotal
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.scrollToEnd()
+        }, 0.2 * 1000)
 
-          // Itens sum
-          this.totalItens = 0
-          for (let t = 0; t < this.list.length; t++) {
-            this.totalItens += this.list[t].qnt
-          }
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
 
-          // Total Calc
-          this.totalGeral += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
-
-          // Just to simulate the time of the request
-          setTimeout(() => {
-            this.scrollToEnd()
-          }, 0.2 * 1000)
-
-          setTimeout(() => {
-            this.listLoading = false
-          }, 1.5 * 1000)
-
-          // Reset top doc values
-          this.listQuery.ean = ''
-          this.qnt = 0
-          // this.item =
-
-
-          // EAN input focus to get ready to next product EAN enter
-          this.$refs.ean.focus()
-          
-        } else {
-          // Caso não encontre o código de barra no banco pula para Incluir
-          this.handleProductCreate(ean)
-        }
-        this.item = null
-        // })
+        // Reset top doc values
+        this.listQuery.ean = ''
+        this.qnt = 0
+        // EAN input focus to get ready to next product EAN enter
+        // this.$refs.ean.focus()
+        this.item = {}
+        this.search = null
+      }
+    },
+    addList() {
+      if (this.qnt <= 0){
+        this.$notify({
+          title: 'Erro',
+          message: 'Defina a quantidade do produto',
+          type: 'warning',
+          duration: 2000
+        })
+        // this.$refs.qnt.focus()
+      }else{
+        this.cupom_add(this.item.id)
       }
     },
     searchProduct(obj) {
@@ -1191,71 +1220,6 @@ export default {
 
 
     },
-    createData() {
-      var self = this
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-
-          //Add new product in product array
-          this.vendaItemId++
-          const aux = { id: this.vendaItemId, ean: this.temp.ean, descricao: this.temp.descricao, pco_venda: this.temp.pco_venda, unidade: this.temp.unidade, qnt: this.qnt, subtotal: (parseFloat(this.qnt) * parseFloat(this.temp.pco_venda)) }
-          console.log(aux)
-          this.produtos.push(aux)
-
-          //Add new product in local storage
-          localStorage.removeItem('produtos');
-          localStorage.setItem('produtos', JSON.stringify(this.produtos));
-
-          this.$refs.ean.focus()
-          this.total = this.produtos.length
-
-          // this.totalGeral += (parseFloat(this.qnt) * parseFloat(this.temp.pco_venda))
-
-          // itens sum
-          this.totalItens = 0
-          for (let t = 0; t < this.list.length; t++) {
-            this.totalItens += this.list[t].qnt
-          }
-
-          console.log('this.totalItens:', this.totalItens)
-
-          this.itemAdd_ean = this.temp.ean
-          this.itemAdd_descricao = this.temp.descricao
-          this.itemAdd_pco_venda = this.temp.pco_venda
-
-
-
-          // Add in venda lista
-          this.addList(this.temp.ean)
-
-          // Zera campo de código
-          this.listQuery.ean = ''
-
-          this.dialogFormVisible = false
-
-
-
-          //Add new product in databank
-
-            create(this.temp).then(() => {
-              this.$notify({
-                title: 'Sucesso',
-                message: 'Produto cadastrado com sucesso',
-                type: 'success',
-                duration: 2000
-              })
-            }, function(motivo) {
-              self.$notify({
-                title: 'erro2',
-                message: motivo,
-                type: 'error',
-                duration: 2000
-              })
-            })
-
-        }
-      })
-    },
     handleProductUpdate(row) {
       console.log(row)
       this.temp2 = Object.assign({}, row) // copy obj
@@ -1351,10 +1315,10 @@ export default {
 
       this.list.splice(index, 1)
       // itens sum
-      this.totalItens = 0
-      for (let t = 0; t < this.list.length; t++) {
-        this.totalItens += this.list[t].qnt
-      }
+      // this.totalItens = 0
+      // for (let t = 0; t < this.list.length; t++) {
+      //   this.totalItens += this.list[t].qnt
+      // }
       // this.vendaItem--
     },
     handleDownload() {
