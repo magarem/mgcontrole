@@ -31,73 +31,38 @@
 </style>
 <template>
   <div class="app-container">
-    <el-row :gutter=40>
+    <el-row :gutter=20>
       <el-col :span="17">
         <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
           <el-col :span="24">
-            <el-table
-              :data="list"
-              border highlight-current-row stripe
-              height="255" 
-               empty-text="Caixa livre"
-              style="width: 100%; font-size: 14px;">
-              <el-table-column align=center label="CUPOM">
-                <el-table-column
-                  align=center
-                  type="index"
-                  label="#"
-                  width="40"
-                  style="background-color: red;">
-                </el-table-column>
-                <el-table-column
-                  align=center
-                  prop="descricao"
-                  label="Produto"
-                  width="250">
-                </el-table-column>
-                <el-table-column
-                  align=center
-                  prop="unidade"
-                  label="Unidade"
-                  width="100">
-                </el-table-column>
-                <el-table-column
-                  align=center
-                  prop="qnt"
-                  label="Quantidade">
-                </el-table-column>
-                <el-table-column
-                  align=center
-                  prop="pco_venda"
-                  label="Preço">
-                  <template slot-scope="scope">
-                    {{ scope.row.pco_venda | money }}
-                  </template>
-                </el-table-column>
-                <el-table-column label="Sub-total"  align="center">
-                  <template slot-scope="scope">
-                    {{ scope.row.subtotal | money }}
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  align="center" label="Excluir">
-                  <template slot-scope="scope">
-                    <el-button @click="handleDelete(scope.row)" type="text" size="small">Excluir</el-button>
-                  </template>
-                </el-table-column>
-              </el-table-column>
-            </el-table>
+          <el-row justify="center">
+            <el-col :span="24">
+              <div style="text-align:center; background-color: #121e33; color: white; padding: 5px;">CUPOM</div>
+            </el-col>
+          </el-row>
+          <vue-good-table
+          
+          :columns="columns_cupom"
+          :rows="list"
+         
+          theme="nocturnal" 
+          max-height="255px"
+           
+          >
+          
+          <div slot="emptystate">
+            Caixa livre
+          </div>
+          </vue-good-table>
           </el-col>
         </el-row>
       </el-col>
-      <el-col :span="7" style="background-color: #F0F8FF; height: 255px">
-        <el-row type="flex" class="row-bg" _justify="center" style="padding-top: 10px;">
+      <el-col :span="7" >
+       <el-card class="box-card" shadow="always" style="height: 270px">
+        <el-row type="flex" class="row-bg" _justify="center" _style="padding-top: 10px;">
           <el-col :span="24" >
-            <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" @click="clientesListFlg = true" icon=el-icon-search>
-              Cliente
-            </el-button>
             <span v-if="cliente.nome" style="margin-right: 10px; font-size: 25px;">
-              <br>{{cliente.id}}<span v-if="cliente.id"> - </span>
+              {{cliente.id}}<span v-if="cliente.id"> - </span>
               {{ cliente.nome }}
             </span>
             <div  style="font-family: verdana; font-size: 25px; margin-top:10px;">
@@ -107,121 +72,93 @@
               Total: {{ totalGeral | money }}
             </div>
             <br>
-             <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="success" icon="el-icon-check" @click="vendaClose()">
+            <el-row :gutter=15 type="flex" class="row-bg" _justify="center" _style="padding-top: 10px;">
+              <el-col :span="12" >
+                <el-button v-waves :loading="downloadLoading" style="_height:60px; font-size:20px; width: 100%;" class="filter-item" type="primary" @click="clientesListFlg = true" icon=el-icon-search>
+                  Cliente
+                </el-button>
+              </el-col>
+              <el-col :span="12" >
+                <el-button v-show="totalGeral>0" style="_height:60px; font-size:20px; width: 100%;" type="warning" icon="el-icon-cancel" @click="vendaCancel()">
+                  Cancelar
+                </el-button>
+               </el-col> 
+              </el-row>
+                <br>
+            <el-button v-show="totalGeral>0" style="height:60px; font-size:25px; width: 100%;" type="success" icon="el-icon-check" @click="vendaClose()">
               Pagar
-            </el-button>
-            <el-button v-show="totalGeral>0" _style="height:60px; font-size:25px;" type="warning" icon="el-icon-cancel" @click="vendaCancel()">
-              Cancelar
             </el-button>
           </el-col>
         </el-row>
+      </el-card>
       </el-col>
     </el-row>
     <br>
-    <el-row :gutter=40 >
+    <el-row :gutter=20 >
+      <!--
+
+          Products List
+
+       -->
+       
       <el-col :span="17">
-        <el-form :inline="true" label-position="right" label-width="100px"  class="demo-form-inline">
-          <h4>Produtos</h4>
-          <!-- <el-form-item label="Produto">
-            <input ref="produto.id" placeholder="Código" v-model="item.id" class="el-input__inner" style="width: 80px; _height: 33px;" autofocus @keyup.enter="productSetById()" />
-          </el-form-item>
-          <el-button v-waves  class="filter-item" type="primary" icon="el-icon-search" @click="produtosListFlg = true">
-            Procurar pelo nome
-          </el-button> -->
-
-
-
-
-
-  <!-- Products list -->
-        <!-- <input ref="nome" placeholder="Nome" v-model="listQuery.descricao" class="el-input__inner" style="width: 170px; height: 33px;" autofocus @keyup.enter="searchProduct({descricao: listQuery.descricao})" /> -->
-     
-      <el-table 
-      height="300"
-        :data="produtos.filter(data => !search || data.descricao.toLowerCase().includes(search.toLowerCase()))"
-        border fit highlight-current-row style="width: 100%">
-        
-        <el-table-column label="ID" prop="ID" sortable="custom" align="center" width="80">
-          <template slot-scope="scope">
-            <span>{{ scope.row.id }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column>
-          <template slot="header" slot-scope="scope">
-              <el-input
-                v-model="search"
-                size="mini"
-                placeholder="Procurar pelo nome"/>
-            </template>
-          <el-table-column label="Descricao" prop="descricao" sortable="custom" align="center" width="350">
-            <template slot-scope="scope">
-              <span>{{ scope.row.descricao | capitalize }}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-
-        <el-table-column label="unidade" prop="unidade" sortable="custom" align="center" width="100">
-          <template slot-scope="scope">
-            <span>{{ scope.row.unidade }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Preço" prop="pco_venda" sortable="custom" align="center" width="130">
-          <template slot-scope="scope">
-            <span>{{ scope.row.pco_venda | money }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column  align="center" width="200" class-name="small-padding fixed-width">
- 
-               
-          <template slot-scope="{row}">
-            <el-button size="mini" type="success" @click="productSet(row); produtosListFlg=false">
-              Selecionar
-            </el-button>
-          </template>
-        </el-table-column>
-
-      </el-table>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="produtosListFlg = false">Fechar</el-button>
-      </span>
-
-
-
-
-
-          
-          <!-- <br>
-          <el-form-item label="Diversos">
-            <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
-            <money ref="diversos.valor" v-model="diversos.valor" v-bind="money" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="addDiversos()"/>
-          </el-form-item> -->
-          <!-- <el-form-item>
-            <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="addDiversos()">
-              Incluir
-            </el-button>
-          </el-form-item> -->
-          <br>
-        </el-form>
+        <el-row>
+          <el-col :span="24">
+            <el-input
+              placeholder="Nome ou código do produto"
+              prefix-icon="el-icon-search"
+              ref=searchTerm v-model="searchTerm" style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A" _class="vgt-input vgt-pull-left">
+            </el-input>
+          </el-col>
+        </el-row>
+        <vue-good-table
+          :columns="columns"
+          :rows="produtos"
+          :search-options="{
+            enabled: false,
+            externalQuery: searchTerm
+          }"
+          theme="black-rhino" 
+          max-height="290px"
+          @on-row-click="productSet"
+          >
+        </vue-good-table>
+        <!-- <br>
+        <el-form-item label="Diversos">
+          <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
+          <money ref="diversos.valor" v-model="diversos.valor" v-bind="money" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="addDiversos()"/>
+        </el-form-item> -->
+        <!-- <el-form-item>
+          <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="addDiversos()">
+            Incluir
+          </el-button>
+        </el-form-item> -->
       </el-col>
-      <el-col :span="7" style="padding-top: 10px; height: 350px; background-color: #FFF8DC;">
-        <!-- Produto:<br> -->
-        <div v-show="item.descricao">
+      <el-col :span="7" style="_padding-top: 10px;  _background-color: #FFF8DC;">
+       <el-card v-show="item.descricao" class="box-card" shadow="always">
+        <div >
           <span style="font-size: 25px; _margin-left: 10px">{{ item.id }}</span><br>
           <span style="font-size: 40px; _margin-left: 10px">{{ item.descricao }}</span><br>
-          <span style="font-size: 35px; _margin-left: 10px">{{ item.pco_venda | money }}</span><br>
+          <span style="font-size: 35px; _margin-left: 10px">{{ item.pco_venda | money }}</span> /
           <span style="font-size: 35px; _margin-left: 10px">{{ item.unidade }}</span><br><br>
+         <el-row :gutter=20 >
+         <el-col :span="10">
           Quantidade:<br>
-          <input ref=qnt v-model="qnt"  style="width: 125px; margin-top: 5px; font-size: 30px;" class="el-input__inner" @keyup="qnt = qnt.replace(',','.')" @keyup.enter="addList()" /><br><br>
+          <input ref=qnt v-model="qnt"  style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner" @keyup="qnt = qnt.replace(',','.'); subtotal = qnt * item.pco_venda" @keyup.enter="addList()" /><br><br>
+         </el-col>
+         <el-col :span="14">
+          Valor:<br>
+          <money v-model="subtotal" v-bind="money" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner"  />
+         </el-col>
+          </el-row>
           <el-button v-waves  class="filter-item" type="success" _icon="el-icon-search" @click="addList()">
             Registra item
           </el-button>
            <el-button v-waves  class="filter-item" type="warning" _icon="el-icon-search" @click="item = {}">
-            cancela item
+            Cancela item
           </el-button>
         </div>
+        </el-card>
       </el-col>
     </el-row >
     
@@ -285,7 +222,7 @@
           {{ temp2.unidade }}
         </el-form-item>
         <el-form-item label="Quantidade" prop="qnt">
-          <el-input-number v-model="temp2.qnt" :min="1" :max="10" @change="temp2.subtotal = temp2.qnt * temp2.pco_venda" />
+          <input ref="qnt" v-model="temp2.qnt" :min="1" :max="10" @change="temp2.subtotal = temp2.qnt * temp2.pco_venda" />
         </el-form-item>
         <el-form-item label="subtotal" prop="total">
           {{ temp2.subtotal | money }}
@@ -472,6 +409,9 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import axios from 'axios'
 import { Money } from 'v-money'
+// import the styles
+import 'vue-good-table/dist/vue-good-table.css'
+import { VueGoodTable } from 'vue-good-table';
 // import elTableInfiniteScroll from 'el-table-infinite-scroll';
 
 async function foo(ean){
@@ -482,7 +422,7 @@ async function foo(ean){
 }
 export default {
   name: 'Balcao',
-  components: { Pagination, Money },
+  components: { Pagination, Money, VueGoodTable },
   directives: { waves },
   filters: {
 
@@ -525,6 +465,66 @@ export default {
   },
   data() {
     return {
+     searchTerm: null,
+     xx:true,
+     columns_cupom:[
+        {
+          label: 'ID',
+          field: 'id',
+        },
+        {
+          label: 'Descricao',
+          field: 'descricao',
+          type: 'string',
+        },
+        {
+          label: 'Preço ',
+          field: 'pco_venda',
+          type: 'decimal'
+          // dateInputFormat: 'yyyy-MM-dd',
+          // dateOutputFormat: 'MMM Do yy',
+        },
+        {
+          label: 'Quantidade',
+          field: 'qnt',
+          type: 'decimal'
+          // dateInputFormat: 'yyyy-MM-dd',
+          // dateOutputFormat: 'MMM Do yy',
+        },
+        {
+          label: 'Unidade',
+          field: 'unidade',
+          type: 'string',
+        },
+        {
+          label: 'Subtotal (R$)',
+          field: 'subtotal',
+          type: 'decimal'
+        }
+     ],
+     columns: [
+        {
+          label: 'ID',
+          field: 'id',
+        },
+        {
+          label: 'Descricao',
+          field: 'descricao',
+          type: 'string',
+        },
+        {
+          label: 'Preço',
+          field: 'pco_venda',
+          type: 'decimal'
+          // dateInputFormat: 'yyyy-MM-dd',
+          // dateOutputFormat: 'MMM Do yy',
+        },
+        {
+          label: 'Unidade',
+          field: 'unidade',
+          type: 'string',
+        },
+      ],
       server: '/dev-api',
       search: null,
       dialogCaixaStatus: false,
@@ -556,6 +556,7 @@ export default {
       clientesList: [],
       list2: [],
       dialogFormProductUpdateVisible: false,
+      subtotal: null,
       item: {},
       itemAdd_qnt: '',
       itemAdd_descricao: '',
@@ -677,7 +678,12 @@ export default {
     }
 
   },
+  mounted(){
+    this.vai()
+  },
   created() {
+    // this.$refs.searchTerm.focus()
+    // this.$nextTick(() => this.$refs.searchTerm.$el.focus())
     fetchList('produtos','').then(response => {
         this.produtos = response.data.items
         console.log(this.produtos);
@@ -701,6 +707,13 @@ export default {
     // }
   },
   methods: {
+    vai(){
+      this.$refs.searchTerm.focus()
+      this.searchTerm = null
+    },
+    vai2(){
+      this.$refs.qnt.focus()
+    },
     dataUpdate(){
       var self = this
       fetchList('produtos','').then(response => {
@@ -859,14 +872,21 @@ export default {
       console.log(this.item);
       // itemAdd_descricao = item.descricao
     },
-    productSet(row) {
-      this.item = this.produtos.find(x => parseInt(x.id) === parseInt(row.id))
-      // itemAdd_descricao = item.descricao
+    productSet(params) {
+      console.log(params);
       
+      this.qnt = null
+      this.subtotal = 0
+      this.item = this.produtos.find(x => parseInt(x.id) === parseInt(params.row.id))
+      this.$nextTick(() => {
+             this.vai2()
+      })
+      // itemAdd_descricao = item.descricao
     },
     produtoIncluir(ean) {
       this.addList(ean)
-      this.produtosListFlg = false
+      this.qnt = 0
+      this.vai()
     },
     clienteSet(row) {
       // this.listQuery.ean = ean
@@ -1048,13 +1068,13 @@ export default {
         this.totalGeral += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
 
         // Just to simulate the time of the request
-        setTimeout(() => {
-          this.scrollToEnd()
-        }, 0.2 * 1000)
+        // setTimeout(() => {
+        //   this.scrollToEnd()
+        // }, 0.2 * 1000)
 
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        // setTimeout(() => {
+        //   this.listLoading = false
+        // }, 1.5 * 1000)
 
         // Reset top doc values
         this.listQuery.ean = ''
@@ -1063,6 +1083,7 @@ export default {
         // this.$refs.ean.focus()
         this.item = {}
         this.search = null
+        this.vai()
       }
     },
     addList() {
@@ -1075,7 +1096,14 @@ export default {
         })
         // this.$refs.qnt.focus()
       }else{
+        this.xx = false
+        this.subtotal = (this.item.pco_venda * this.qnt)
         this.cupom_add(this.item.id)
+        // Just to simulate the time of the request
+          setTimeout(() => {
+            this.xx = true
+          }, 1.5 * 100)
+        
       }
     },
     searchProduct(obj) {
