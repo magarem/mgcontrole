@@ -1,5 +1,8 @@
 <style scoped>
   /* It is simple way to use scroll bar to table body*/
+  .box_product_selected {
+    font-size: 25px;
+  }
 
   .tableBodyScroll thead {
     background-color: #B38D4F;
@@ -35,72 +38,79 @@
       <el-col :span="17">
         <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
           <el-col :span="24">
-          <el-row justify="center">
-            <el-col :span="24">
-              <div style="text-align:center; background-color: #121e33; color: white; padding: 5px;">CUPOM</div>
-            </el-col>
-          </el-row>
-          <vue-good-table
-          
-          :columns="columns_cupom"
-          :rows="list"
-         
-          theme="nocturnal" 
-          max-height="255px"
-           
-          >
-          
-          <div slot="emptystate">
-            Caixa livre
-          </div>
-          </vue-good-table>
+            <el-row justify="center">
+              <el-col :span="24">
+                <div style="text-align:center; background-color: #121e33; color: white; padding: 5px;">CUPOM</div>
+              </el-col>
+            </el-row>
+            <el-row justify="center">
+              <el-col :span="24">
+                <vue-good-table
+                  :columns="columns_cupom"
+                  :rows="cupom.itens"  
+                  theme="nocturnal" 
+                  max-height="255px"
+                  @on-row-click="cupomRowView" >
+                  <div slot="emptystate">
+                    Caixa livre
+                  </div>
+                </vue-good-table>
+              </el-col>
+            </el-row>
           </el-col>
         </el-row>
       </el-col>
       <el-col :span="7" >
-       <el-card class="box-card" shadow="always" style="height: 270px">
-        <el-row type="flex" class="row-bg" _justify="center" _style="padding-top: 10px;">
-          <el-col :span="24" >
-            <span v-if="cliente.nome" style="margin-right: 10px; font-size: 25px;">
-              {{cliente.id}}<span v-if="cliente.id"> - </span>
-              {{ cliente.nome }}
-            </span>
-            <div  style="font-family: verdana; font-size: 25px; margin-top:10px;">
-              Itens: {{ list.length }}
-            </div>
-            <div  style="font-family: tahoma; font-size: 25px;">
-              Total: {{ totalGeral | money }}
-            </div>
-            <br>
-            <el-row :gutter=15 type="flex" class="row-bg" _justify="center" _style="padding-top: 10px;">
-              <el-col :span="12" >
-                <el-button v-waves :loading="downloadLoading" style="_height:60px; font-size:20px; width: 100%;" class="filter-item" type="primary" @click="clientesListFlg = true" icon=el-icon-search>
-                  Cliente
-                </el-button>
-              </el-col>
-              <el-col :span="12" >
-                <el-button v-show="totalGeral>0" style="_height:60px; font-size:20px; width: 100%;" type="warning" icon="el-icon-cancel" @click="vendaCancel()">
-                  Cancelar
-                </el-button>
-               </el-col> 
+        <el-card class="box-card" shadow="always" style="height: 270px">
+          <el-row type="flex" class="row-bg">
+            <el-col :span="24" >
+              <el-row :gutter=15 type="flex" class="row-bg">
+                <el-col :span="24" >
+                  <span v-if="cupom.cliente.nome" style="margin-right: 10px; font-size: 25px;">
+                    {{ cupom.cliente.id }}<span v-if="cupom.cliente.id"> - </span>
+                    {{ cupom.cliente.nome }}
+                  </span>
+                  <div style="font-family: verdana; font-size: 25px; margin-top:10px;">
+                    Itens: {{ cupom.itens.length }}
+                  </div>
+                  <div  style="font-family: tahoma; font-size: 25px;">
+                    Total: {{ cupom.subtotal | money }}
+                  </div>
+                </el-col>
               </el-row>
-                <br>
-            <el-button v-show="totalGeral>0" style="height:60px; font-size:25px; width: 100%;" type="success" icon="el-icon-check" @click="vendaClose()">
-              Pagar
-            </el-button>
-          </el-col>
-        </el-row>
-      </el-card>
+              <el-row :gutter=15 type="flex" class="row-bg" style="margin-top:15px">
+                <el-col :span="12" >
+                  <el-button v-waves 
+                    style="font-size:20px; width: 100%;" 
+                    class="filter-item" type="primary" 
+                    @click="clientesListFlg = true" 
+                    icon=el-icon-search>
+                    Cliente
+                  </el-button>
+                </el-col>
+                <el-col :span="12" >
+                  <el-button v-show="cupom.total>0" 
+                    style="font-size:20px; width: 100%;" 
+                    type="warning" icon="el-icon-cancel" 
+                    @click="vendaCancel()">
+                    Cancelar
+                  </el-button>
+                </el-col> 
+              </el-row>
+              <br>
+              <el-button v-show="cupom.total > 0" style="height:60px; font-size:25px; width: 100%;" type="success" icon="el-icon-check" @click="vendaClose()">
+                Pagar
+              </el-button>
+            </el-col>
+          </el-row>
+        </el-card>
       </el-col>
     </el-row>
     <br>
     <el-row :gutter=20 >
       <!--
-
           Products List
-
-       -->
-       
+      -->
       <el-col :span="17">
         <el-row>
           <el-col :span="24">
@@ -111,68 +121,67 @@
             </el-input>
           </el-col>
         </el-row>
-        <vue-good-table
-          :columns="columns"
-          :rows="produtos"
-          :search-options="{
-            enabled: false,
-            externalQuery: searchTerm
-          }"
-          theme="black-rhino" 
-          max-height="290px"
-          @on-row-click="productSet"
-          >
-        </vue-good-table>
-        <!-- <br>
-        <el-form-item label="Diversos">
-          <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
-          <money ref="diversos.valor" v-model="diversos.valor" v-bind="money" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="addDiversos()"/>
-        </el-form-item> -->
-        <!-- <el-form-item>
-          <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="addDiversos()">
-            Incluir
-          </el-button>
-        </el-form-item> -->
+        <el-row>
+          <el-col :span="24">
+            <vue-good-table
+              :columns="columns"
+              :rows="produtos"
+              :search-options="{
+                enabled: false,
+                externalQuery: searchTerm
+              }"
+              theme="black-rhino" 
+              max-height="290px"
+              @on-row-click="productSet"
+              >
+            </vue-good-table>
+            <!-- <br>
+            <el-form-item label="Diversos">
+              <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
+              <money ref="diversos.valor" v-model="diversos.valor" v-bind="money" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="addDiversos()"/>
+            </el-form-item> -->
+            <!-- <el-form-item>
+              <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="addDiversos()">
+                Incluir
+              </el-button>
+            </el-form-item> -->
+          </el-col>
+        </el-row>
       </el-col>
-      <el-col :span="7" style="_padding-top: 10px;  _background-color: #FFF8DC;">
-       <el-card v-show="item.descricao" class="box-card" shadow="always">
-        <div >
-          <span style="font-size: 25px; _margin-left: 10px">{{ item.id }}</span><br>
-          <span style="font-size: 40px; _margin-left: 10px">{{ item.descricao }}</span><br>
-          <span style="font-size: 35px; _margin-left: 10px">{{ item.pco_venda | money }}</span> /
-          <span style="font-size: 35px; _margin-left: 10px">{{ item.unidade }}</span><br><br>
-         <el-row :gutter=20 >
-         <el-col :span="10">
-          Quantidade:<br>
-          <input ref=qnt v-model="qnt"  style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner" @keyup="qnt = qnt.replace(',','.'); subtotal = qnt * item.pco_venda" @keyup.enter="addList()" /><br><br>
-         </el-col>
-         <el-col :span="14">
-          Valor:<br>
-          <money v-model="subtotal" v-bind="money" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner"  />
-         </el-col>
+      <el-col :span="7">
+        <el-card v-show="product_selected.id" class="box-card box_product_selected" shadow="always">
+          <el-row :gutter=20 >
+           <el-col :span="24">
+            {{ product_selected.id }}<br>
+            {{ product_selected.descricao }}<br>
+            {{ product_selected.pco_venda | money }}/{{ product_selected.unidade }}<br><br>
+             Quantidade:<br>
+             <input ref=qnt v-model="product_selected.qnt"  style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner" @keyup.enter="cupom_add()" />
+             Valor:<br>
+             <input v-model="product_selected.total" v-bind="money" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner"  />
+           </el-col>
           </el-row>
-          <el-button v-waves  class="filter-item" type="success" _icon="el-icon-search" @click="addList()">
-            Registra item
-          </el-button>
-           <el-button v-waves  class="filter-item" type="warning" _icon="el-icon-search" @click="item = {}">
-            Cancela item
-          </el-button>
-        </div>
+          <el-row :gutter=20 style="margin-top: 20px">
+            <el-col :span="24">
+              <el-button v-waves  class="filter-item" type="success" _icon="el-icon-search" @click="cupom_add">
+                Registra item
+              </el-button>
+              <el-button v-waves  class="filter-item" type="warning" _icon="el-icon-search" @click="product_selected = {}">
+                Cancela item
+              </el-button>
+            </el-col>
+          </el-row>
         </el-card>
       </el-col>
     </el-row >
-    
-    
-    
-    
-   
-    
-    <!-- /TOTAL -->
+
+
+
+
 
     <!----                                                        ----->
     <!----          Modal aux windows                             ----->
     <!----                                                        ----->
-    
     <el-dialog :visible.sync="dialogCaixaStatus" title="Posição de caixa" top="5vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
 
@@ -205,32 +214,38 @@
       </div>
     </el-dialog>
 
-
-    <!-- Change qnt of row -->
-    <el-dialog :visible.sync="dialogFormQntVisible" :title="textMap[dialogStatus]" top="5vh">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="140px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="Código" prop="ean">
-          {{ temp2.ean }}
+    <!-- CUPOM view row -->
+    <el-dialog :visible.sync="dialogFormCupomView" :title="textMap[dialogStatus]" top="5vh">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="140px" style="_width: 400px; _margin-left:50px; font-size: 18px;">
+        <el-form-item label="Código:" prop="ean">
+          <el-input v-model="temp2.id"></el-input>
         </el-form-item>
-        <el-form-item label="Descrição" prop="descricao">
-          {{ temp2.descricao }}
+        <el-form-item label="Código:" prop="ean">
+          <el-input v-model="temp2.id"></el-input>
         </el-form-item>
-        <el-form-item label="Preço" prop="preco">
-          {{ temp2.pco_venda | money }}
+        <el-form-item label="Descrição:" prop="descricao">
+          <el-input v-model="temp2.descricao"></el-input>
         </el-form-item>
-        <el-form-item label="Unidade" prop="unidade">
-          {{ temp2.unidade }}
+        <el-form-item label="Preço:" prop="preco">
+          <el-input v-model="temp2.pco_venda"></el-input>
         </el-form-item>
-        <el-form-item label="Quantidade" prop="qnt">
-          <input ref="qnt" v-model="temp2.qnt" :min="1" :max="10" @change="temp2.subtotal = temp2.qnt * temp2.pco_venda" />
+        <el-form-item label="Unidade:" prop="unidade">
+          <el-input v-model="temp2.unidade"></el-input>
         </el-form-item>
-        <el-form-item label="subtotal" prop="total">
-          {{ temp2.subtotal | money }}
+        <el-form-item label="Quantidade:" prop="qnt">
+          <el-input v-model="temp2.qnt" style="width: 100px;"></el-input>
+          <!-- <input ref="qnt" v-model="temp2.qnt" :min="1" :max="10" @change="temp2.subtotal = temp2.qnt * temp2.pco_venda" /> -->
+        </el-form-item>
+        <el-form-item label="subtotal:" prop="total">
+          <el-input v-model="temp2.subtotal"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormQntVisible = false">Cancela</el-button>
-        <el-button type="primary" @click="updateData()">Confirma</el-button>
+        <!-- <el-button @click="dialogFormQntVisible = false">Cancela</el-button> -->
+       <el-button @click="dialogFormCupomView = false">
+            Fechar
+        </el-button>
+        <el-button type="danger" @click="handleDelete(temp2)">Excluir</el-button>
       </div>
     </el-dialog>
 
@@ -243,31 +258,21 @@
               <el-col :span="24"><div class="grid-content bg-purple-dark">Venda</div></el-col>
             </el-row>
             <el-form-item label="Total">
-              <!--el-input v-model="totalGeral" v-money="money"></el-input-->
-              {{ totalGeral|money }}
+              {{ cupom.subtotal | money }}
             </el-form-item>
             <el-form-item label="Desconto">
-              <!--el-input v-model="desconto" v-money="money"></el-input-->
               <money v-model="desconto" v-bind="money" class="el-input__inner" />
             </el-form-item>
-            <!--el-form-item label="Acréscimo"-->
-              <!--el-input v-model="acrescimo" v-money="money"></el-input-->
-              <!--money v-model="acrescimo" v-bind="money" class="el-input__inner" /-->
-            <!--/el-form-item-->
             <el-form-item label="Total a pagar">
-              {{ total_a_pagar | money }}
+              {{ (cupom.subtotal - desconto) | money }}
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-row>
               <el-col :span="24"><div class="grid-content bg-purple-dark">Pagamento</div></el-col>
             </el-row>
-            <el-form-item label="">
-              <el-checkbox v-model="faturado">A faturar</el-checkbox>
-            </el-form-item>
-            <div v-if="!faturado">
+            <div>
               <el-form-item label="Dinheiro">
-                <!--el-input v-model="pago_dinheiro"></el-input-->
                 <money v-model="pago_dinheiro" v-bind="money" class="el-input__inner" />
               </el-form-item>
               <el-form-item label="Cartão de débito">
@@ -278,95 +283,33 @@
                 <!--el-input v-model="pago_credito"></el-input-->
                 <money v-model="pago_credito" v-bind="money" class="el-input__inner" />
               </el-form-item>
-              <el-form-item label="Valor pago">
-                <!--el-input v-model="valor_pago"></el-input-->
-                <money v-model="valor_pago" v-bind="money" class="el-input__inner" />
+              <el-form-item label="Faturado">
+                <money v-model="pago_faturado" v-bind="money" class="el-input__inner" />
               </el-form-item>
-
-              <el-form-item label="Troco">
-                <!--el-input v-model="pago_troco"></el-input-->
-                <money v-if="pago_troco>0" v-model="pago_troco" v-bind="money" class="el-input__inner" />
+              <!-- <el-form-item label="Falta pagar">
+                <money v-model="falta_pagar" v-bind="money" class="el-input__inner" />
+              </el-form-item> -->
+              <el-form-item label="Falta pagar" v-if="pago_falta > 0">
+                <money v-model="pago_falta" v-bind="money" class="el-input__inner" />
+              </el-form-item>
+              <el-form-item label="Troco" v-if="pago_falta <= 0">
+                <money v-model="pago_falta" v-bind="money" class="el-input__inner" />
               </el-form-item>
             </div>
           </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <p v-if="(faturado && !cliente.id)">Defina o código do cliente a ser faturado</p>
-        <el-button v-if="(faturado && cliente.id) || pago_troco>=0" type="primary" @click="vendaCloseOk(); dialogPvVisible = false">Confirma</el-button>
+        <el-button  type="primary" @click="vendaCloseOk();">Confirma</el-button>
         <el-button @click="vendaCloseFlg = false">
             Cancela
         </el-button>
       </span>
     </el-dialog>
 
-    <!-- Venda close end -->
-    <!-- <el-dialog :visible.sync="vendaCloseOkVisible" title="Venda registrada" width="30%">
-      <span>Venda registrada com sucesso!</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="vendaCloseOkEnd">Ok</el-button>
-      </span>
-    </el-dialog> -->
-
-    <!-- Products list -->
-    <el-dialog :visible.sync="produtosListFlg" title="Busca de produto" width="70%">
-        <!-- <input ref="nome" placeholder="Nome" v-model="listQuery.descricao" class="el-input__inner" style="width: 170px; height: 33px;" autofocus @keyup.enter="searchProduct({descricao: listQuery.descricao})" /> -->
-     
-      <el-table 
-        :data="produtos.filter(data => !search || data.descricao.toLowerCase().includes(search.toLowerCase()))"
-        border fit highlight-current-row style="width: 100%">
-        
-        <el-table-column label="ID" prop="ID" sortable="custom" align="center" width="80">
-          <template slot-scope="scope">
-            <span>{{ scope.row.id }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column>
-          <template slot="header" slot-scope="scope">
-              <el-input
-                v-model="search"
-                size="mini"
-                placeholder="Procurar pelo nome"/>
-            </template>
-          <el-table-column label="Descricao" prop="descricao" sortable="custom" align="center" width="350">
-            <template slot-scope="scope">
-              <span>{{ scope.row.descricao | capitalize }}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-
-        <el-table-column label="unidade" prop="unidade" sortable="custom" align="center" width="100">
-          <template slot-scope="scope">
-            <span>{{ scope.row.unidade }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Preço" prop="pco_venda" sortable="custom" align="center" width="130">
-          <template slot-scope="scope">
-            <span>{{ scope.row.pco_venda | money }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column  align="center" width="200" class-name="small-padding fixed-width">
- 
-               
-          <template slot-scope="{row}">
-            <el-button size="mini" type="success" @click="productSet(row); produtosListFlg=false">
-              Selecionar
-            </el-button>
-          </template>
-        </el-table-column>
-
-      </el-table>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="produtosListFlg = false">Fechar</el-button>
-      </span>
-    </el-dialog>
-
     <!-- Clientes busca lista -->
     <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
-      <input ref="clienteBusca" placeholder="Nome" v-model="cliente.busca" class="el-input__inner" style="width: 250px; height: 33px; margin-bottom:10px;" @keyup.enter="getCliente({nome: cliente.busca})">
+      <input ref="clienteBusca" placeholder="Nome" v-model="search.cliente" class="el-input__inner" style="width: 250px; height: 33px; margin-bottom:10px;" @keyup.enter="getCliente">
       <el-table :data="clientesList" border fit highlight-current-row style="width: 100%">
         <el-table-column label="Código" prop="id" sortable="custom" align="center" width="100">
           <template slot-scope="scope">
@@ -396,8 +339,6 @@
       </span>
     </el-dialog>
 
-    <!-- /Modal aux windows -->
-
   </div>
 </template>
 
@@ -413,6 +354,8 @@ import { Money } from 'v-money'
 import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table';
 // import elTableInfiniteScroll from 'el-table-infinite-scroll';
+import { ModelSelect } from 'vue-search-select'
+import 'vue-search-select/dist/VueSearchSelect.css'
 
 async function foo(ean){
     var data = await fetch(process.env.VUE_APP_BASE_API + '/eansearch?ean='+ean); // notice the await
@@ -422,7 +365,7 @@ async function foo(ean){
 }
 export default {
   name: 'Balcao',
-  components: { Pagination, Money, VueGoodTable },
+  components: { Pagination, Money, VueGoodTable, ModelSelect },
   directives: { waves },
   filters: {
 
@@ -465,218 +408,225 @@ export default {
   },
   data() {
     return {
-     searchTerm: null,
-     xx:true,
-     columns_cupom:[
-        {
-          label: 'ID',
-          field: 'id',
+      search:{
+        cliente: null
+      },
+      cupom:{
+        cliente:{
+          id: 1,
+          nome: 'Indefinido'
         },
-        {
-          label: 'Descricao',
-          field: 'descricao',
-          type: 'string',
-        },
-        {
-          label: 'Preço ',
-          field: 'pco_venda',
-          type: 'decimal'
-          // dateInputFormat: 'yyyy-MM-dd',
-          // dateOutputFormat: 'MMM Do yy',
-        },
-        {
-          label: 'Quantidade',
-          field: 'qnt',
-          type: 'decimal'
-          // dateInputFormat: 'yyyy-MM-dd',
-          // dateOutputFormat: 'MMM Do yy',
-        },
-        {
-          label: 'Unidade',
-          field: 'unidade',
-          type: 'string',
-        },
-        {
-          label: 'Subtotal (R$)',
-          field: 'subtotal',
-          type: 'decimal'
-        }
-     ],
-     columns: [
-        {
-          label: 'ID',
-          field: 'id',
-        },
-        {
-          label: 'Descricao',
-          field: 'descricao',
-          type: 'string',
-        },
-        {
-          label: 'Preço',
-          field: 'pco_venda',
-          type: 'decimal'
-          // dateInputFormat: 'yyyy-MM-dd',
-          // dateOutputFormat: 'MMM Do yy',
-        },
-        {
-          label: 'Unidade',
-          field: 'unidade',
-          type: 'string',
-        },
+        itens:[],
+        subtotal: null,
+        desconto: null,
+        total: null
+      },
+      dialogFormCupomView: false,
+      product_selected: {
+        qnt: null
+      },
+      searchTerm: null,
+      xx: true,
+      itemx: {
+        value: '',
+        text: ''
+      },
+      columns_cupom:[
+          {
+            label: 'ID',
+            field: 'id',
+          },
+          {
+            label: 'Descricao',
+            field: 'descricao',
+            type: 'string',
+          },
+          {
+            label: 'Preço ',
+            field: 'pco_venda',
+            type: 'decimal'
+            // dateInputFormat: 'yyyy-MM-dd',
+            // dateOutputFormat: 'MMM Do yy',
+          },
+          {
+            label: 'Quantidade',
+            field: 'qnt',
+            type: 'decimal'
+            // dateInputFormat: 'yyyy-MM-dd',
+            // dateOutputFormat: 'MMM Do yy',
+          },
+          {
+            label: 'Unidade',
+            field: 'unidade',
+            type: 'string',
+          },
+          {
+            label: 'total (R$)',
+            field: 'total',
+            type: 'decimal'
+          }
       ],
-      server: '/dev-api',
-      search: null,
-      dialogCaixaStatus: false,
-      caixaStatus:{
-        data: new Date().toLocaleString("pt-BR"),
-        usuario: this.$store.getters.name,
-        operacao: 'abertura',
-        valor: 0
-      },
-      busca: {
-        produto: {
+      columns: [
+          {
+            label: 'ID',
+            field: 'id',
+          },
+          {
+            label: 'Descricao',
+            field: 'descricao',
+            type: 'string',
+          },
+          {
+            label: 'Preço',
+            field: 'pco_venda',
+            type: 'decimal'
+          },
+          {
+            label: 'Unidade',
+            field: 'unidade',
+            type: 'string',
+          },
+        ],
+        server: '/dev-api',
+        dialogCaixaStatus: false,
+        caixaStatus:{
+          data: new Date().toLocaleString("pt-BR"),
+          usuario: this.$store.getters.name,
+          operacao: 'abertura',
+          valor: 0
+        },
+        busca: {
+          produto: {
+            id: null,
+            nome: null
+          }
+        },
+        msgMain: { txt: 'Caixa livre', color: 'green' },
+        subtotal: 0,
+        diversos: {
+          txt: '',
+          valor: 0
+        },
+        produtos:[],
+        cliente: {
           id: null,
-          nome: null
-        }
-      },
-      msgMain: { txt: 'Caixa livre', color: 'green' },
-      subtotal: 0,
-      diversos: {
-        txt: '',
-        valor: 0
-      },
-      produtos:[],
-      cliente: {
-        id: null,
-        nome: null,
-        busca: null
-      },
-      clienteBusca: '',
-      clientesList: [],
-      list2: [],
-      dialogFormProductUpdateVisible: false,
-      subtotal: null,
-      item: {},
-      itemAdd_qnt: '',
-      itemAdd_descricao: '',
-      itemAdd_pco_venda: '',
-      itemAdd_subTotal: '',
-      itemN: 0,
-      itemAdd_ean: '',
-      vendaItemId: 0,
-      totalItens: 0,
-      money: {
-        decimal: ',',
-        thousands: '.',
-        prefix: 'R$ ',
-        precision: 2,
-        masked: false /* doesn't work with directive */
-      },
-      form: {},
-      lastEan: null,
-      faturado: false,
-      valor_pago: 0,
-      pago_troco: 0,
-      pago_dinheiro: 0,
-      pago_debito: 0,
-      pago_credito: 0,
-      total_a_pagar: 0,
-      desconto: 0,
-      acrescimo: 0,
-      pago_falta: 0,
-      vendaID: Math.random().toString(36).substring(2, 9) + Math.random().toString(36).substring(2, 6),
-      vendaItem: 0,
-      produtosListFlg: false,
-      vendaCloseFlg: false,
-      clientesListFlg: false,
-      dialogFormQntVisible: false,
-      dialogFormVisible: false,
-      produtosListVisible: false,
-      vendaCloseOkVisible: false,
-      tableKey: 0,
-      list: [],
-      vendasStack: [],
-      produtosList: [],
-      total: 0,
-      totalGeral: 0,
-      listLoading: true,
-      qnt: 1,
-      listQuery: {
-        id: null,
-        descricao: null,
-        page: 1,
-        limit: 20,
-        // importance: undefined,
-        // title: undefined,
-        // type: undefined,
-        sort: '+id'
-      },
-      // importanceOptions: [1, 2, 3],
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
-      temp: {
-        id: 0,
-        ean: ''
-      },
-      temp2: {
-        id: 0
-      },
-      dialogStatus: '',
-      textMap: {
-        update: 'Editar',
-        create: 'Incluir'
-      },
-      dialogPvVisible: false,
-      pvData: [],
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false
-    }
+          nome: null,
+          busca: null
+        },
+        clienteBusca: '',
+        clientesList: [],
+        list2: [],
+        dialogFormProductUpdateVisible: false,
+        subtotal: null,
+        item: {},
+        itemAdd_qnt: '',
+        itemAdd_descricao: '',
+        itemAdd_pco_venda: '',
+        itemAdd_subTotal: '',
+        itemN: 0,
+        itemAdd_ean: '',
+        vendaItemId: 0,
+        totalItens: 0,
+        money: {
+          decimal: ',',
+          thousands: '.',
+          prefix: 'R$ ',
+          precision: 2,
+          masked: false /* doesn't work with directive */
+        },
+        form: {},
+        lastEan: null,
+        faturado: false,
+        valor_pago: 0,
+        pago_troco: 0,
+        pago_dinheiro: 0,
+        pago_debito: 0,
+        pago_credito: 0,
+        pago_faturado: 0,
+        pago_falta: 0,
+        total_a_pagar: 0,
+        desconto: 0,
+        acrescimo: 0,
+        pago_falta: 0,
+        // vendaID: Math.random().toString(36).substring(2, 9) + Math.random().toString(36).substring(2, 6),
+        vendaItem: 0,
+        produtosListFlg: false,
+        vendaCloseFlg: false,
+        clientesListFlg: false,
+        dialogFormQntVisible: false,
+        dialogFormVisible: false,
+        produtosListVisible: false,
+        vendaCloseOkVisible: false,
+        tableKey: 0,
+        list: [],
+        vendasStack: [],
+        produtosList: [],
+        total: 0,
+        totalGeral: 0,
+        listLoading: true,
+        qnt: null,
+        listQuery: {
+          id: null,
+          descricao: null,
+          page: 1,
+          limit: 20,
+          // importance: undefined,
+          // title: undefined,
+          // type: undefined,
+          sort: '+id'
+        },
+        // importanceOptions: [1, 2, 3],
+        sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
+        statusOptions: ['published', 'draft', 'deleted'],
+        showReviewer: false,
+        temp: {
+          id: 0,
+          ean: ''
+        },
+        temp2: {
+          id: 0
+        },
+        dialogStatus: '',
+        textMap: {
+          update: 'Editar',
+          create: 'Incluir'
+        },
+        dialogPvVisible: false,
+        pvData: [],
+        rules: {
+          type: [{ required: true, message: 'type is required', trigger: 'change' }],
+          timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+          title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        },
+        downloadLoading: false
+      }
   },
   watch: {
-    // sempre que a pergunta mudar, essa função será executada
     desconto: function() {
-      this.total_a_pagar = this.totalGeral - this.desconto + parseFloat(this.acrescimo)
-      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito))
-      this.pago_troco = this.valor_pago - this.total_a_pagar
-      // this.answer = 'Esperando você parar de escrever...'
-      // this.debouncedGetAnswer()
-    },
-    acrescimo: function() {
-      this.total_a_pagar = this.totalGeral - this.desconto + parseFloat(this.acrescimo)
-      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito))
-      this.pago_troco = this.valor_pago - this.total_a_pagar
-      // this.answer = 'Esperando você parar de escrever...'
-      // this.debouncedGetAnswer()
+      this.cupom.total = this.cupom.total - this.desconto 
+      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
+      this.pago_falta = this.cupom.total - this.valor_pago 
     },
     pago_dinheiro: function() {
-      this.total_a_pagar = this.totalGeral - this.desconto + parseFloat(this.acrescimo)
-      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito))
-      this.pago_troco = this.valor_pago - this.total_a_pagar
-      this.pago_falta = this.total_a_pagar - this.pago_falta
-      // this.answer = 'Esperando você parar de escrever...'
-      // this.debouncedGetAnswer()
+      // this.cupom.total = this.cupom.total - this.desconto 
+      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
+      this.pago_falta = this.cupom.total - this.valor_pago
     },
     pago_debito: function() {
-      this.total_a_pagar = this.totalGeral - this.desconto + parseFloat(this.acrescimo)
-      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito))
-      this.pago_troco = this.valor_pago - this.total_a_pagar
-      // this.answer = 'Esperando você parar de escrever...'
-      // this.debouncedGetAnswer()
+      // this.cupom.total = this.cupom.total - this.desconto 
+      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
+      this.pago_falta = this.cupom.total - this.valor_pago
     },
     pago_credito: function() {
-      this.total_a_pagar = this.totalGeral - this.desconto + parseFloat(this.acrescimo)
-      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito))
-      this.pago_troco = this.valor_pago - this.total_a_pagar
-      // this.answer = 'Esperando você parar de escrever...'
-      // this.debouncedGetAnswer()
+      // this.cupom.total = this.cupom.total - this.desconto 
+      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito)  + parseFloat(this.pago_faturado))
+      this.pago_falta = this.cupom.total - this.valor_pago
+    },
+    pago_faturado: function() {
+      // this.cupom.total = this.cupom.total - this.desconto 
+      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito)  + parseFloat(this.pago_faturado))
+      this.pago_falta = this.cupom.total - this.valor_pago
     }
-
   },
   mounted(){
     this.vai()
@@ -707,8 +657,14 @@ export default {
     // }
   },
   methods: {
+    cupomRowView(params) {
+      this.dialogFormCupomView = true
+      this.temp2 = params.row
+      console.log('params:', params);
+    },
     vai(){
       this.$refs.searchTerm.focus()
+      // this.$refs.searchTerm.$refs.input
       this.searchTerm = null
     },
     vai2(){
@@ -866,22 +822,16 @@ export default {
 
       return sums
     },
-    productSetById() {
-      console.log(this.busca.produto.id);
-      this.item = this.produtos.find(x => parseInt(x.id) === parseInt(this.busca.produto.id))
-      console.log(this.item);
-      // itemAdd_descricao = item.descricao
-    },
     productSet(params) {
       console.log(params);
-      
-      this.qnt = null
-      this.subtotal = 0
-      this.item = this.produtos.find(x => parseInt(x.id) === parseInt(params.row.id))
+      // this.item = this.produtos.find(x => parseInt(x.id) === parseInt(params.row.id))
+      this.product_selected = params.row
+      this.product_selected.qnt = null
+      this.product_selected.total = null
+      console.log('this.product_selected:', this.product_selected);
       this.$nextTick(() => {
-             this.vai2()
+            this.vai2()
       })
-      // itemAdd_descricao = item.descricao
     },
     produtoIncluir(ean) {
       this.addList(ean)
@@ -890,95 +840,87 @@ export default {
     },
     clienteSet(row) {
       // this.listQuery.ean = ean
-      console.log('cliente id:', row.id)
-      this.cliente.id = row.id
-      this.cliente.nome = row.nome
+      console.log('row:', row)
+      this.cupom.cliente.id = row.id
+      this.cupom.cliente.nome = row.nome
       this.clientesListFlg = false
       this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
-      this.$refs.ean.focus()
+      // this.$refs.ean.focus()
     },
     vendaClose() {
-      this.totalGeral = 0
-      this.faturado = 0
-      // Totaliza
-      for (const v of this.list) {
-        this.totalGeral += v.subtotal
-      }
+      // this.total = 0
+      // // Totaliza
+      // for (const v of this.cupom.itens) {
+      //   this.total += v.total
+      // }
 
-      this.total_a_pagar = this.totalGeral
+      // this.total_a_pagar = this.totalGeral
 
-      // clean up form
+      // clean up Venda Close form
       this.desconto = 0
-      this.acrescimo = 0
       this.pago_dinheiro = 0
       this.pago_credito = 0
-      this.totalpago = 0
-      this.pago_troco = 0 - this.total_a_pagar
+      this.pago_faturado = 0
+      this.pago_troco = 0
       this.vendaCloseFlg = true
     },
     vendaCloseOk() {
-      var self = this
-      this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito
-      const b = { 
-        vendaID: this.vendaID, 
-        cliente: this.cliente.id, 
-        subtotal: this.totalGeral, 
+      console.log("this.cupom", this.cupom);
+      this.cupom.total = this.cupom.subtotal - this.desconto
+      this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito + this.pago_faturado
+      // this.falta_pagar = this.cupom.total - this.totalpago
+      const auxObj = { 
+        cliente: this.cupom.cliente.id, 
+        subtotal: this.cupom.subtotal, 
         desconto: this.desconto, 
-        acrescimo: this.acrescimo, 
-        total: this.total, 
-        faturado: this.faturado, 
+        total: this.cupom.total, 
         dinheiro: this.pago_dinheiro, 
         debito: this.pago_debito, 
         credito: this.pago_credito, 
-        totalpago: this.totalpago, 
+        faturado: this.pago_faturado, 
         troco: this.pago_troco, 
-        itens: this.list }
-      console.log('b>>', b)
-      const json = JSON.stringify(b)
-      console.log(':::>>', json)
+        itens: this.cupom.itens }
+      console.log('auxObj>>', auxObj)
+      const auxJson = JSON.stringify(auxObj)
 
       // Try save operation in server
-
-      const post_data = { json_data: json }
-      // axios.post(self.server+'/vendaClose', post_data)
-
-      vendaClose(post_data).then((ret) => {
-        // this.temp.id = response.data
+      vendaClose({ json_data: auxJson }).then((ret) => {
         console.log('response:', ret) 
-        this.$notify({
-              title: 'Sucesso',
-              message: 'Venda registrada com sucesso!',
-              type: 'success',
-              duration: 2000
-            })
-        this.cliente = {}
+        this.cupom = {
+          cliente:{
+            id: 1,
+            nome: 'Indefinido'
+          },
+          itens: [],
+          subtotal: 0,
+          total: 0
+        }
+       this.$notify({
+          title: 'Sucesso',
+          message: 'Venda registrada com sucesso!',
+          type: 'success',
+          duration: 2000
+        })
+        
       })
 
-
       // Reset venda
-      this.vendaID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-      this.total_a_pagar = 0
-      this.totalGeral = 0
+      // this.vendaID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+      // this.cupom = {}
 
-      // clean up form
+      // Clean up form
       this.desconto = 0
       this.acrescimo = 0
       this.pago_dinheiro = 0
       this.pago_debito = 0
       this.pago_credito = 0
-      this.pago_troco = 0 - this.total_a_pagar
-      this.list = []
+      this.pago_faturado = 0
+      this.pago_troco = 0
 
-      this.listQuery.ean = ''
-      this.listQuery.descricao = ''
-
-      this.itemAdd_descricao = ''
-      this.itemAdd_pco_venda = 0
-
+      // Close modal
       this.vendaCloseFlg = false
-      this.vendaCloseOkVisible = true
-      this.vendaItem = 0
     },
+
     vendaCloseOkEnd() {
       this.totalItens = 0
       this.msgMain = { txt: 'Caixa Livre', color: 'green' }
@@ -1035,54 +977,34 @@ export default {
       // EAN input focus to get ready to next product EAN enter
       this.$refs.ean.focus()
     },
-    cupom_add(id) {
+    cupom_add() {
       this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
-      this.produtosListFlg = false
-      var item = null
+      this.product_selected.qnt = this.product_selected.qnt.replace(',','.')
       // Procura produto pelo ID
-      var item = this.produtos.find(x => parseInt(x.id) === parseInt(id))
+      // var item = this.produtos.find(x => parseInt(x.id) === parseInt(id))
       // Caso encontre o código de barra no banco executa bloco
-      if (item) {
-        this.vendaItemId++ // add one in venda ID
-        var subtotal = (parseFloat(this.qnt) * parseFloat(item.pco_venda)) // Calc row subtotal
-        // Add in list array
-        this.itemN++
-        this.list.unshift({id: this.vendaItemId, itemN: this.itemN, id_produto: item.id, vendaID: this.vendaID, ean: item.ean||0, descricao: item.descricao, pco_venda: item.pco_venda, unidade: item.unidade, qnt: this.qnt, subtotal: subtotal})
-        this.total = 1 // Rows total
+      if (this.product_selected.id) {
+       var auxObj = {
+          id: this.product_selected.id,
+          descricao: this.product_selected.descricao,
+          pco_venda: this.product_selected.pco_venda,
+          qnt: this.product_selected.qnt,
+          unidade: this.product_selected.unidade,
+          total: this.product_selected.qnt * this.product_selected.pco_venda
+        }
 
-        // this.itemAdd_ean = item.ean
-        // this.itemAdd_id = item.id
-        // this.itemAdd_qnt = item.qnt
-        // this.itemAdd_descricao = item.descricao
-        // this.itemAdd_unidade = item.unidade
-        // this.itemAdd_pco_venda = item.pco_venda
-        // this.itemAdd_subTotal = subtotal
-
-        // Itens sum
-        // this.totalItens = this.list.length
-        // for (let t = 0; t < this.list.length; t++) {
-        //   this.totalItens += this.list[t].qnt
-        // }
-
+        console.log('auxObj:', auxObj);
+        
+        this.cupom.itens.unshift(auxObj)
+        // this.vendaItemId++ // add one in venda ID
+        this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
+       
         // Total Calc
-        this.totalGeral += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
+        this.cupom.total = this.cupom.subtotal //+= (parseFloat(this.qnt) * parseFloat(item.pco_venda))
 
-        // Just to simulate the time of the request
-        // setTimeout(() => {
-        //   this.scrollToEnd()
-        // }, 0.2 * 1000)
-
-        // setTimeout(() => {
-        //   this.listLoading = false
-        // }, 1.5 * 1000)
-
-        // Reset top doc values
-        this.listQuery.ean = ''
-        this.qnt = 0
-        // EAN input focus to get ready to next product EAN enter
-        // this.$refs.ean.focus()
-        this.item = {}
-        this.search = null
+        // Reset qnt
+        this.product_selected = {}
+        this.search = {}
         this.vai()
       }
     },
@@ -1139,26 +1061,18 @@ export default {
     },
     getCliente(x) {
       const self = this
-      // this.cliente.id = ""
-      // this.cliente.nome = ""
       self.clientesList = []
-      if (this.cliente.id){
-        this.cliente.nome = ""
-      }
-      if (this.cliente.nome){
-        this.cliente.id = ""
-      }
       if (1==1) {
-        this.clientesListFlg = true
-        this.listLoading = true
-        fetchList('clientes', {find: x}).then(response => {
+        // this.clientesListFlg = true
+        // this.listLoading = true
+        fetchList('clientes', {find: {nome: this.search.cliente}}).then(response => {
           console.log('response.data-->:', response.data)
           self.clientesList = response.data.items
-          this.total2 = response.data.total
+          // this.total2 = response.data.total
           // Just to simulate the time of the request
-          setTimeout(() => {
-            this.listLoading = false
-          }, 1.5 * 1000)
+          // setTimeout(() => {
+          //   this.listLoading = false
+          // }, 1.5 * 1000)
         }).catch(function(error) {
           // handle error
           console.log(error)
@@ -1338,10 +1252,11 @@ export default {
         duration: 2000
       })
       console.log(row)
-      this.totalGeral -= row.subtotal
-      const index = this.list.indexOf(row)
-
-      this.list.splice(index, 1)
+      this.cupom.subtotal  -= row.total
+      // const index = this.list.indexOf(row)
+      this.cupom.itens = this.cupom.itens.filter(item => item.id !== row.id);
+      this.dialogFormCupomView = false
+      // this.list.splice(index, 1)
       // itens sum
       // this.totalItens = 0
       // for (let t = 0; t < this.list.length; t++) {

@@ -414,24 +414,36 @@ function updateSQL_string(table, id, obj){
     // if (req.query.doc){ strWhere += " and doc like '%"+req.query.doc+"%'"}
 
     sqlStr = `SELECT count(*) as total FROM ${key} ${strWhere} ${strSort}`
-    console.log(sqlStr);
+    console.log('>>>', sqlStr);
     
     db.all(sqlStr, function(err, rows, fields) {
-       let totGeral = rows[0].total
-       console.log('totGeral:', totGeral);
-       sqlStr = `SELECT * FROM ${key} ${strWhere} ${strSort} ${strLimit}`;
-       console.log('sqlStr', sqlStr);
-       db.all(sqlStr, function(err, rows, fields) {
-       // console.log('rows.length:', rows.length);
-         jsonStr = {
-           "code": 20000,
-           "data": {
-               // "total": (rows||[]).length}
-               "total": totGeral}
-           }
-          jsonStr.data.items = rows
+      if (rows){
+        console.log('!!2')
+        let totGeral = rows[0].total
+        console.log('totGeral:', totGeral);
+        sqlStr = `SELECT * FROM ${key} ${strWhere} ${strSort} ${strLimit}`;
+        console.log('sqlStr', sqlStr);
+        db.all(sqlStr, function(err, rows, fields) {
+        // console.log('rows.length:', rows.length);
+          jsonStr = {
+            "code": 20000,
+            "data": {
+                // "total": (rows||[]).length}
+                "total": totGeral}
+            }
+            jsonStr.data.items = rows
+            res.send(jsonStr);
+        });
+      }else{
+        jsonStr = {
+          "code": 20000,
+          "data": {
+              // "total": (rows||[]).length}
+              "total": 0}
+          }
+          jsonStr.data.items = []
           res.send(jsonStr);
-       });
+      }
     })
     })
 
@@ -581,63 +593,102 @@ function updateSQL_string(table, id, obj){
   //Balcao
   app.post(environment + '/vendaClose', function (req, res) {
 
-    json_data = JSON.parse(req.body.json_data)
-
-    console.log('json_data:', json_data);
-    
-
-    // Get user token
-    let token = req.headers['x-token']
     // Get domain
+    let token = req.headers['x-token']
     let domain = token.split('.')[0]
 
+    //Get form data
+    var json_data = JSON.parse(req.body.json_data)
+    console.log('json_data:', json_data);
+    
     let data = new Date()
     console.log('--->>>./' + domain + '.db');
-    
+
+    var cliente = json_data.cliente
+    var itens = json_data.itens
+    var subtotal = json_data.subtotal 
+    var desconto =  json_data.desconto
+    var total =  json_data.total
+    var pago_dinheiro = json_data.dinheiro 
+    var pago_debito = json_data.debito 
+    var pago_credito = json_data.credito 
+    var pago_faturado = json_data.faturado
+    // var pago_troco =  json_data.pago_troco 
+
     db_open('./' + domain + '.db').then(db => {
       
-      db.run('INSERT INTO vendas (vendaID, cliente, subtotal, desconto, acrescimo, total, faturado, dinheiro, debito, credito, totalpago, troco, created) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', [json_data.vendaID, json_data.cliente, json_data.subtotal, json_data.desconto, json_data.acrescimo, json_data.total, json_data.faturado, json_data.dinheiro, json_data.debito, json_data.credito, json_data.totalpago, json_data.troco, data], function(err) {
+      // Insert Venda
+      db.run('INSERT INTO vendas (cliente, subtotal, desconto, total, created) VALUES (?,?,?,?,?)', [cliente, subtotal, desconto, total, data], function(err) {
         if (err) {
           return console.log(err.message);
         }
         // get the last insert id
+        var id_venda = this.lastID
         console.log(`${this.lastID}`);
+
+        // Insert venda_pagamento
+        db.run('INSERT INTO venda_pagamento (id_venda, dinheiro, cartao_debito, cartao_credito, faturado) VALUES (?,?,?,?,?)', [id_venda, pago_dinheiro, pago_debito, pago_credito, pago_faturado], function(err) {
+          if (err) {
+            return console.log(err.message);
+          }
+          // get the last insert id
+          console.log(`venda_pagamento lastID >>${this.lastID}`);
+        });
+
+        var sql_insert_values_array = []
+        for (var i = 0; i < itens.length; i++) {
+          id_venda = id_venda 
+          produto = itens[i].id 
+          valor = itens[i].pco_venda
+          qnt = itens[i].qnt
+          sql_insert_values_array.push(`(${id_venda}, ${produto}, ${valor}, ${qnt})`)
+          console.log(sql_insert_values_array[i]);
+        }
+
+        sql_insert_values_str = sql_insert_values_array.join(',')
+        console.log('sql_insert_values_str:', sql_insert_values_str);
+
+        let sql = 'INSERT INTO venda_itens (id_venda, produto, valor, qnt) VALUES ' + sql_insert_values_str;
+        
+        console.log('sql:', sql);
+
+        db.run(sql, function(err) {
+            if (err) {
+              return console.error(err.message);
+            }
+            console.log(`Rows inserted ${this.changes}`);
+
+            jsonStr = {
+              "code": 20000,
+              "data": {
+                  "total": this.changes
+              }
+            }
+            
+            res.send(jsonStr);
+
+        });
+
       });
 
       // Lança no caixa
-      db.run('INSERT INTO caixa (data, descricao, tipo, valor) VALUES (?,?,?,?)', [data, 'Venda: ' + json_data.vendaID, '1', json_data.subtotal - json_data.desconto], function(err) {
-        if (err) {
-          return console.log(err.message);
-        }
-      });
+      // db.run('INSERT INTO caixa (data, descricao, tipo, valor) VALUES (?,?,?,?)', [data, 'Venda: ' + json_data.vendaID, '1', json_data.subtotal - json_data.desconto], function(err) {
+      //   if (err) {
+      //     return console.log(err.message);
+      //   }
+      // });
 
-      let total = 0
-      //Insert itens
-      for (var i = 0; i < json_data.itens.length; i++) {
-        console.log(json_data.itens[i].vendaID, json_data.itens[i].id, json_data.itens[i].ean, json_data.itens[i].descricao, json_data.itens[i].pco_venda, json_data.itens[i].unidade, json_data.itens[i].qnt, json_data.itens[i].subtotal);
-        db.run('INSERT INTO vendas_itens (vendaID, vendaItem, ean, descricao, pco_venda, unidade, qnt, subtotal) VALUES (?,?,?,?,?,?,?,?)', [json_data.itens[i].vendaID, json_data.itens[i].id, json_data.itens[i].ean, json_data.itens[i].descricao, json_data.itens[i].pco_venda, json_data.itens[i].unidade, json_data.itens[i].qnt, json_data.itens[i].subtotal], function(err) {
-            if (err) {
-              return console.log(err.message);
-            }
-            // get the last insert id
-            console.log(`insert venda table success`);
-        });
-        total += json_data.itens[i].subtotal
-        // Dá baixa dos itens no estoque
-        // let sql = "UPDATE produtos SET estoque = estoque - " + parseInt(json_data.itens[i].qnt) + " WHERE ean like '%" + json_data.itens[i].ean + "%'";
-        // console.log(sql);
-        // db.run(sql);
-      }
+     
 
-      db.run('INSERT INTO caixa (data, historico, entrada, saida) VALUES (?,?,?,?)', [data, 'Venda: ' + json_data.fornecedor + ' - ' + json_data.compraID, total, 0], function(err) {
-        if (err) {
-          return console.log(err.message);
-        }
-        // get the last insert id
-        console.log(`${this.lastID}`);
-      });
+      // db.run('INSERT INTO caixa (data, historico, entrada, saida) VALUES (?,?,?,?)', [data, 'Venda: ' + json_data.fornecedor + ' - ' + json_data.compraID, total, 0], function(err) {
+      //   if (err) {
+      //     return console.log(err.message);
+      //   }
+      //   // get the last insert id
+      //   console.log(`${this.lastID}`);
+      // });
 
-      res.send({code: 20000, data: req.body.json_data});
+      
     })
   });
 
@@ -822,4 +873,4 @@ function updateSQL_string(table, id, obj){
       .contentType("text/plain")
       .end("Oops! Something went wrong!");
   };
-  app.listen(port, () => console.log('Server start on port ${port}'));
+  app.listen(port, () => console.log('Server start on port ${port}'))
