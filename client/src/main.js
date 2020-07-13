@@ -23,7 +23,7 @@ import * as filters from './filters' // global filters
 import vSelect from 'vue-select'
 
 Vue.component('v-select', vSelect)
-import 'vue-select/dist/vue-select.css';
+import 'vue-select/dist/vue-select.css'
 
 /**
  * If you don't want to use mock-server
