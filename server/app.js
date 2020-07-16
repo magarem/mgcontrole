@@ -607,27 +607,32 @@ function updateSQL_string(table, id, obj){
     var cliente = json_data.cliente
     var itens = json_data.itens
     var subtotal = json_data.subtotal 
-    var desconto =  json_data.desconto
-    var total =  json_data.total
-    var pago_dinheiro = json_data.dinheiro 
-    var pago_debito = json_data.debito 
-    var pago_credito = json_data.credito 
-    var pago_faturado = json_data.faturado
+    var desconto = json_data.desconto
+    var total = json_data.total
+    var value_dinheiro = json_data.dinheiro 
+    var value_debito = json_data.debito 
+    var value_credito = json_data.credito 
+    var value_faturado = json_data.faturado
     // var pago_troco =  json_data.pago_troco 
 
     db_open('./' + domain + '.db').then(db => {
       
+      console.log('subtotal:', subtotal);
+
+
+     
+
       // Insert Venda
-      db.run('INSERT INTO vendas (cliente, subtotal, desconto, total, created) VALUES (?,?,?,?,?)', [cliente, subtotal, desconto, total, data], function(err) {
+      db.run(`INSERT INTO vendas VALUES (null, ${cliente}, ${subtotal}, ${desconto}, null, ${total}, null)`, function(err) {
+        console.log('this.lastID:', this.lastID);
+
         if (err) {
           return console.log(err.message);
         }
-        // get the last insert id
-        var id_venda = this.lastID
-        console.log(`${this.lastID}`);
 
+        var id_venda = this.lastID
         // Insert venda_pagamento
-        db.run('INSERT INTO venda_pagamento (id_venda, dinheiro, cartao_debito, cartao_credito, faturado) VALUES (?,?,?,?,?)', [id_venda, pago_dinheiro, pago_debito, pago_credito, pago_faturado], function(err) {
+        db.run('INSERT INTO venda_pagamento (id_venda, value_dinheiro, value_debito, value_credito, value_faturado) VALUES (?,?,?,?,?)', [this.lastID, value_dinheiro, value_debito, value_credito, value_faturado], function(err) {
           if (err) {
             return console.log(err.message);
           }
@@ -635,23 +640,19 @@ function updateSQL_string(table, id, obj){
           console.log(`venda_pagamento lastID >>${this.lastID}`);
         });
 
+       
+        // Insert in Vendas itens
         var sql_insert_values_array = []
         for (var i = 0; i < itens.length; i++) {
-          id_venda = id_venda 
           produto = itens[i].id 
           valor = itens[i].pco_venda
           qnt = itens[i].qnt
           sql_insert_values_array.push(`(${id_venda}, ${produto}, ${valor}, ${qnt})`)
           console.log(sql_insert_values_array[i]);
         }
-
         sql_insert_values_str = sql_insert_values_array.join(',')
         console.log('sql_insert_values_str:', sql_insert_values_str);
-
         let sql = 'INSERT INTO venda_itens (id_venda, produto, valor, qnt) VALUES ' + sql_insert_values_str;
-        
-        console.log('sql:', sql);
-
         db.run(sql, function(err) {
             if (err) {
               return console.error(err.message);
@@ -664,31 +665,9 @@ function updateSQL_string(table, id, obj){
                   "total": this.changes
               }
             }
-            
             res.send(jsonStr);
-
         });
-
-      });
-
-      // Lança no caixa
-      // db.run('INSERT INTO caixa (data, descricao, tipo, valor) VALUES (?,?,?,?)', [data, 'Venda: ' + json_data.vendaID, '1', json_data.subtotal - json_data.desconto], function(err) {
-      //   if (err) {
-      //     return console.log(err.message);
-      //   }
-      // });
-
-     
-
-      // db.run('INSERT INTO caixa (data, historico, entrada, saida) VALUES (?,?,?,?)', [data, 'Venda: ' + json_data.fornecedor + ' - ' + json_data.compraID, total, 0], function(err) {
-      //   if (err) {
-      //     return console.log(err.message);
-      //   }
-      //   // get the last insert id
-      //   console.log(`${this.lastID}`);
-      // });
-
-      
+      });   
     })
   });
 

@@ -36,6 +36,7 @@
   <div class="app-container">
     <el-row :gutter="20">
       <el-col :span="17">
+         <!-- <el-card  class="box-card" shadow="always"> -->
         <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
           <el-col :span="24">
             <el-row justify="center">
@@ -50,8 +51,7 @@
                   :rows="cupom.itens"
                   theme="nocturnal"
                   max-height="255px"
-                  @on-row-click="cupomRowView"
-                >
+                  @on-row-click="cupomRowView">
                   <div slot="emptystate">
                     Caixa livre
                   </div>
@@ -60,15 +60,16 @@
             </el-row>
           </el-col>
         </el-row>
+        <!-- </el-card> -->
       </el-col>
       <el-col :span="7">
         <el-card class="box-card" shadow="always" style="height: 270px">
-          <el-row type="flex" class="row-bg">
-            <el-col :span="24">
+          <el-row type="flex" class="row-bg" >
+            <el-col :span="24" >
               <el-row :gutter="15" type="flex" class="row-bg">
                 <el-col :span="24">
                   <span v-if="cupom.cliente.nome" style="font-size: 25px;">
-                    <a @click="clientesListFlg = true"><b>Cliente</b></a>:<br>{{ cupom.cliente.id }}<span v-if="cupom.cliente.id"> - </span>
+                    <a @click="getCliente"><b>Cliente</b></a>:<br>{{ cupom.cliente.id }}<span v-if="cupom.cliente.id"> - </span>
                     {{ cupom.cliente.nome }}
                   </span>
                 </el-col>
@@ -108,14 +109,12 @@
                     v-show="cupom.total>0"
                     style="height:60px; font-size:25px; width: 100%;"
                     type="danger"
-                    @click="vendaCancel()"
-                  >
+                    @click="vendaCancel()">
                     Cancelar
                   </el-button>
                 </el-col>
               </el-row>
               <br>
-
             </el-col>
           </el-row>
         </el-card>
@@ -127,15 +126,22 @@
           Products List
       -->
       <el-col :span="17">
+        <el-card  class="box-card" shadow="always" >
         <el-row>
           <el-col :span="24">
+            <el-row justify="center">
+              <el-col :span="24">
+                <div style="font-size: 20px; text-align:center; background-color: #4D5C7A; color: white; padding: 5px;">Produtos</div>
+              </el-col>
+            </el-row>
             <el-input
               ref="searchTerm"
               v-model="searchTerm"
               placeholder="Nome ou código do produto"
               prefix-icon="el-icon-search"
-              style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
+              style="margin: 0px; padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
               _class="vgt-input vgt-pull-left"
+              autocomplete="nope"
             />
           </el-col>
         </el-row>
@@ -149,29 +155,20 @@
                 externalQuery: searchTerm
               }"
               theme="black-rhino"
-              max-height="290px"
+              max-height="200px"
               @on-row-click="productSet"
             />
-            <!-- <br>
-            <el-form-item label="Diversos">
-              <input ref="diversos.txt" v-model="diversos.txt" placeholder="Diversos" class="el-input__inner" style="width: 100px; height: 33px;">
-              <money ref="diversos.valor" v-model="diversos.valor" v-bind="money" class="el-input__inner" style="width: 100px; height: 33px;" @keyup.enter="addDiversos()"/>
-            </el-form-item> -->
-            <!-- <el-form-item>
-              <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="addDiversos()">
-                Incluir
-              </el-button>
-            </el-form-item> -->
           </el-col>
         </el-row>
+        </el-card>
       </el-col>
       <el-col :span="7">
         <el-card v-show="product_selected.id" class="box-card box_product_selected" shadow="always">
           <el-row :gutter="20">
             <el-col :span="24">
-              {{ product_selected.id }}<br>
+              {{ product_selected.id }} - 
               {{ product_selected.descricao }}<br>
-              {{ product_selected.pco_venda | money }}/{{ product_selected.unidade }}<br>
+              <span style='font-size:40px;'>{{ product_selected.pco_venda | money }}/{{ product_selected.unidade }}</span><br>
             </el-col>
           </el-row>
           <el-row :gutter="20" style="margin-top: 10px">
@@ -183,7 +180,7 @@
 
             <el-col :span="12">
               Valor:<br>
-              <input v-model="product_selected.total" v-bind="money" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner">
+              <money v-model="product_selected.total" v-bind="money" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner" />
             </el-col>
           </el-row>
           <el-row :gutter="5" style="margin-top: 20px">
@@ -240,7 +237,7 @@
 
     <!-- Venda close -->
     <el-dialog :visible.sync="vendaCloseFlg" title="Fechamento de venda" width="60%" center top="5vh">
-      <el-form ref="form" :model="form" label-width="170px">
+      <el-form style="font-size: 20px" ref="form" :model="form" label-width="170px">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-row>
@@ -289,7 +286,7 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="vendaCloseOk();">Confirma</el-button>
+        <el-button v-if="pago_falta <= 0" type="primary" @click="vendaCloseOk();">Confirma</el-button>
         <el-button @click="vendaCloseFlg = false">
           Cancela
         </el-button>
@@ -298,36 +295,30 @@
 
     <!-- Clientes busca lista -->
     <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
-      <input ref="clienteBusca" v-model="search.cliente" placeholder="Nome" class="el-input__inner" style="width: 250px; height: 33px; margin-bottom:10px;" @keyup.enter="getCliente">
-      <el-table :data="clientesList" border fit highlight-current-row style="width: 100%">
-        <el-table-column label="Código" prop="id" sortable="custom" align="center" width="100">
-          <template slot-scope="scope">
-            <span>{{ scope.row.id }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Nome" prop="nome" sortable="custom" align="center" width="385">
-          <template slot-scope="scope">
-            <span>{{ scope.row.nome }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Documento" prop="doc" sortable="custom" align="center" width="200">
-          <template slot-scope="scope">
-            <span>{{ scope.row.doc }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Ações" align="center" width="170" class-name="small-padding fixed-width">
-          <template slot-scope="{row}">
-            <el-button size="default" type="success" @click="clienteSet(row)">
-              Selecionar
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+       <el-input
+              ref="searchClient"
+              v-model="searchTermClient"
+              placeholder="Nome"
+              prefix-icon="el-icon-search"
+              style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
+              _class="vgt-input vgt-pull-left"
+              autocomplete="nope"
+            />
+        <vue-good-table
+          :columns="columns_clientes"
+          :rows="clientesList" 
+          :search-options="{
+            enabled: false,
+            externalQuery: searchTermClient
+          }"
+          theme="black-rhino"
+          max-height="255px"
+          @on-row-click="clienteSet">
+        </vue-good-table>
       <span slot="footer" class="dialog-footer" align="center">
         <el-button type="primary" @click="clientesListFlg = false">Fechar</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
@@ -376,6 +367,18 @@ export default {
         qnt: null
       },
       searchTerm: null,
+      columns_clientes: [
+        {
+          label: 'Código',
+          field: 'id',
+          width: '100px'
+        },
+        {
+          label: 'Nome',
+          field: 'nome',
+          type: 'string'
+        }
+      ],
       columns_cupom: [
         {
           label: 'ID',
@@ -440,6 +443,8 @@ export default {
       },
       msgMain: { txt: 'Caixa livre', color: 'green' },
       produtos: [],
+      searchClient: null,
+      searchTermClient: null,
       clienteBusca: '',
       clientesList: [],
       money: {
@@ -521,25 +526,26 @@ export default {
     vai2() {
       this.$refs.qnt.focus()
     },
-    getCliente(x) {
+    vai3() {
+      this.$refs.searchClient.focus()
+    },
+    getCliente() {
       const self = this
       self.clientesList = []
-
-      fetchList('clientes', { find: { nome: this.search.cliente }}).then(response => {
-        console.log('response.data-->:', response.data)
+      fetchList('clientes', '').then(response => {
+        console.log('response.data:', response.data)
         self.clientesList = response.data.items
       }).catch(function(error) {
         console.log(error)
       })
-
-      this.$notify({
-        title: 'Procurar',
-        message: 'Digite mais de 2 dígitos',
-        type: 'warning',
-        duration: 2000
+      this.clientesListFlg = true
+      this.$nextTick(() => {
+        this.searchTermClient = null
+        this.vai3()
       })
     },
-    clienteSet(row) {
+    clienteSet(params) {
+      var row = params.row
       console.log('row:', row)
       this.cupom.cliente.id = row.id
       this.cupom.cliente.nome = row.nome
@@ -593,22 +599,26 @@ export default {
     vendaClose() {
       this.desconto = 0
       this.pago_dinheiro = 0
+      this.pago_debito = 0
       this.pago_credito = 0
       this.pago_faturado = 0
       this.pago_troco = 0
+      this.pago_falta = this.cupom.total
       this.vendaCloseFlg = true
+      
     },
     vendaCloseOk() {
       console.log('this.cupom', this.cupom)
       this.cupom.total = this.cupom.subtotal - this.desconto
       this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito + this.pago_faturado
-      // this.falta_pagar = this.cupom.total - this.totalpago
+      
+     // this.falta_pagar = this.cupom.total - this.totalpago
       const auxObj = {
         cliente: this.cupom.cliente.id,
         subtotal: this.cupom.subtotal,
         desconto: this.desconto,
         total: this.cupom.total,
-        dinheiro: this.pago_dinheiro,
+        dinheiro: this.pago_dinheiro + this.pago_falta, //pago_falta = -troco
         debito: this.pago_debito,
         credito: this.pago_credito,
         faturado: this.pago_faturado,

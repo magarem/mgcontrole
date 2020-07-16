@@ -13,6 +13,7 @@ import Layout from '@/layout'
 // import nestedRouter from './modules/nested'
 import cadastrosRouter from './modules/cadastros'
 import vendasRouter from './modules/vendas'
+import financeiroRouter from './modules/financeiro'
 
 
 /**
@@ -108,6 +109,7 @@ export const constantRoutes = [
 export const asyncRoutes = [
   cadastrosRouter,
   vendasRouter,
+  financeiroRouter,
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
