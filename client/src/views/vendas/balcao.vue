@@ -36,7 +36,7 @@
   <div class="app-container">
     <el-row :gutter="20">
       <el-col :span="17">
-         <!-- <el-card  class="box-card" shadow="always"> -->
+        <!-- <el-card  class="box-card" shadow="always"> -->
         <el-row type="flex" class="row-bg" justify="center" _style="background-color: #112940">
           <el-col :span="24">
             <el-row justify="center">
@@ -51,7 +51,8 @@
                   :rows="cupom.itens"
                   theme="nocturnal"
                   max-height="255px"
-                  @on-row-click="cupomRowView">
+                  @on-row-click="cupomRowView"
+                >
                   <div slot="emptystate">
                     Caixa livre
                   </div>
@@ -64,8 +65,8 @@
       </el-col>
       <el-col :span="7">
         <el-card class="box-card" shadow="always" style="height: 270px">
-          <el-row type="flex" class="row-bg" >
-            <el-col :span="24" >
+          <el-row type="flex" class="row-bg">
+            <el-col :span="24">
               <el-row :gutter="15" type="flex" class="row-bg">
                 <el-col :span="24">
                   <span v-if="cupom.cliente.nome" style="font-size: 25px;">
@@ -109,7 +110,8 @@
                     v-show="cupom.total>0"
                     style="height:60px; font-size:25px; width: 100%;"
                     type="danger"
-                    @click="vendaCancel()">
+                    @click="vendaCancel()"
+                  >
                     Cancelar
                   </el-button>
                 </el-col>
@@ -126,49 +128,49 @@
           Products List
       -->
       <el-col :span="17">
-        <el-card  class="box-card" shadow="always" >
-        <el-row>
-          <el-col :span="24">
-            <el-row justify="center">
-              <el-col :span="24">
-                <div style="font-size: 20px; text-align:center; background-color: #4D5C7A; color: white; padding: 5px;">Produtos</div>
-              </el-col>
-            </el-row>
-            <el-input
-              ref="searchTerm"
-              v-model="searchTerm"
-              placeholder="Nome ou código do produto"
-              prefix-icon="el-icon-search"
-              style="margin: 0px; padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
-              _class="vgt-input vgt-pull-left"
-              autocomplete="nope"
-            />
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <vue-good-table
-              :columns="columns"
-              :rows="produtos"
-              :search-options="{
-                enabled: false,
-                externalQuery: searchTerm
-              }"
-              theme="black-rhino"
-              max-height="200px"
-              @on-row-click="productSet"
-            />
-          </el-col>
-        </el-row>
+        <el-card class="box-card" shadow="always">
+          <el-row>
+            <el-col :span="24">
+              <el-row justify="center">
+                <el-col :span="24">
+                  <div style="font-size: 20px; text-align:center; background-color: #4D5C7A; color: white; padding: 5px;">Produtos</div>
+                </el-col>
+              </el-row>
+              <el-input
+                ref="searchTerm"
+                v-model="searchTerm"
+                placeholder="Nome ou código do produto"
+                prefix-icon="el-icon-search"
+                style="margin: 0px; padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
+                _class="vgt-input vgt-pull-left"
+                autocomplete="nope"
+              />
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24">
+              <vue-good-table
+                :columns="columns"
+                :rows="produtos"
+                :search-options="{
+                  enabled: false,
+                  externalQuery: searchTerm
+                }"
+                theme="black-rhino"
+                max-height="200px"
+                @on-row-click="productSet"
+              />
+            </el-col>
+          </el-row>
         </el-card>
       </el-col>
       <el-col :span="7">
         <el-card v-show="product_selected.id" class="box-card box_product_selected" shadow="always">
           <el-row :gutter="20">
             <el-col :span="24">
-              {{ product_selected.id }} - 
+              {{ product_selected.id }} -
               {{ product_selected.descricao }}<br>
-              <span style='font-size:40px;'>{{ product_selected.pco_venda | money }}/{{ product_selected.unidade }}</span><br>
+              <span style="font-size:40px;">{{ product_selected.pco_venda | money }}/{{ product_selected.unidade }}</span><br>
             </el-col>
           </el-row>
           <el-row :gutter="20" style="margin-top: 10px">
@@ -237,7 +239,7 @@
 
     <!-- Venda close -->
     <el-dialog :visible.sync="vendaCloseFlg" title="Fechamento de venda" width="60%" center top="5vh">
-      <el-form style="font-size: 20px" ref="form" :model="form" label-width="170px">
+      <el-form ref="form" style="font-size: 20px" :model="form" label-width="170px">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-row>
@@ -295,26 +297,26 @@
 
     <!-- Clientes busca lista -->
     <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
-       <el-input
-              ref="searchClient"
-              v-model="searchTermClient"
-              placeholder="Nome"
-              prefix-icon="el-icon-search"
-              style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
-              _class="vgt-input vgt-pull-left"
-              autocomplete="nope"
-            />
-        <vue-good-table
-          :columns="columns_clientes"
-          :rows="clientesList" 
-          :search-options="{
-            enabled: false,
-            externalQuery: searchTermClient
-          }"
-          theme="black-rhino"
-          max-height="255px"
-          @on-row-click="clienteSet">
-        </vue-good-table>
+      <el-input
+        ref="searchClient"
+        v-model="searchTermClient"
+        placeholder="Nome"
+        prefix-icon="el-icon-search"
+        style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
+        _class="vgt-input vgt-pull-left"
+        autocomplete="nope"
+      />
+      <vue-good-table
+        :columns="columns_clientes"
+        :rows="clientesList"
+        :search-options="{
+          enabled: false,
+          externalQuery: searchTermClient
+        }"
+        theme="black-rhino"
+        max-height="255px"
+        @on-row-click="clienteSet"
+      />
       <span slot="footer" class="dialog-footer" align="center">
         <el-button type="primary" @click="clientesListFlg = false">Fechar</el-button>
       </span>
@@ -364,7 +366,8 @@ export default {
       },
       dialogFormCupomView: false,
       product_selected: {
-        qnt: null
+        qnt: 0,
+        total: 0
       },
       searchTerm: null,
       columns_clientes: [
@@ -480,7 +483,7 @@ export default {
   },
   watch: {
     qnt: function() {
-      this.qnt = this.qnt.replace(',', '.')
+      this.qnt = this.qnt?this.qnt.replace(',', '.'):""
       this.product_selected.qnt = this.qnt
       this.product_selected.total = this.product_selected.qnt * this.product_selected.pco_venda
     },
@@ -589,8 +592,8 @@ export default {
       console.log(params)
       // this.item = this.produtos.find(x => parseInt(x.id) === parseInt(params.row.id))
       this.product_selected = params.row
-      this.product_selected.qnt = null
-      this.product_selected.total = null
+      this.product_selected.qnt = 0.0
+      this.product_selected.total = 0
       console.log('this.product_selected:', this.product_selected)
       this.$nextTick(() => {
         this.vai2()
@@ -605,20 +608,19 @@ export default {
       this.pago_troco = 0
       this.pago_falta = this.cupom.total
       this.vendaCloseFlg = true
-      
     },
     vendaCloseOk() {
       console.log('this.cupom', this.cupom)
       this.cupom.total = this.cupom.subtotal - this.desconto
       this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito + this.pago_faturado
-      
-     // this.falta_pagar = this.cupom.total - this.totalpago
+
+      // this.falta_pagar = this.cupom.total - this.totalpago
       const auxObj = {
         cliente: this.cupom.cliente.id,
         subtotal: this.cupom.subtotal,
         desconto: this.desconto,
         total: this.cupom.total,
-        dinheiro: this.pago_dinheiro + this.pago_falta, //pago_falta = -troco
+        dinheiro: this.pago_dinheiro + this.pago_falta, // pago_falta = -troco
         debito: this.pago_debito,
         credito: this.pago_credito,
         faturado: this.pago_faturado,

@@ -13,10 +13,16 @@ const financeiroRouter = {
   },
   children: [
     {
-      path: 'financeiro',
+      path: 'livro_caixa',
       component: () => import('@/views/financeiro/livro_caixa'),
       name: 'Livro caixa',
       meta: { title: 'Livro caixa' }
+    },
+    {
+      path: 'clientes_contas',
+      component: () => import('@/views/financeiro/clientes_contas'),
+      name: 'clientes_contas',
+      meta: { title: 'Clientes contas' }
     }
   ]
 }

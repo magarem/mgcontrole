@@ -282,8 +282,8 @@ export default {
       })
     },
     getList_vendaItens(params) {
-      console.log('params.row.id:', params.row.id);
-      
+      console.log('params.row.id:', params.row.id)
+
       // Load spin
       this.listLoading = true
 

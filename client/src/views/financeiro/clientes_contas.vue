@@ -5,16 +5,33 @@
       <el-form-item label="Cliente">
         <!-- <el-input v-model="filter.cliente"></el-input> -->
         <!-- <autocomplete ref="nameOfRef" :items=list_clients /> -->
-        <el-autocomplete
+        <!-- <el-autocomplete
           class="inline-input"
           v-model="filter.cliente"
           :fetch-suggestions="querySearch"
           placeholder="Please Input"
-          value-key = "cliente_nome"
+          value-key = "cliente"
           @select="filterHandle"
           prefix-icon="el-icon-search"
           clearable >
-        </el-autocomplete>
+        </el-autocomplete> -->
+
+        <el-autocomplete
+  popper-class="my-autocomplete"
+  v-model="state"
+  :fetch-suggestions="querySearch"
+  placeholder="Please input"
+  @select="handleSelect">
+  <i
+    class="el-icon-edit el-input__icon"
+    slot="suffix"
+    @click="handleIconClick">
+  </i>
+  <template slot-scope="{ item }">
+    <div class="value">{{ item.value }}</div>
+    <span class="link">{{ item.link }}</span>
+  </template>
+</el-autocomplete>
       </el-form-item>
      
       
@@ -24,6 +41,8 @@
           <el-option label="venda a vista em dinheiro" value="1"></el-option>
         </el-select>
       </el-form-item>
+
+      
        
       <!--el-form-item label="Activity time">
         <el-col :span="11">
@@ -56,6 +75,7 @@
       </el-form-item> -->
       <el-form-item>
         <el-button type="primary" @click="filterHandle">Filtrar</el-button>
+        <el-button type="primary" @click="dialogFormVisible=true">Incluir</el-button>
         <el-button @click="getList">Cancel</el-button>
       </el-form-item>
     </el-form>
@@ -67,7 +87,88 @@
       theme="black-rhino"
     />
 
-    {{ list_total }}
+      <el-dialog :title="textMap[dialogStatus]" align="center" :visible.sync="dialogFormVisible" top="5vh" width="70%">
+      <el-form ref="dataForm" :model="temp" label-position="left" label-width="80px" style="_width: 400px; margin:0 50px 0 50px;">
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item label="Cliente" prop="nome">
+              <el-autocomplete
+                popper-class="my-autocomplete"
+                v-model="temp.cliente"
+                :fetch-suggestions="querySearch"
+                placeholder="Please input"
+                value-key = "cliente"
+                @select="handleSelect">
+                <i
+                    class="el-icon-edit el-input__icon"
+                    slot="suffix"
+                    @click="handleIconClick">
+                </i>
+                <template slot-scope="{ item }">
+                    <div class="value">{{ item.value }}</div>
+                    <span class="link">{{ item.link }}</span>
+                </template>
+                </el-autocomplete>
+              
+              
+               <el-autocomplete
+          class="inline-input"
+          v-model="temp.cliente"
+          :fetch-suggestions="querySearch"
+          placeholder="Please Input"
+          value-key = "cliente.id"
+          @select="filterHandle"
+          prefix-icon="el-icon-search"
+          clearable >
+        </el-autocomplete>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24">
+             <!-- <el-form-item label="Operação">
+                <el-select v-model="filter.id_conta" placeholder="Selecione o tipo de conta">
+                <el-option label="Crédito" value="1"></el-option>
+                <el-option label="Débito" value="-1"></el-option>
+                </el-select>
+            </el-form-item> -->
+
+            <el-form-item label="Crédito Valor" prop="fone">
+              <el-input v-model="temp.credito" />
+            </el-form-item>
+            <el-form-item label="Débito Valor" prop="fone">
+              <el-input v-model="temp.debito" />
+            </el-form-item>
+            <el-form-item label="Doc" prop="endereco">
+              <el-input v-model="temp.doc" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- <el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item label="Obs" prop="obs">
+              <el-input
+                v-model="temp.obs"
+                type="textarea"
+                :rows="3"
+                placeholder=""
+              />
+            </el-form-item>
+          </el-col>
+        </el-row> -->
+      </el-form>
+
+      <div slot="footer" class="dialog-footer" align="center">
+        <el-button @click="dialogFormVisible = false">
+          Cancela
+        </el-button>
+        <el-button type="primary" >
+          Confirma
+        </el-button>
+       
+      </div>
+    </el-dialog>
+
 
   </div>
 </template>
@@ -152,11 +253,19 @@ export default {
   },
   data() {
     return {
+        state: '',
+      dialogStatus: '',
+      temp: {},
       list_clients: [],
+      dialogFormVisible: false,
       filter:{
         cliente: null
       },
       list_total: null,
+       textMap: {
+        update: 'Edit',
+        create: 'Create'
+      },
       columns: [
         {
           label: 'ID',
@@ -166,47 +275,51 @@ export default {
         },
         {
           label: 'Data',
-          field: 'date',
+          field: 'data',
           type: 'string',
           width: '180px'
         },
         {
-          label: 'Tipo',
-          field: 'tipo',
+          label: 'cliente',
+          field: 'cliente_id',
           type: 'string',
           width: '80px'
         },
         {
-          label: 'Conta',
-          field: 'id_conta',
-          type: 'number',
-          width: '80px'
-        },
-        {
-          label: 'Conta descrição',
-          field: 'conta_desc',
+          label: 'cliente nome',
+          field: 'cliente',
           type: 'string',
-          width: '350px'
+          width: '200px'
         },
         {
           label: 'Doc',
           field: 'doc',
-          type: 'string'
+          type: 'integer',
+          width: '40px'
         },
         {
-          label: 'Value',
-          field: 'value',
-          type: 'decimal'
+          label: 'Débito',
+          field: 'debito',
+          type: 'decimal',
+          width: '80px'
         },
         {
-          label: 'Cliente/Fornecedor',
-          field: 'cliente_nome',
-          type: 'string'
+          label: 'Crédito',
+          field: 'credito',
+          type: 'decimal',
+          width: '80px'
         },
         {
-          label: 'Status',
-          field: 'status',
-          type: 'string'
+          label: 'Saldo',
+          field: 'saldo',
+          type: 'decimal',
+          width: '80px'
+        },
+        {
+          label: 'Saldo total',
+          field: 'total_parcial',
+          type: 'decimal',
+          width: '120px'
         }
       ],
       list: [],
@@ -220,7 +333,6 @@ export default {
       },
       listQuery: {
         // find: {
-        //     id_cliente_fornecedor: 54,
         //     id_conta: 4
         // }
       }
@@ -230,22 +342,17 @@ export default {
     this.getList()
   },
   methods: {
-    querySearch(queryString, cb) {
-      
-      
-      var list = this.list_clients;
-      var results = queryString ? list.filter(this.createFilter(queryString)) : list;
-      // call callback function to return suggestions
-      cb(results);
-    },
-    createFilter(queryString) {
-      console.log('queryString:', queryString);
-      return (item) => {
-        console.log('item:', item);
-        
-        return (item.cliente_nome.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-      };
-    },
+   querySearch(queryString, cb) {
+        var links = this.list_clients;
+        var results = queryString ? links.filter(this.createFilter(queryString)) : links;
+        // call callback function to return suggestion objects
+        cb(results);
+      },
+      createFilter(queryString) {
+        return (link) => {
+          return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+        };
+      },
     filterHandle(){
       console.log(this.filter.id_conta);
       this.list = this.list_original
@@ -256,15 +363,40 @@ export default {
       }
       if (this.filter.cliente){
         this.list = this.list.filter( x => 
-          x.cliente_nome == this.filter.cliente
+          x.cliente == this.filter.cliente
         );
       }else{
         this.getList()
       }
     },
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          // this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          create('financeiro_clientes_contas', this.temp).then((ret) => {
+            // this.temp.id = response.data
+            console.log('response.data:', ret.data.id)
+            this.temp.id = ret.data.id
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Sucesso',
+              message: 'Cliente cadastrado',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleSelect(){
+        console.log(this.state);
+        
+    },
+    handleIconClick(){},
     getList() {
       this.listLoading = true
-      fetchList('financeiro_livrocaixa_completo', this.listQuery).then(response => {
+      fetchList('view_financeiro_clientes_contas', this.listQuery).then(response => {
         this.list_original = response.data.items
         this.list = response.data.items
         this.total = response.data.total
@@ -275,28 +407,24 @@ export default {
 
         function getClient(item) {
           // return {cliente_nome: item.cliente_nome};
-          return item.cliente_nome
+          return {
+                value: item.cliente,
+                nome: item.nome
+                }
         }
 
-        this.list_clients = this.list.map(getClient)
-        this.list_clients = [...new Set(this.list_clients)]; 
+        // this.list_clients = this.list.map(getClient)
+        // this.list_clients = [...new Set(this.list_clients)]; 
 
-        this.list_clients = this.list_clients.map(function getClient_obj(item) {
-          return {cliente_nome: item};
+        this.list_clients = this.list.map(function getClient_obj(item) {
+          return {
+                    link: item.cliente_id,
+                    value: item.cliente + ' - ' + item.cliente_id}
+                 
         })
-        
-        // this.list_clients = [...new Map(this.list_clients.map(item => [item[key], item])).values()];
-        
-        // for (var t=0; t++; t < this.list.length){
-        //   this.list_clients = [
-        //    {value: "marcelo magalhaes"},{value: "indefinido"},{value: "corais do mar"}
-        // ]
 
-        // }
-        // this.list_clients = [
-        //   {value2: "marcelo magalhaes"},{value2: "indefinido"},{value2: "corais do mar"}
-        // ]
-
+        console.log('this.list_clients:', this.list_clients);
+        
 
         function amount(item) {
           return item.value

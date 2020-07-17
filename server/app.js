@@ -237,8 +237,6 @@ app.get(environment + '/eansearch', function (req, res, next) {
   })
 
   app.post(environment + '/user/login', function (req, res, next) {
-    
-
 
     console.log(req.headers)
 
@@ -403,7 +401,7 @@ function updateSQL_string(table, id, obj){
       if (w) strWhere += ' and ' + w
     }
 
-    let strSort = " order by id DESC"
+    let strSort = " order by id"//DESC
    
     if (req.query.sort) {
       strLimit = " limit " + ((parseInt(req.query.page) - 1) * req.query.limit) + ',' + req.query.limit

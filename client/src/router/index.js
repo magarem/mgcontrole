@@ -15,7 +15,6 @@ import cadastrosRouter from './modules/cadastros'
 import vendasRouter from './modules/vendas'
 import financeiroRouter from './modules/financeiro'
 
-
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html

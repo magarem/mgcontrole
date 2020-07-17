@@ -166,47 +166,32 @@ export default {
         },
         {
           label: 'Data',
-          field: 'date',
+          field: 'data',
           type: 'string',
           width: '180px'
         },
         {
-          label: 'Tipo',
-          field: 'tipo',
+          label: 'cliente',
+          field: 'id_cliente',
           type: 'string',
           width: '80px'
         },
         {
-          label: 'Conta',
-          field: 'id_conta',
-          type: 'number',
-          width: '80px'
-        },
-        {
-          label: 'Conta descrição',
-          field: 'conta_desc',
+          label: 'Cliente Nome',
+          field: 'cliente',
           type: 'string',
-          width: '350px'
+          width: '380px'
         },
         {
           label: 'Doc',
           field: 'doc',
-          type: 'string'
+          type: 'string',
+          width: '150px'
         },
         {
-          label: 'Value',
-          field: 'value',
+          label: 'Valor',
+          field: 'valor',
           type: 'decimal'
-        },
-        {
-          label: 'Cliente/Fornecedor',
-          field: 'cliente_nome',
-          type: 'string'
-        },
-        {
-          label: 'Status',
-          field: 'status',
-          type: 'string'
         }
       ],
       list: [],
@@ -220,7 +205,6 @@ export default {
       },
       listQuery: {
         // find: {
-        //     id_cliente_fornecedor: 54,
         //     id_conta: 4
         // }
       }
@@ -231,8 +215,6 @@ export default {
   },
   methods: {
     querySearch(queryString, cb) {
-      
-      
       var list = this.list_clients;
       var results = queryString ? list.filter(this.createFilter(queryString)) : list;
       // call callback function to return suggestions
@@ -264,7 +246,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      fetchList('financeiro_livrocaixa_completo', this.listQuery).then(response => {
+      fetchList('financeiro_clientes_contas', this.listQuery).then(response => {
         this.list_original = response.data.items
         this.list = response.data.items
         this.total = response.data.total
