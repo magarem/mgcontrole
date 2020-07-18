@@ -483,7 +483,7 @@ export default {
   },
   watch: {
     qnt: function() {
-      this.qnt = this.qnt?this.qnt.replace(',', '.'):""
+      this.qnt = this.qnt ? this.qnt.replace(',', '.') : ''
       this.product_selected.qnt = this.qnt
       this.product_selected.total = this.product_selected.qnt * this.product_selected.pco_venda
     },

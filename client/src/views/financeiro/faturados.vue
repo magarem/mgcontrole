@@ -6,25 +6,24 @@
         <!-- <el-input v-model="filter.cliente"></el-input> -->
         <!-- <autocomplete ref="nameOfRef" :items=list_clients /> -->
         <el-autocomplete
-          class="inline-input"
           v-model="filter.cliente"
+          class="inline-input"
           :fetch-suggestions="querySearch"
           placeholder="Please Input"
-          value-key = "cliente_nome"
-          @select="filterHandle"
+          value-key="cliente_nome"
           prefix-icon="el-icon-search"
-          clearable >
-        </el-autocomplete>
+          clearable
+          @select="filterHandle"
+        />
       </el-form-item>
-     
-      
+
       <el-form-item label="Conta">
         <el-select v-model="filter.id_conta" placeholder="Selecione o tipo de conta">
-          <el-option label="venda faturada" value="4"></el-option>
-          <el-option label="venda a vista em dinheiro" value="1"></el-option>
+          <el-option label="venda faturada" value="4" />
+          <el-option label="venda a vista em dinheiro" value="1" />
         </el-select>
       </el-form-item>
-       
+
       <!--el-form-item label="Activity time">
         <el-col :span="11">
           <el-date-picker type="date" placeholder="Pick a date" v-model="form.date1" style="width: 100%;"></el-date-picker>
@@ -105,7 +104,7 @@
 </style>
 
 <script>
-import { fetchList} from '@/api/generic'
+import { fetchList } from '@/api/generic'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 
@@ -153,7 +152,7 @@ export default {
   data() {
     return {
       list_clients: [],
-      filter:{
+      filter: {
         cliente: null
       },
       list_total: null,
@@ -215,32 +214,32 @@ export default {
   },
   methods: {
     querySearch(queryString, cb) {
-      var list = this.list_clients;
-      var results = queryString ? list.filter(this.createFilter(queryString)) : list;
+      var list = this.list_clients
+      var results = queryString ? list.filter(this.createFilter(queryString)) : list
       // call callback function to return suggestions
-      cb(results);
+      cb(results)
     },
     createFilter(queryString) {
-      console.log('queryString:', queryString);
+      console.log('queryString:', queryString)
       return (item) => {
-        console.log('item:', item);
-        
-        return (item.cliente_nome.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-      };
-    },
-    filterHandle(){
-      console.log(this.filter.id_conta);
-      this.list = this.list_original
-      if (this.filter.id_conta){
-        this.list = this.list.filter( x => 
-          x.id_conta == this.filter.id_conta
-        );
+        console.log('item:', item)
+
+        return (item.cliente_nome.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
       }
-      if (this.filter.cliente){
-        this.list = this.list.filter( x => 
+    },
+    filterHandle() {
+      console.log(this.filter.id_conta)
+      this.list = this.list_original
+      if (this.filter.id_conta) {
+        this.list = this.list.filter(x =>
+          x.id_conta == this.filter.id_conta
+        )
+      }
+      if (this.filter.cliente) {
+        this.list = this.list.filter(x =>
           x.cliente_nome == this.filter.cliente
-        );
-      }else{
+        )
+      } else {
         this.getList()
       }
     },
@@ -261,14 +260,14 @@ export default {
         }
 
         this.list_clients = this.list.map(getClient)
-        this.list_clients = [...new Set(this.list_clients)]; 
+        this.list_clients = [...new Set(this.list_clients)]
 
         this.list_clients = this.list_clients.map(function getClient_obj(item) {
-          return {cliente_nome: item};
+          return { cliente_nome: item }
         })
-        
+
         // this.list_clients = [...new Map(this.list_clients.map(item => [item[key], item])).values()];
-        
+
         // for (var t=0; t++; t < this.list.length){
         //   this.list_clients = [
         //    {value: "marcelo magalhaes"},{value: "indefinido"},{value: "corais do mar"}
@@ -278,7 +277,6 @@ export default {
         // this.list_clients = [
         //   {value2: "marcelo magalhaes"},{value2: "indefinido"},{value2: "corais do mar"}
         // ]
-
 
         function amount(item) {
           return item.value
