@@ -463,14 +463,15 @@ function updateSQL_string(table, id, obj){
     sql = insertSQL_string(key, req.body)
 
     db_open(`./${domain}.db`).then(db => {
+      console.log('sql:', sql);
       db.run(sql,
-               function(err) {
-                  if (err) return console.log(err.message);
-                  // get the last insert id
-                  console.log(`A row has been inserted with rowid ${this.lastID}`);
-                  jsonStr = {code: 20000, data: {id: this.lastID}}
-                  res.send(jsonStr);
-               }
+        function(err) {
+          if (err) return console.log(err.message);
+          // get the last insert id
+          console.log(`A row has been inserted with rowid ${this.lastID}`);
+          jsonStr = {code: 20000, data: {id: this.lastID}}
+          res.send(jsonStr);
+        }
       );
     })
 
@@ -589,7 +590,7 @@ function updateSQL_string(table, id, obj){
     })
   })
   //Balcao
-  app.post(environment + '/vendaClose', function (req, res) {
+  app.post(`${environment}/vendaClose`, function (req, res) {
 
     // Get domain
     let token = req.headers['x-token']
@@ -622,20 +623,33 @@ function updateSQL_string(table, id, obj){
 
       // Insert Venda
       db.run(`INSERT INTO vendas VALUES (null, ${cliente}, ${subtotal}, ${desconto}, null, ${total}, null)`, function(err) {
+      // db.run(`INSERT INTO vendas_completo VALUES (null, ${cliente}, null, ${subtotal}, ${desconto}, ${total}, null, ${value_dinheiro}, ${value_debito}, ${value_credito}, ${value_faturado})`, function(err) {
         console.log('this.lastID:', this.lastID);
 
         if (err) {
           return console.log(err.message);
         }
-
         var id_venda = this.lastID
-        // Insert venda_pagamento
-        db.run('INSERT INTO venda_pagamento (id_venda, value_dinheiro, value_debito, value_credito, value_faturado) VALUES (?,?,?,?,?)', [this.lastID, value_dinheiro, value_debito, value_credito, value_faturado], function(err) {
+
+
+        sql = `INSERT OR REPLACE INTO financeiro_operacoes
+          VALUES (null, 0, 'vendas', ${id_venda}, 'clientes', ${cliente}, ${total}, null)`
+        db.run(sql, function(err) {
           if (err) {
             return console.log(err.message);
           }
+
+          var top_id = this.lastID
+          console.log('top_id:', top_id);
           // get the last insert id
           console.log(`venda_pagamento lastID >>${this.lastID}`);
+        
+         // Insert venda_pagamento
+         venda_pg('f_pg_dinheiro', value_dinheiro, top_id, cliente, db);
+         venda_pg('f_pg_debito', value_debito, top_id, cliente, db);
+         venda_pg('f_pg_credito', value_credito, top_id, cliente, db);
+         venda_pg('f_pg_faturado', value_faturado, top_id, cliente, db);
+        
         });
 
        
@@ -650,7 +664,7 @@ function updateSQL_string(table, id, obj){
         }
         sql_insert_values_str = sql_insert_values_array.join(',')
         console.log('sql_insert_values_str:', sql_insert_values_str);
-        let sql = 'INSERT INTO venda_itens (id_venda, produto, valor, qnt) VALUES ' + sql_insert_values_str;
+        sql = 'INSERT INTO venda_itens (id_venda, produto, valor, qnt) VALUES ' + sql_insert_values_str;
         db.run(sql, function(err) {
             if (err) {
               return console.error(err.message);
@@ -851,3 +865,18 @@ function updateSQL_string(table, id, obj){
       .end("Oops! Something went wrong!");
   };
   app.listen(port, () => console.log('Server start on port ${port}'))
+
+function venda_pg(destino_tabela, value, top_id, cliente, db) {
+  if (value > 0) {
+    sql = `INSERT OR REPLACE INTO financeiro_operacoes
+          VALUES (null, ${top_id}, 'clientes', ${cliente}, '${destino_tabela}', null, '${value}', null)`;
+    db.run(sql, function (err) {
+      if (err) {
+        return console.log(err.message);
+      }
+      // get the last insert id
+      console.log(`venda_pagamento lastID >>${this.lastID}`);
+    });
+  }
+}
+
