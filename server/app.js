@@ -411,7 +411,7 @@ function updateSQL_string(table, id, obj){
     // if (req.query.nome){ strWhere += " and nome like '%"+req.query.nome+"%' or doc like '%"+req.query.nome+"%'"}
     // if (req.query.doc){ strWhere += " and doc like '%"+req.query.doc+"%'"}
 
-    sqlStr = `SELECT count(*) as total FROM ${key} ${strWhere} ${strSort}`
+    sqlStr = `SELECT count(*) as total FROM ${key} ${strWhere}`
     console.log('>>>', sqlStr);
     
     db.all(sqlStr, function(err, rows, fields) {
@@ -419,7 +419,7 @@ function updateSQL_string(table, id, obj){
         console.log('!!2')
         let totGeral = rows[0].total
         console.log('totGeral:', totGeral);
-        sqlStr = `SELECT * FROM ${key} ${strWhere} ${strSort} ${strLimit}`;
+        sqlStr = `SELECT * FROM ${key} ${strWhere} `//${strSort} ${strLimit}`;
         console.log('sqlStr', sqlStr);
         db.all(sqlStr, function(err, rows, fields) {
         // console.log('rows.length:', rows.length);
@@ -589,6 +589,7 @@ function updateSQL_string(table, id, obj){
       });
     })
   })
+
   //Balcao
   app.post(`${environment}/vendaClose`, function (req, res) {
 
@@ -599,10 +600,6 @@ function updateSQL_string(table, id, obj){
     //Get form data
     var json_data = JSON.parse(req.body.json_data)
     console.log('json_data:', json_data);
-    
-    let data = new Date()
-    console.log('--->>>./' + domain + '.db');
-
     var cliente = json_data.cliente
     var itens = json_data.itens
     var subtotal = json_data.subtotal 
@@ -612,76 +609,47 @@ function updateSQL_string(table, id, obj){
     var value_debito = json_data.debito 
     var value_credito = json_data.credito 
     var value_faturado = json_data.faturado
-    // var pago_troco =  json_data.pago_troco 
 
+    //Open database
     db_open('./' + domain + '.db').then(db => {
       
-      console.log('subtotal:', subtotal);
-
-
-     
-
-      // Insert Venda
-      db.run(`INSERT INTO vendas VALUES (null, ${cliente}, ${subtotal}, ${desconto}, null, ${total}, null)`, function(err) {
-      // db.run(`INSERT INTO vendas_completo VALUES (null, ${cliente}, null, ${subtotal}, ${desconto}, ${total}, null, ${value_dinheiro}, ${value_debito}, ${value_credito}, ${value_faturado})`, function(err) {
-        console.log('this.lastID:', this.lastID);
-
-        if (err) {
-          return console.log(err.message);
-        }
-        var id_venda = this.lastID
-
-
-        sql = `INSERT OR REPLACE INTO financeiro_operacoes
-          VALUES (null, 0, 'vendas', ${id_venda}, 'clientes', ${cliente}, ${total}, null)`
-        db.run(sql, function(err) {
-          if (err) {
-            return console.log(err.message);
+      // Register op Venda
+      register_op(null, 'vendas', null, 'usuarios', cliente, total, db)
+      .then(
+        result => {
+          console.log("Promise resolved: " + result)
+          var top_id = result
+          // Prepara obj pagamento
+          var pagamento_obj = {
+            dinheiro: value_dinheiro,
+            debito: value_debito,
+            credito: value_credito,
+            faturado: value_faturado
           }
-
-          var top_id = this.lastID
-          console.log('top_id:', top_id);
-          // get the last insert id
-          console.log(`venda_pagamento lastID >>${this.lastID}`);
-        
-         // Insert venda_pagamento
-         venda_pg('f_pg_dinheiro', value_dinheiro, top_id, cliente, db);
-         venda_pg('f_pg_debito', value_debito, top_id, cliente, db);
-         venda_pg('f_pg_credito', value_credito, top_id, cliente, db);
-         venda_pg('f_pg_faturado', value_faturado, top_id, cliente, db);
-        
-        });
-
-       
-        // Insert in Vendas itens
-        var sql_insert_values_array = []
-        for (var i = 0; i < itens.length; i++) {
-          produto = itens[i].id 
-          valor = itens[i].pco_venda
-          qnt = itens[i].qnt
-          sql_insert_values_array.push(`(${id_venda}, ${produto}, ${valor}, ${qnt})`)
-          console.log(sql_insert_values_array[i]);
-        }
-        sql_insert_values_str = sql_insert_values_array.join(',')
-        console.log('sql_insert_values_str:', sql_insert_values_str);
-        sql = 'INSERT INTO venda_itens (id_venda, produto, valor, qnt) VALUES ' + sql_insert_values_str;
-        db.run(sql, function(err) {
+          var pagamento = JSON.stringify(pagamento_obj)
+          // Insert Venda
+          db.run(`INSERT INTO vendas (id, cliente, itens, subtotal, desconto, acrescimo, total, pagamento) VALUES (${top_id}, ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}')`, function(err) {
             if (err) {
-              return console.error(err.message);
+              return console.log(err.message);
             }
-            console.log(`Rows inserted ${this.changes}`);
-
-            jsonStr = {
-              "code": 20000,
-              "data": {
-                  "total": this.changes
-              }
+          })
+          // Insert venda_pagamento
+          venda_pg('f_pg_dinheiro', value_dinheiro, top_id, cliente, db);
+          venda_pg('f_pg_debito', value_debito, top_id, cliente, db);
+          venda_pg('f_pg_credito', value_credito, top_id, cliente, db);
+          venda_pg('f_pg_faturado', value_faturado, top_id, cliente, db);
+          jsonStr = {
+            "code": 20000,
+            "data": {
+                "total": this.changes
             }
-            res.send(jsonStr);
-        });
-      });   
+          }
+          res.send(jsonStr);
+        }
+      )
     })
   });
+
 
 ///////////////////////////////
 
@@ -865,6 +833,26 @@ function updateSQL_string(table, id, obj){
       .end("Oops! Something went wrong!");
   };
   app.listen(port, () => console.log('Server start on port ${port}'))
+
+
+function register_op(pid, origem_tabela, origem_tabela_id, destino_tabela, destino_tabela_id, valor, db){
+  const promise = new Promise( (resolve, reject) => { 
+    sql = `INSERT OR REPLACE INTO financeiro_operacoes VALUES (null, ${pid}, '${origem_tabela}', '${origem_tabela_id}', '${destino_tabela}', '${destino_tabela_id}', '${valor}', null)`
+    db.run(sql, function(err) {
+      if (err) {return console.log(err.message);}
+      var id_op = this.lastID
+      resolve(id_op)
+    });
+    
+  });
+  return promise;
+}
+
+
+
+
+
+
 
 function venda_pg(destino_tabela, value, top_id, cliente, db) {
   if (value > 0) {

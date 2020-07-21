@@ -11,7 +11,7 @@
         </el-button>
       </router-link>
     </div>
-
+    <div style="width: 90%; margin: auto;">
     <vue-good-table
       :columns="columns"
       :rows="vendas"
@@ -20,6 +20,7 @@
       :line-numbers="true"
       @on-row-click="getList_vendaItens"
     />
+    </div>
 
     <!--pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" /-->
 
@@ -167,25 +168,28 @@ export default {
         }
       ],
       columns: [
+        // {
+        //   label: 'ID',
+        //   field: 'id'
+        // },
         {
-          label: 'ID',
-          field: 'id'
+          label: 'Data',
+          field: 'data',
+          type: 'string',
+          width: '200px'
         },
         {
           label: 'Cliente',
           field: 'cliente',
-          type: 'number',
-          width: '150px'
-        },
-        {
-          label: 'Nome',
-          field: 'nome',
-          type: 'string'
+          type: 'string',
+          width: '350px'
         },
         {
           label: 'Subtotal',
           field: 'subtotal',
-          type: 'decimal'
+          type: 'decimal',
+          width: '150px'
+          
           // dateInputFormat: 'yyyy-MM-dd',
           // dateOutputFormat: 'MMM Do yy',
         },
@@ -197,7 +201,8 @@ export default {
         {
           label: 'Total',
           field: 'total',
-          type: 'decimal'
+          type: 'decimal',
+          width: '200px'
         }
       ],
       venda_selected: {
@@ -269,7 +274,7 @@ export default {
       this.listLoading = true
       console.log(this.listQuery)
 
-      fetchList('vendas_completo', this.listQuery).then(response => {
+      fetchList('view_vendas_completo', this.listQuery).then(response => {
         console.log('response.data.items:', response.data.items)
         this.vendas = response.data.items
 

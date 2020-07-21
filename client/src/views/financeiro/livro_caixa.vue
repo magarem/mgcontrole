@@ -1,73 +1,14 @@
 <template>
   <div class="app-container">
-    <h2>Filtro</h2>
-    <el-form ref="form" :model="filter" label-width="120px">
-      <el-form-item label="Cliente">
-        <!-- <el-input v-model="filter.cliente"></el-input> -->
-        <!-- <autocomplete ref="nameOfRef" :items=list_clients /> -->
-        <el-autocomplete
-          v-model="filter.cliente"
-          class="inline-input"
-          :fetch-suggestions="querySearch"
-          placeholder="Please Input"
-          value-key="cliente_nome"
-          prefix-icon="el-icon-search"
-          clearable
-          @select="filterHandle"
-        />
-      </el-form-item>
-
-      <el-form-item label="Conta">
-        <el-select v-model="filter.id_conta" placeholder="Selecione o tipo de conta">
-          <el-option label="venda faturada" value="4" />
-          <el-option label="venda a vista em dinheiro" value="1" />
-        </el-select>
-      </el-form-item>
-
-      <!--el-form-item label="Activity time">
-        <el-col :span="11">
-          <el-date-picker type="date" placeholder="Pick a date" v-model="form.date1" style="width: 100%;"></el-date-picker>
-        </el-col>
-        <el-col class="line" :span="2">-</el-col>
-        <el-col :span="11">
-          <el-time-picker placeholder="Pick a time" v-model="form.date2" style="width: 100%;"></el-time-picker>
-        </el-col>
-      </el-form-item>
-      <el-form-item label="Instant delivery">
-        <el-switch v-model="form.delivery"></el-switch>
-      </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type"></el-checkbox>
-          <el-checkbox label="Promotion activities" name="type"></el-checkbox>
-          <el-checkbox label="Offline activities" name="type"></el-checkbox>
-          <el-checkbox label="Simple brand exposure" name="type"></el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor"></el-radio>
-          <el-radio label="Venue"></el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input type="textarea" v-model="form.desc"></el-input>
-      </el-form-item> -->
-      <el-form-item>
-        <el-button type="primary" @click="filterHandle">Filtrar</el-button>
-        <el-button @click="getList">Cancel</el-button>
-      </el-form-item>
-    </el-form>
-    <vue-good-table
-      :columns="columns"
-      :rows="list"
-      :search-options="{enabled: true}"
-      max-height="455px"
-      theme="black-rhino"
-    />
-
-    {{ list_total }}
-
+      <div style="width: 80%; margin: auto;">
+          <vue-good-table
+            :columns="columns"
+            :rows="list"
+            :search-options="{enabled: true}"
+            max-height="455px"
+            theme="black-rhino"
+          />
+      </div>
   </div>
 </template>
 <style scoped>
@@ -158,54 +99,28 @@ export default {
       list_total: null,
       columns: [
         {
-          label: 'ID',
-          field: 'id',
-          type: 'number',
-          width: '50px'
-        },
-        {
           label: 'Data',
-          field: 'date',
+          field: 'data',
           type: 'string',
           width: '180px'
         },
         {
-          label: 'Tipo',
-          field: 'tipo',
+          label: 'Descrição',
+          field: 'desc',
           type: 'string',
-          width: '80px'
+          width: '220px'
         },
+        // {
+        //   label: 'Doc',
+        //   field: 'doc',
+        //   type: 'string',
+        //   width: '180px'
+        // },
         {
-          label: 'Conta',
-          field: 'id_conta',
-          type: 'number',
-          width: '80px'
-        },
-        {
-          label: 'Conta descrição',
-          field: 'conta_desc',
-          type: 'string',
-          width: '350px'
-        },
-        {
-          label: 'Doc',
-          field: 'doc',
-          type: 'string'
-        },
-        {
-          label: 'Value',
-          field: 'value',
-          type: 'decimal'
-        },
-        {
-          label: 'Cliente/Fornecedor',
-          field: 'cliente_nome',
-          type: 'string'
-        },
-        {
-          label: 'Status',
-          field: 'status',
-          type: 'string'
+          label: 'Crédito',
+          field: 'valor',
+          type: 'decimal',
+          width: '250px'
         }
       ],
       list: [],
@@ -261,7 +176,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      fetchList('financeiro_livrocaixa_completo', this.listQuery).then(response => {
+      fetchList('view_fin_caixa', this.listQuery).then(response => {
         this.list_original = response.data.items
         this.list = response.data.items
         this.total = response.data.total
