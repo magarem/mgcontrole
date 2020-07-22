@@ -324,6 +324,7 @@ app.get(environment + '/eansearch', function (req, res, next) {
         jsonStr = {
           "code": 20000, 
           "data": {
+            "user_id": row[0].user_id,
             "roles": [row[0].roles],
             "introduction": row[0].introduction,
             "avatar": row[0].avatar,
@@ -348,6 +349,15 @@ app.get(environment + '/eansearch', function (req, res, next) {
     //     "name":req.session.username}
     // }
     // res.send(ret)
+  })
+  app.post(environment + '/user/logout', function (req, res, next) {
+    //Make the string of return
+    jsonStr = {
+      code: 20000,
+      data: 'success'
+    }
+    console.log('jsonStr', jsonStr);
+    res.send(jsonStr);
   })
 
 ////////////////////////////////
