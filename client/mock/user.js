@@ -4,7 +4,7 @@ const tokens = {
     token: 'admin-token'
   },
   editor: {
-    token: 'editor-token'
+    token: 'cliente-token'
   }
 }
 
@@ -15,8 +15,8 @@ const users = {
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     name: 'Super Admin'
   },
-  'editor-token': {
-    roles: ['editor'],
+  'cliente-token': {
+    roles: ['cliente'],
     introduction: 'I am an editor',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     name: 'Normal Editor'
@@ -72,7 +72,7 @@ module.exports = [
 
   // user logout
   {
-    url: '/vue-element-admin/user/logout',
+    url: '/user/logout',
     type: 'post',
     response: _ => {
       return {

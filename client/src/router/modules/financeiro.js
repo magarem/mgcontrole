@@ -16,7 +16,8 @@ const financeiroRouter = {
       path: 'livro_caixa',
       component: () => import('@/views/financeiro/livro_caixa'),
       name: 'Livro caixa',
-      meta: { title: 'Livro caixa' }
+      meta: { title: 'Livro caixa',
+        roles: ['admin'] }
     },
     {
       path: 'clientes_contas',

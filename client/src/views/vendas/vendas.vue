@@ -12,14 +12,14 @@
       </router-link>
     </div>
     <div style="width: 90%; margin: auto;">
-    <vue-good-table
-      :columns="columns"
-      :rows="vendas"
-      :search-options="{enabled: true}"
-      theme="black-rhino"
-      :line-numbers="true"
-      @on-row-click="getList_vendaItens"
-    />
+      <vue-good-table
+        :columns="columns"
+        :rows="vendas"
+        :search-options="{enabled: true}"
+        theme="black-rhino"
+        :line-numbers="true"
+        @on-row-click="getList_vendaItens"
+      />
     </div>
 
     <!--pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" /-->
@@ -189,7 +189,7 @@ export default {
           field: 'subtotal',
           type: 'decimal',
           width: '150px'
-          
+
           // dateInputFormat: 'yyyy-MM-dd',
           // dateOutputFormat: 'MMM Do yy',
         },

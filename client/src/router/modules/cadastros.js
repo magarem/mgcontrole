@@ -11,14 +11,14 @@ const cadastrosRouter = {
 
     title: 'Cadastros',
     icon: 'table',
-    roles: ['admin','editor']
+    roles: ['admin']
   },
   children: [
     {
       path: 'clientes',
       component: () => import('@/views/cadastros/clientes'),
       name: 'Clientes-',
-      meta: {roles: ['admin'], title: 'Clientes' }
+      meta: { roles: ['admin'], title: 'Clientes' }
     },
     {
       path: 'fornecedores',

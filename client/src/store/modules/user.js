@@ -3,6 +3,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const state = {
+  user_id: '',
   token: getToken(),
   name: '',
   avatar: '',
@@ -34,7 +35,6 @@ const actions = {
     const { domain, username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ domain: domain.toLowerCase(), username: username.trim().toLowerCase(), password: password }).then(response => {
-        console.log(response)
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
@@ -56,7 +56,6 @@ const actions = {
         }
 
         const { roles, name, avatar, introduction } = data
-
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')

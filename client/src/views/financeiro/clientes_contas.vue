@@ -3,11 +3,15 @@
     <!-- <div v-if="selected" style="padding-top:10px; width: 100%;">
       You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
       </div> -->
+    <h1 v-if="list[0]">{{ list[0].cliente }}</h1>
+
     <el-form ref="form" :model="filter" label-width="120px">
       <el-row :gutter="20">
         <el-col :span="5">
-
-          <el-form-item label="Cliente">
+          <!-- <el-tag v-permission="['admin']">admin</el-tag>
+          <el-tag v-permission="['cliente']">cliente</el-tag>
+          <div v-if="checkPermission(['admin'])">admin</div> -->
+          <el-form-item v-if="checkPermission(['admin'])" label="Cliente">
             <div class="autosuggest-container">
               <vue-autosuggest
                 v-model="query"
@@ -17,7 +21,8 @@
                 @focus="focusMe"
                 @click="clickHandler"
                 @input="onInputChange"
-                @selected="onSelected">
+                @selected="onSelected"
+              >
                 <div slot-scope="{suggestion}" style="display: flex; align-items: center;">
                   <div style="{ display: 'flex', color: 'navyblue'}">{{ suggestion.item.cliente }}</div>
                 </div>
@@ -26,7 +31,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item>
+          <el-form-item v-if="checkPermission(['admin'])">
             <el-button type="primary" @click="filterHandle">Filtrar</el-button>
             <el-button type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
           </el-form-item>
@@ -40,12 +45,12 @@
       </el-row>
     </el-form>
     <div style="width:95%; margin:auto;">
-    <vue-good-table
-      :columns="columns"
-      :rows="list"
-      :search-options="{enabled: false}"
-      theme="black-rhino"
-    />
+      <vue-good-table
+        :columns="columns"
+        :rows="list"
+        :search-options="{enabled: false}"
+        theme="black-rhino"
+      />
     </div>
     <!--
 
@@ -53,10 +58,10 @@
 
     -->
     <el-dialog title="" :visible.sync="dialogFormVisible" top="5vh" width="50%">
-     <div slot="title" style="font-size: 35px;">Adicionar crédito para cliente</div>
+      <div slot="title" style="font-size: 35px;">Adicionar crédito para cliente</div>
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="170px" style="_width: 400px; _margin:0 50px 0 50px; font-size: 20px">
         <el-form-item label="Cliente:" prop="cliente">
-          <div style="font-size: 30px; margin: auto;">{{selected.cliente_id}} - {{selected.cliente}}</div>
+          <div style="font-size: 30px; margin: auto;">{{ selected.cliente_id }} - {{ selected.cliente }}</div>
         </el-form-item>
         <el-form-item label="Crédito Valor:" prop="fone">
           <money v-model="temp.credito" v-bind="money" style="width: 50%; _margin-top: 5px; font-size: 22px;" class="el-input__inner" />
@@ -122,9 +127,11 @@
 </style>
 
 <script>
+import { getToken } from '@/utils/auth'
+import permission from '@/directive/permission/index.js'
+import checkPermission from '@/utils/permission'
 import { fetchList, create } from '@/api/generic'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 
 import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table'
@@ -133,22 +140,22 @@ import { Money } from 'v-money'
 export default {
   name: 'ClientesContas',
   components: { VueGoodTable, VueAutosuggest, Money },
-  directives: { waves },
+  directives: { waves, permission },
   filters: {
     money(value) {
       if (typeof value !== 'number') {
         return value
       }
       const formatter = new Intl.NumberFormat('pt', {
-          style: 'currency',
-          currency: 'BRL'
+        style: 'currency',
+        currency: 'BRL'
       })
-      
+
       return formatter.format(value)
     },
     booleanChange(value) {
       var ret = 'Não'
-      if (value == 1) ret = 'Sim'
+      if (value === 1) ret = 'Sim'
       return ret
     },
     capitalize(value) {
@@ -163,19 +170,17 @@ export default {
         deleted: 'danger'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
     return {
+      user_id: '',
       list_total: {
         debito: 0,
         credito: 0
       },
       query: '',
-      selected: '',
+      selected: {},
       dialogStatus: '',
       temp: {},
       list_clients: [],
@@ -217,14 +222,14 @@ export default {
           field: 'debito',
           type: 'decimal',
           width: '180px'
-        } ,
+        },
         {
           label: 'Crédito',
           field: 'credito',
           type: 'decimal',
           width: '180px'
-        }  
-               // {
+        }
+        // {
         //   label: 'Crédito',
         //   field: 'credito',
         //   type: 'decimal',
@@ -263,6 +268,8 @@ export default {
     saldo: function() {
       if (this.list !== null && this.list.length > 0) {
         return this.list[this.list.length - 1].total_parcial
+      }else{
+        return 0
       }
     },
     filteredOptions() {
@@ -280,11 +287,17 @@ export default {
       ]
     }
   },
+
   mounted() {
     this.getList()
     this.getList_original()
+    if (this.checkPermission(['cliente'])) {
+      this.selected.cliente_id = getToken().split(':')[1]
+      this.filterHandle()
+    }
   },
   methods: {
+    checkPermission,
     clickHandler(item) {
       // event fired when clicking on the input
     },
@@ -325,9 +338,8 @@ export default {
         valor: this.temp.credito
       }
       create('financeiro_operacoes', this.temp1).then((ret) => {
-       
         var top_id = ret.data.id
-        console.log('top_id:', top_id);
+        console.log('top_id:', top_id)
 
         this.temp2 = {
           pid: top_id,
@@ -338,32 +350,29 @@ export default {
           valor: this.temp.credito
         }
         create('financeiro_operacoes', this.temp2).then((ret) => {
-            var last_id = ret.data.id 
-            this.temp3 = {
-              pid: last_id,
-              origem_tabela: 'clientes',
-              origem_tabela_id: this.temp.cliente_id,
-              destino_tabela: 'caixa',
-              destino_tabela_id: null,
-              valor: this.temp.credito
-            }
-            
-            create('financeiro_operacoes', this.temp3).then((ret) => {
-              this.dialogFormVisible = false
-              this.$notify({
-                title: 'Sucesso',
-                message: 'Cliente cadastrado',
-                type: 'success',
-                duration: 2000
-              })
+          var last_id = ret.data.id
+          this.temp3 = {
+            pid: last_id,
+            origem_tabela: 'clientes',
+            origem_tabela_id: this.temp.cliente_id,
+            destino_tabela: 'caixa',
+            destino_tabela_id: null,
+            valor: this.temp.credito
+          }
 
+          create('financeiro_operacoes', this.temp3).then((ret) => {
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Sucesso',
+              message: 'Cliente cadastrado',
+              type: 'success',
+              duration: 2000
             })
+          })
 
-        
           this.getList()
         })
-     
-     })
+      })
     },
     getList() {
       if (this.selected.cliente_id) {
@@ -372,7 +381,7 @@ export default {
           this.list = response.data.items
         })
 
-        //Pega o total
+        // Pega o total
         fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
           this.list_total = response.data.items[0]
         })
@@ -381,7 +390,7 @@ export default {
     getList_original() {
       fetchList('f_clientes_faturados').then(response => {
         this.total = response.data.total
-        console.log(response.data);
+        console.log(response.data)
         this.list_original = response.data.items.map(function(item) {
           return { cliente_id: item.cliente_id, cliente: item.cliente }
         })

@@ -9,7 +9,8 @@ const vendasRouter = {
   name: 'Vendas',
   meta: {
     title: 'Vendas',
-    icon: 'table'
+    icon: 'table',
+    roles: ['admin']
   },
   children: [
     {

@@ -1,14 +1,14 @@
 <template>
   <div class="app-container">
-      <div style="width: 80%; margin: auto;">
-          <vue-good-table
-            :columns="columns"
-            :rows="list"
-            :search-options="{enabled: true}"
-            max-height="455px"
-            theme="black-rhino"
-          />
-      </div>
+    <div style="width: 80%; margin: auto;">
+      <vue-good-table
+        :columns="columns"
+        :rows="list"
+        :search-options="{enabled: true}"
+        max-height="455px"
+        theme="black-rhino"
+      />
+    </div>
   </div>
 </template>
 <style scoped>
