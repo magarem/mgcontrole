@@ -9,9 +9,6 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         Incluir
       </el-button>
-      <!--el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Exportar
-      </el-button-->
     </div>
     <el-table
       :key="tableKey"
@@ -36,18 +33,6 @@
         </template>
       </el-table-column>
 
-      <!-- <el-table-column label="Tipo" prop="tipo" sortable="custom" align="center" width="100">
-        <template slot-scope="scope">
-          <span>{{ scope.row.tipo | capitalize }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Doc" prop="doc" sortable="custom" align="center" width="90">
-        <template slot-scope="scope">
-          <span>{{ scope.row.doc | capitalize }}</span>
-        </template>
-      </el-table-column> -->
-
       <el-table-column label="Contato" prop="contato" sortable="custom" align="center" width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.contato }}</span>
@@ -59,30 +44,6 @@
           <span>{{ scope.row.fone }}</span>
         </template>
       </el-table-column>
-
-      <!-- <el-table-column label="Fone2" prop="fone2" sortable="custom" align="center" width="100">
-        <template slot-scope="scope">
-          <span>{{ scope.row.fone2 }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Email" prop="email" sortable="custom" align="center" width="100">
-        <template slot-scope="scope">
-          <span>{{ scope.row.email }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Endereço" prop="endereco" sortable="custom" align="center" width="100">
-        <template slot-scope="scope">
-          <span>{{ scope.row.endereco }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Obs" prop="obs" sortable="custom" align="center" width="100">
-        <template slot-scope="scope">
-          <span>{{ scope.row.obs }}</span>
-        </template>
-      </el-table-column> -->
 
       <el-table-column label="Actions" align="center" width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
@@ -230,16 +191,12 @@ export default {
       listQuery: {
         page: 1,
         limit: 10,
-        // importance: undefined,
-        // title: undefined,
-        // type: undefined,
         sort: 'id DESC',
         find:{
           nome: "",
           doc: ""
         }
       },
-      // importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
@@ -265,20 +222,16 @@ export default {
   },
   methods: {
     getList() {
-      this.listLoading = true
-      console.log('this.listQuery:', this.listQuery)
+      // this.listLoading = true
       const self = this
-      console.log('getToken():', getToken());
-      
       fetchList('clientes', this.listQuery).then(response => {
-        console.log('response.data-->:', response.data)
         this.list = response.data.items
         this.total = response.data.total
-
+        this.listLoading = false
         // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        // setTimeout(() => {
+        //   this.listLoading = false
+        // }, 1.5 * 1000)
       })
     },
     handleFilter() {

@@ -268,7 +268,7 @@ export default {
     saldo: function() {
       if (this.list !== null && this.list.length > 0) {
         return this.list[this.list.length - 1].total_parcial
-      }else{
+      } else {
         return 0
       }
     },

@@ -60,22 +60,9 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Entrar</el-button>
 
-      <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div>
-
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
-      </div>
+     
     </el-form>
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
@@ -98,7 +85,7 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('Entre com o nome de usuário'))
       } else {
         callback()
       }
@@ -114,8 +101,8 @@ export default {
     return {
       loginForm: {
         domain: null,
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         domain: [{ required: true, trigger: 'blur' }],
@@ -178,17 +165,13 @@ export default {
           
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
-              console.log("llll>1");
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
-              console.log("llll>2");
             })
             .catch(() => {
-              console.log("!");
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
           return false
         }
       })

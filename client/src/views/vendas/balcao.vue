@@ -51,8 +51,7 @@
                   :rows="cupom.itens"
                   theme="nocturnal"
                   max-height="255px"
-                  @on-row-click="cupomRowView"
-                >
+                  @on-row-click="cupomRowView" >
                   <div slot="emptystate">
                     Caixa livre
                   </div>
@@ -238,52 +237,62 @@
     </el-dialog>
 
     <!-- Venda close -->
-    <el-dialog :visible.sync="vendaCloseFlg" title="Fechamento de venda" width="60%" center top="5vh">
-      <el-form ref="form" style="font-size: 20px" :model="form" label-width="170px">
-        <el-row :gutter="20">
+    <el-dialog :visible.sync="vendaCloseFlg"  width="60%" center top="5vh">
+      <span slot="title" style="font-size: 35px">Fechamento de venda</span>
+      <el-form ref="form" style="font-size: 20px" :model="form" label-width="0px" label-position=top>
+        <el-row :gutter="25">
+              <el-col :span="12">
+
+                 <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>Total da compra</span>
+                    <!-- <el-button style="float: right; padding: 3px 0" type="text">Operation button</el-button> -->
+                  </div>
+                  <div>
+                  <div style="margin-bottom: 10px">Sub Total:
+                   <span style="font-size: 25px;">{{ cupom.subtotal | money }}</span>
+                  </div>
+                  <div style="margin-bottom: 10px">Desconto:</div>
+                  <money v-model="desconto" v-bind="money" class="el-input__inner" />
+                   <div style="margin-top: 15px; margin-bottom: 15px">Total a pagar:
+                <!-- <el-form-item label="Total a pagar"> --><br>
+                <span style="font-size: 45px;">{{ (cupom.subtotal - desconto) | money }}</span></div>
+                <!-- </el-form-item> -->
+                </div>
+                </el-card>
+                
+              </el-col>
+             
           <el-col :span="12">
-            <el-row>
-              <el-col :span="24"><div class="grid-content bg-purple-dark">Venda</div></el-col>
-            </el-row>
-            <el-form-item label="Total">
-              {{ cupom.subtotal | money }}
-            </el-form-item>
-            <el-form-item label="Desconto">
-              <money v-model="desconto" v-bind="money" class="el-input__inner" />
-            </el-form-item>
-            <el-form-item label="Total a pagar">
-              {{ (cupom.subtotal - desconto) | money }}
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-row>
-              <el-col :span="24"><div class="grid-content bg-purple-dark">Pagamento</div></el-col>
-            </el-row>
-            <div>
-              <el-form-item label="Dinheiro">
-                <money v-model="pago_dinheiro" v-bind="money" class="el-input__inner" />
-              </el-form-item>
-              <el-form-item label="Cartão de débito">
-                <!--el-input v-model="pago_debito"></el-input-->
-                <money v-model="pago_debito" v-bind="money" class="el-input__inner" />
-              </el-form-item>
-              <el-form-item label="Cartão de crédito">
-                <!--el-input v-model="pago_credito"></el-input-->
-                <money v-model="pago_credito" v-bind="money" class="el-input__inner" />
-              </el-form-item>
-              <el-form-item v-if="cupom.cliente.id > 1" label="Faturado">
-                <money v-model="pago_faturado" v-bind="money" class="el-input__inner" />
-              </el-form-item>
-              <!-- <el-form-item label="Falta pagar">
-                <money v-model="falta_pagar" v-bind="money" class="el-input__inner" />
-              </el-form-item> -->
-              <el-form-item v-if="pago_falta > 0" label="Falta pagar">
-                <money v-model="pago_falta" v-bind="money" class="el-input__inner" />
-              </el-form-item>
-              <el-form-item v-if="pago_falta <= 0" label="Troco">
-                <money v-model="pago_falta" v-bind="money" class="el-input__inner" />
-              </el-form-item>
-            </div>
+            
+                
+                
+                <el-card class="box-card">
+                  <div slot="header" class="clearfix">
+                    <span>Forma de pagamento</span>
+                    <!-- <el-button style="float: right; padding: 3px 0" type="text">Operation button</el-button> -->
+                  </div>
+                  <div>
+                    <div style="margin-top: 0px; margin-bottom: 15px">Dinheiro:<br>
+                      <money v-model="pago_dinheiro" v-bind="money" class="el-input__inner" />
+                    </div>
+                    <div style="margin-bottom: 15px">Cartão de débito:<br>
+                      <money v-model="pago_debito" v-bind="money" class="el-input__inner" />
+                    </div>
+                    <div style="margin-bottom: 15px">Cartão de crédito:<br>
+                      <money v-model="pago_credito" v-bind="money" class="el-input__inner" />
+                    </div>
+                    <div v-if="cupom.cliente.id > 1" style="margin-bottom: 15px">Faturado:
+                      <money v-model="pago_faturado" v-bind="money" class="el-input__inner" />
+                    </div>
+                    <div v-if="pago_falta > 0" style="margin-top: 15px; margin-bottom: 5px">Falta pagar:
+                      {{pago_falta | money}}
+                    </div>
+                    <div v-if="pago_falta <= 0" style="margin-top: 15px; margin-bottom: 5px">Troco:
+                      {{pago_falta | money}}
+                    </div>
+                </div>
+                </el-card>
           </el-col>
         </el-row>
       </el-form>
@@ -488,29 +497,33 @@ export default {
       this.product_selected.total = this.product_selected.qnt * this.product_selected.pco_venda
     },
     desconto: function() {
-      this.cupom.total = this.cupom.total - this.desconto
-      this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
-      this.pago_falta = this.cupom.total - this.valor_pago
+      // this.cupom.total = this.cupom.total - this.desconto
+      if (this.desconto > this.cupom.total) { 
+        return this.cupom.total
+      }else{
+        this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
+        this.pago_falta = this.cupom.total - this.desconto - this.valor_pago
+      }
     },
     pago_dinheiro: function() {
       // this.cupom.total = this.cupom.total - this.desconto
       this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
-      this.pago_falta = this.cupom.total - this.valor_pago
+      this.pago_falta = this.cupom.total - this.desconto - this.valor_pago
     },
     pago_debito: function() {
       // this.cupom.total = this.cupom.total - this.desconto
       this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
-      this.pago_falta = this.cupom.total - this.valor_pago
+      this.pago_falta = this.cupom.total - this.desconto - this.valor_pago
     },
     pago_credito: function() {
       // this.cupom.total = this.cupom.total - this.desconto
       this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
-      this.pago_falta = this.cupom.total - this.valor_pago
+      this.pago_falta = this.cupom.total - this.desconto - this.valor_pago
     },
     pago_faturado: function() {
       // this.cupom.total = this.cupom.total - this.desconto
       this.valor_pago = (parseFloat(this.pago_dinheiro) + parseFloat(this.pago_debito) + parseFloat(this.pago_credito) + parseFloat(this.pago_faturado))
-      this.pago_falta = this.cupom.total - this.valor_pago
+      this.pago_falta = this.cupom.total - this.desconto - this.valor_pago
     }
   },
   mounted() {
