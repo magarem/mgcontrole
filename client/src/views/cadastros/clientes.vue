@@ -130,7 +130,7 @@
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
           Confirma
         </el-button>
-       
+
       </div>
     </el-dialog>
 
@@ -192,9 +192,9 @@ export default {
         page: 1,
         limit: 10,
         sort: 'id DESC',
-        find:{
-          nome: "",
-          doc: ""
+        find: {
+          nome: '',
+          doc: ''
         }
       },
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
@@ -264,7 +264,7 @@ export default {
         id: undefined,
         // importance: 1,
         // remark: '',
-        timestamp: new Date(),
+        timestamp: new Date()
         // title: '',
         // status: 'published',
         // type: ''
@@ -344,38 +344,30 @@ export default {
       })
     },
     handleDelete(row) {
-
-
-        this.$confirm('Excluir registro?', 'Aviso', {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancelar',
-          type: 'warning'
-        }).then(() => {
-
-            this.$notify({
-              title: 'Sucesso',
-              message: 'Exclusão de registro',
-              type: 'success',
-              duration: 2000
-            })
-            const index = this.list.indexOf(row)
-            this.list.splice(index, 1)
-
-            // Server order
-            deleteItem('clientes', row).then(() => {
-              console.log('Deleted:--->', row.id)
-            })
-         
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: 'Exclusão cancelada'
-          });          
+      this.$confirm('Excluir registro?', 'Aviso', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancelar',
+        type: 'warning'
+      }).then(() => {
+        this.$notify({
+          title: 'Sucesso',
+          message: 'Exclusão de registro',
+          type: 'success',
+          duration: 2000
         })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
 
-
-
-      
+        // Server order
+        deleteItem('clientes', row).then(() => {
+          console.log('Deleted:--->', row.id)
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Exclusão cancelada'
+        })
+      })
     },
     handleDownload() {
       this.downloadLoading = true

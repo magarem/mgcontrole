@@ -1,7 +1,7 @@
 <template>
-  <div class="app-container" >
-    <div class="filter-container" >
-      <router-link to="/vendas/balcao" >
+  <div class="app-container">
+    <div class="filter-container">
+      <router-link to="/vendas/balcao">
         <el-button class="filter-item" style="margin-left: 10px; height: 50px; font-size: 25px;" type="success">
           Incluir nova venda
         </el-button>
@@ -23,7 +23,7 @@
 
     -->
     <el-dialog :visible.sync="dialogPvVisible" title="Venda" width="80%" top="5vh" center>
-     <span slot="title" style="font-size: 30px; margin-bottom: 100px;">Venda detalhada</span>
+      <span slot="title" style="font-size: 30px; margin-bottom: 100px;">Venda detalhada</span>
       <el-row :gutter="10" type="flex" class="row-bg">
         <el-col :span="2"><div class="grid-content bg-purple"><b>#:</b> {{ venda_selected.id }}</div></el-col>
         <el-col :span="7"><div class="grid-content bg-purple"><b>Data:</b> {{ venda_selected.data }}</div></el-col>
@@ -34,6 +34,9 @@
       <el-row :gutter="20">
         <el-col :span="24"><div class="grid-content bg-purple"><b>Cliente:</b> {{ venda_selected.cliente }} - {{ venda_selected.nome }}</div></el-col>
       </el-row>
+   
+     
+
       <vue-good-table
         :columns="venda_itens_columns"
         :rows="venda_selected.itens"
@@ -41,6 +44,30 @@
         :line-numbers="true"
         theme="black-rhino"
       />
+
+       <!-- <table class=table1 v-if=venda_selected.pagamento >
+        <tr> 
+            <th class=titulo :colspan="venda_selected_pagamento_keys_length">Forma de pagamento</th>
+        </tr>
+        <tr> 
+            <th  v-for="y,t in venda_selected.pagamento" >{{ t }}</th>
+        </tr>
+         <tr v-for="j in venda_selected.pagamento" > 
+            <td  v-for="yy in j"  >{{ yy }}</td>
+        </tr>
+      </table> -->
+        <br>
+       <table class=table1 v-if=venda_selected.pagamento >
+        <tr> 
+            <th class=titulo :colspan="venda_selected_pagamento_keys_length">Forma de pagamento</th>
+        </tr>
+        <tr> 
+            <th  v-for="y,t in venda_selected.pagamento" >{{ t }}</th>
+        </tr>
+         <tr  > 
+            <td  v-for="yy in venda_selected.pagamento"  >{{ yy | money}}</td>
+        </tr>
+      </table>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">Fechar</el-button>
       </span>
@@ -48,6 +75,21 @@
   </div>
 </template>
 <style scoped>
+    
+  .table1 td, th {
+    background-color: #F8F8F8;
+    padding: 15px;
+    margin: 5px;
+    border-bottom: 1px solid #ddd;
+    text-transform: capitalize;
+    font-size: 16px;
+  }
+
+  .titulo {
+    text-transform: uppercase;
+  }
+
+  
   .grid-content {
     padding: 7px;;
     font-size: 18px;;
@@ -166,6 +208,8 @@ export default {
           width: '200px'
         }
       ],
+      venda_selected_itens_keys_length: 0,
+      venda_selected_pagamento_keys_length: 0,
       venda_selected: {
         items: {}
       },
@@ -236,6 +280,7 @@ export default {
       fetchList('view_vendas_completo', this.listQuery).then(response => {
         console.log('response.data.items:', response.data.items)
         this.vendas = response.data.items
+        
         this.total = response.data.total
 
         // Just to simulate the time of the request
@@ -252,6 +297,12 @@ export default {
       // Set object of form view
       this.venda_selected = params.row
       this.venda_selected.itens = JSON.parse(this.venda_selected.itens)
+      this.venda_selected_itens_keys_length = Object.keys(this.venda_selected.itens[0]).length
+     
+     //Pagamento
+      this.venda_selected.pagamento = JSON.parse(this.venda_selected.pagamento)
+      this.venda_selected_pagamento_keys_length = Object.keys(this.venda_selected.pagamento).length
+
 
       // Sum total
       this.venda_selected.total = params.row.subtotal - params.row.desconto

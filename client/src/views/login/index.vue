@@ -62,7 +62,6 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Entrar</el-button>
 
-     
     </el-form>
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
@@ -107,7 +106,7 @@ export default {
       loginRules: {
         domain: [{ required: true, trigger: 'blur' }],
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur'}]
+        password: [{ required: true, trigger: 'blur' }]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -161,8 +160,8 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          console.log(this.loginForm);
-          
+          console.log(this.loginForm)
+
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
