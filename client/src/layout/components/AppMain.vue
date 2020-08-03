@@ -25,6 +25,7 @@ export default {
 <style lang="scss" scoped>
 .app-main {
   /* 50= navbar  50  */
+  // background-color: black;
   min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
@@ -32,6 +33,7 @@ export default {
 }
 
 .fixed-header+.app-main {
+  background-color: darkblue;
   padding-top: 50px;
 }
 
@@ -51,6 +53,7 @@ export default {
 // fix css style bug in open el-dialog
 .el-popup-parent--hidden {
   .fixed-header {
+    background-color: black;
     padding-right: 15px;
   }
 }

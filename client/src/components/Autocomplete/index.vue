@@ -17,6 +17,7 @@ export default {
 
   data() {
     return {
+      selected_id: null,
       isOpen: false,
       results: [],
       search: '',
@@ -34,6 +35,8 @@ export default {
     }
   },
   mounted() {
+    this.setFocus()
+    // this.$refs.searchTerm_.focus()
     document.addEventListener('click', this.handleClickOutside)
   },
   destroyed() {
@@ -41,6 +44,18 @@ export default {
   },
 
   methods: {
+    emitToParent(event) {
+      console.log('emit');
+      this.search = ""
+      this.$emit('childToParent', this.selected_id)
+    },
+    getSelected_item_id(){
+      return this.selected_id
+    },
+    setFocus(){
+      this.search = ""
+      this.$refs.searchTerm_.focus()
+    },
     onChange() {
       // Let's warn the parent that a change was made
       this.$emit('input', this.search)
@@ -54,16 +69,19 @@ export default {
         this.isOpen = true
       }
     },
-
     filterResults() {
       // first uncapitalize all the things
       this.results = this.items.filter((item) => {
-        return item.toLowerCase().indexOf(this.search.toLowerCase()) > -1
+        // console.log('item:', item);
+        return item.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1
       })
     },
     setResult(result) {
-      this.search = result
+      this.search = result.name
+      this.selected_id = result.id
       this.isOpen = false
+      this.arrowCounter = -1
+      this.emitToParent()
     },
     onArrowDown(evt) {
       if (this.arrowCounter < this.results.length) {
@@ -76,9 +94,11 @@ export default {
       }
     },
     onEnter() {
-      this.search = this.results[this.arrowCounter]
+      this.search = this.results[this.arrowCounter].name
+      this.selected_id = this.results[this.arrowCounter].id
       this.isOpen = false
       this.arrowCounter = -1
+      this.emitToParent()
     },
     handleClickOutside(evt) {
       if (!this.$el.contains(evt.target)) {
@@ -93,12 +113,14 @@ export default {
 <template>
   <div class="autocomplete">
     <input
+      ref="searchTerm_"
       v-model="search"
       type="text"
       @input="onChange"
       @keydown.down="onArrowDown"
       @keydown.up="onArrowUp"
       @keydown.enter="onEnter"
+      style="width: 200px"
     >
     <ul
       v-show="isOpen"
@@ -119,7 +141,7 @@ export default {
         :class="{ 'is-active': i === arrowCounter }"
         @click="setResult(result)"
       >
-        {{ result }}
+        {{ result.name }}
       </li>
     </ul>
   </div>

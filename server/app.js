@@ -275,8 +275,9 @@ app.get(environment + '/eansearch', function (req, res, next) {
       // })
       
       //Make the string of return
-      jsonStr = {"code": 20000,"data": {"token": "","total": 1 }}
-      if (row.length>0) jsonStr = {"code": 20000,"data": {"token": row[0].token, "total": 1 }}
+      console.log('row:', row);
+      jsonStr = {"code": 50008,"data": {"token": "","total": 0 }}
+      if (row && row.length>0) jsonStr = {"code": 20000,"data": {"token": row[0].token, "total": 1 }}
       
       console.log('ret', ret);
       res.send(jsonStr);
@@ -582,6 +583,7 @@ function updateSQL_string(table, id, obj){
       });
     })
   })
+
   app.get(environment + '/vendaItens', function (req, res, next) {
     db_open('./' + req.session.owner + '.db').then(db => {
       sqlStr = "SELECT * FROM vendas_itens where vendaId = '" + req.query.vendaID + "'" ;
@@ -619,6 +621,13 @@ function updateSQL_string(table, id, obj){
     var value_debito = json_data.debito 
     var value_credito = json_data.credito 
     var value_faturado = json_data.faturado
+    var date = json_data.date
+
+    if (!date){
+      date = new Date().getTime()
+    }
+
+    console.log('var date:', date);
 
     //Open database
     db_open('./' + domain + '.db').then(db => {
@@ -638,7 +647,7 @@ function updateSQL_string(table, id, obj){
           }
           var pagamento = JSON.stringify(pagamento_obj)
           // Insert Venda
-          db.run(`INSERT INTO vendas (id, cliente, itens, subtotal, desconto, acrescimo, total, pagamento) VALUES (${top_id}, ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}')`, function(err) {
+          db.run(`INSERT INTO vendas (id, cliente, itens, subtotal, desconto, acrescimo, total, pagamento, created) VALUES (${top_id}, ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}', '${date}')`, function(err) {
             if (err) {
               return console.log(err.message);
             }
@@ -725,8 +734,10 @@ function updateSQL_string(table, id, obj){
       console.log('json_data.itens.length:', json_data.itens.length);
       console.log('json_data.itens[0].qnt:', json_data.itens[0].qnt);
 
-      let data = new Date().getTime()
-      db.run('INSERT INTO compras (compraID, fornecedor, subtotal, desconto, acrescimo, total, dinheiro, debito, credito, totalpago, troco, created) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', [json_data.compraID, json_data.fornecedor, json_data.subtotal, json_data.desconto, json_data.acrescimo, json_data.total, json_data.dinheiro, json_data.debito, json_data.credito, json_data.totalpago, json_data.troco, data], function(err) {
+      if (!json_data.date){
+        json_data.date = new Date().getTime()
+      }
+      db.run('INSERT INTO compras (compraID, fornecedor, subtotal, desconto, acrescimo, total, dinheiro, debito, credito, totalpago, troco, created) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', [json_data.compraID, json_data.fornecedor, json_data.subtotal, json_data.desconto, json_data.acrescimo, json_data.total, json_data.dinheiro, json_data.debito, json_data.credito, json_data.totalpago, json_data.troco, date], function(err) {
         if (err) {
           return console.log(err.message);
         }

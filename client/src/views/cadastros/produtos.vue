@@ -9,14 +9,7 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         Incluir
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Exportar
-      </el-button>
-      <!-- <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        reviewer
-      </el-checkbox> -->
     </div>
-
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -26,12 +19,6 @@
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
-      <!--el-table-column label="ID" prop="id" sortable="custom" align="center" width="80">
-        <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
-        </template>
-      </el-table-column-->
-
       <el-table-column label="ID" prop="ean" sortable="custom" align="center" width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -49,12 +36,6 @@
           <span>{{ scope.row.descricao | capitalize }}</span>
         </template>
       </el-table-column>
-
-      <!-- <el-table-column label="Preço custo" prop="pco_custo" sortable="custom" align="center" width="90">
-        <template slot-scope="scope">
-          <span>{{ scope.row.pco_custo | money }}</span>
-        </template>
-      </el-table-column> -->
 
       <el-table-column label="Preço" prop="pco_venda" sortable="custom" align="center" width="90">
         <template slot-scope="scope">
@@ -79,12 +60,6 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit
           </el-button>
-          <!--el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
-            Publish
-          </el-button>
-          <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
-            Draft
-          </el-button-->
           <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
             Delete
           </el-button>
@@ -95,21 +70,17 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" style="width: 400px; margin-left:50px;">
         <el-form-item label="EAN" prop="ean">
-          <!-- <el-select v-model="temp.ean" class="filter-item" placeholder="EAN"> -->
-          <!--el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" /-->
           <el-input v-model="temp.ean" />
-          <!-- </el-select> -->
         </el-form-item>
         <el-form-item label="Descrição" prop="descricao">
           <el-input v-model="temp.descricao" />
-          <!--el-date-picker v-model="temp.descricao" type="datetime" placeholder="Please pick a date" /-->
         </el-form-item>
-        <el-form-item label="Preço custo" prop="preco_custo">
+        <el-form-item label="Custo" prop="preco_custo">
           <money v-model="temp.pco_custo" v-bind="money" class="el-input__inner" />
         </el-form-item>
-        <el-form-item label="Preço" prop="preco">
+        <el-form-item label="Preço de venda" prop="preco">
           <money v-model="temp.pco_venda" v-bind="money" class="el-input__inner" />
         </el-form-item>
         <el-form-item label="Unidade" prop="unidade">
@@ -118,17 +89,6 @@
         <el-form-item label="Estoque" prop="estoque">
           <el-input v-model="temp.estoque" />
         </el-form-item>
-        <!--el-form-item label="Status">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item-->
-        <!--el-form-item label="Imp">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
-        </el-form-item-->
-        <!--el-form-item label="Remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
-        </el-form-item-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -140,18 +100,12 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
-
+<style scoped>
+ table {border-collapse: collapse;}
+  td   {padding: 6px;}
+</style>
 <script>
 import { fetchList, create, update, deleteItem } from '@/api/generic'
 import waves from '@/directive/waves' // waves directive

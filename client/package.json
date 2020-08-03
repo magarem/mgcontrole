@@ -32,6 +32,7 @@
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "path-to-regexp": "2.4.0",
+    "printd": "^1.4.2",
     "screenfull": "4.2.0",
     "script-loader": "0.7.2",
     "sortablejs": "1.8.4",
@@ -47,6 +48,7 @@
     "vue-splitpane": "1.0.4",
     "vue-suggestion": "^1.1.0",
     "vuedraggable": "2.20.0",
+    "vuejs-auto-complete": "^0.9.0",
     "vuex": "3.1.0",
     "xlsx": "0.14.1"
   },

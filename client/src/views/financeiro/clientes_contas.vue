@@ -4,7 +4,7 @@
       You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
       </div> -->
     <h1 v-if="list[0]">{{ list[0].cliente }}</h1>
-
+    Token:<h2>{{token}}</h2>
     <el-form ref="form" :model="filter" label-width="120px">
       <el-row :gutter="20">
         <el-col :span="5">
@@ -174,6 +174,7 @@ export default {
   },
   data() {
     return {
+      token: null,
       user_id: '',
       list_total: {
         debito: 0,
@@ -291,6 +292,7 @@ export default {
   mounted() {
     this.getList()
     this.getList_original()
+    this.token = getToken()
     if (this.checkPermission(['cliente'])) {
       this.selected.cliente_id = getToken().split(':')[1]
       this.filterHandle()

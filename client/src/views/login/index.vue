@@ -163,11 +163,13 @@ export default {
           console.log(this.loginForm)
 
           this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
+            .then((x) => {
+              console.log('this.redirect::', this.redirect);
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
             .catch(() => {
+              console.log('catch');
               this.loading = false
             })
         } else {

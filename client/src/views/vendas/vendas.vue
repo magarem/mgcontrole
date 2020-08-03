@@ -8,14 +8,69 @@
       </router-link>
     </div>
     <div style="width: 90%; margin: auto;">
-      <vue-good-table
+
+
+
+ <el-table
+      v-loading="listLoading"
+      :data="vendas"
+      border
+      fit
+      highlight-current-row
+      style="width: 100%;"
+      @row-click="getList_vendaItens">
+
+      <el-table-column label="Data" prop="data" sortable="custom" align="center" width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.data }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="300">
+        <template slot-scope="scope">
+          <span>{{ scope.row.cliente  }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Subtotal" prop="subtotal" sortable="custom" align="center" width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.subtotal | money }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Desconto" prop="desconto" sortable="custom" align="center" width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.desconto | money}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Total" prop="total" sortable="custom" align="center" width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.total | money }}</span>
+        </template>
+      </el-table-column>
+
+      <!-- <el-table-column label="Actions" align="center" width="150" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            Edit
+          </el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(row)">
+            Delete
+          </el-button>
+        </template>
+      </el-table-column> -->
+    </el-table>
+
+
+
+
+      <!-- <vue-good-table
         :columns="columns"
         :rows="vendas"
         :search-options="{enabled: true}"
         theme="black-rhino"
         :line-numbers="true"
         @on-row-click="getList_vendaItens"
-      />
+      /> -->
     </div>
     <!--
 
@@ -34,8 +89,6 @@
       <el-row :gutter="20">
         <el-col :span="24"><div class="grid-content bg-purple"><b>Cliente:</b> {{ venda_selected.cliente }} - {{ venda_selected.nome }}</div></el-col>
       </el-row>
-   
-     
 
       <vue-good-table
         :columns="venda_itens_columns"
@@ -45,27 +98,27 @@
         theme="black-rhino"
       />
 
-       <!-- <table class=table1 v-if=venda_selected.pagamento >
-        <tr> 
+      <!-- <table class=table1 v-if=venda_selected.pagamento >
+        <tr>
             <th class=titulo :colspan="venda_selected_pagamento_keys_length">Forma de pagamento</th>
         </tr>
-        <tr> 
+        <tr>
             <th  v-for="y,t in venda_selected.pagamento" >{{ t }}</th>
         </tr>
-         <tr v-for="j in venda_selected.pagamento" > 
+         <tr v-for="j in venda_selected.pagamento" >
             <td  v-for="yy in j"  >{{ yy }}</td>
         </tr>
       </table> -->
-        <br>
-       <table class=table1 v-if=venda_selected.pagamento >
-        <tr> 
-            <th class=titulo :colspan="venda_selected_pagamento_keys_length">Forma de pagamento</th>
+      <br>
+      <table v-if="venda_selected.pagamento" class="table1">
+        <tr>
+          <th class="titulo" :colspan="venda_selected_pagamento_keys_length">Forma de pagamento</th>
         </tr>
-        <tr> 
-            <th  v-for="y,t in venda_selected.pagamento" >{{ t }}</th>
+        <tr>
+          <th v-for="y,t in venda_selected.pagamento">{{ t }}</th>
         </tr>
-         <tr  > 
-            <td  v-for="yy in venda_selected.pagamento"  >{{ yy | money}}</td>
+        <tr>
+          <td v-for="yy in venda_selected.pagamento">{{ yy | money }}</td>
         </tr>
       </table>
       <span slot="footer" class="dialog-footer">
@@ -75,7 +128,7 @@
   </div>
 </template>
 <style scoped>
-    
+
   .table1 td, th {
     background-color: #F8F8F8;
     padding: 15px;
@@ -89,7 +142,6 @@
     text-transform: uppercase;
   }
 
-  
   .grid-content {
     padding: 7px;;
     font-size: 18px;;
@@ -144,6 +196,8 @@ export default {
   },
   data() {
     return {
+      tableKey: null,
+      sortChange: null,
       dialogPvVisible: false,
       venda_itens_columns: [
         {
@@ -280,7 +334,7 @@ export default {
       fetchList('view_vendas_completo', this.listQuery).then(response => {
         console.log('response.data.items:', response.data.items)
         this.vendas = response.data.items
-        
+
         this.total = response.data.total
 
         // Just to simulate the time of the request
@@ -290,22 +344,22 @@ export default {
       })
     },
     getList_vendaItens(params) {
+      console.log(1, params);
       this.getVendas()
       // Load spin
       this.listLoading = true
       this.venda_selected = {}
       // Set object of form view
-      this.venda_selected = params.row
+      this.venda_selected = params
       this.venda_selected.itens = JSON.parse(this.venda_selected.itens)
       this.venda_selected_itens_keys_length = Object.keys(this.venda_selected.itens[0]).length
-     
-     //Pagamento
+
+      // Pagamento
       this.venda_selected.pagamento = JSON.parse(this.venda_selected.pagamento)
       this.venda_selected_pagamento_keys_length = Object.keys(this.venda_selected.pagamento).length
 
-
       // Sum total
-      this.venda_selected.total = params.row.subtotal - params.row.desconto
+      this.venda_selected.total = params.subtotal - params.desconto
 
       this.dialogPvVisible = true
     }
