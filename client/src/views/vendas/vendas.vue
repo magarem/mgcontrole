@@ -9,44 +9,43 @@
     </div>
     <div style="width: 90%; margin: auto;">
 
+      <el-table
+        v-loading="listLoading"
+        :data="vendas"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+        @row-click="getList_vendaItens"
+      >
 
+        <el-table-column label="Data" prop="data" sortable="custom" align="center" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.data }}</span>
+          </template>
+        </el-table-column>
 
- <el-table
-      v-loading="listLoading"
-      :data="vendas"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%;"
-      @row-click="getList_vendaItens">
+        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="300">
+          <template slot-scope="scope">
+            <span>{{ scope.row.cliente }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Subtotal" prop="subtotal" sortable="custom" align="center" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.subtotal | money }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Data" prop="data" sortable="custom" align="center" width="200">
-        <template slot-scope="scope">
-          <span>{{ scope.row.data }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="300">
-        <template slot-scope="scope">
-          <span>{{ scope.row.cliente  }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Subtotal" prop="subtotal" sortable="custom" align="center" width="200">
-        <template slot-scope="scope">
-          <span>{{ scope.row.subtotal | money }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Desconto" prop="desconto" sortable="custom" align="center" width="200">
-        <template slot-scope="scope">
-          <span>{{ scope.row.desconto | money}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Total" prop="total" sortable="custom" align="center" width="200">
-        <template slot-scope="scope">
-          <span>{{ scope.row.total | money }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column label="Desconto" prop="desconto" sortable="custom" align="center" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.desconto | money }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Total" prop="total" sortable="custom" align="center" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.total | money }}</span>
+          </template>
+        </el-table-column>
 
       <!-- <el-table-column label="Actions" align="center" width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
@@ -58,10 +57,7 @@
           </el-button>
         </template>
       </el-table-column> -->
-    </el-table>
-
-
-
+      </el-table>
 
       <!-- <vue-good-table
         :columns="columns"
@@ -344,7 +340,7 @@ export default {
       })
     },
     getList_vendaItens(params) {
-      console.log(1, params);
+      console.log(1, params)
       this.getVendas()
       // Load spin
       this.listLoading = true

@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.find.ean" placeholder="EAN" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" clearable />
-      <el-input v-model="listQuery.find.descricao" placeholder="Descrição" style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter" clearable />
+      <el-input v-model="listQuery.find.ean" placeholder="EAN" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.find.descricao" placeholder="Descrição" style="width: 300px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Procurar
       </el-button>
@@ -18,7 +18,8 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange">
+      @sort-change="sortChange"
+    >
       <el-table-column label="ID" prop="ean" sortable="custom" align="center" width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -113,7 +114,6 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { Money } from 'v-money'
 
-
 export default {
   name: 'Produtos',
   components: { Pagination, Money },
@@ -165,14 +165,14 @@ export default {
         find: {
           ean: null,
           descricao: null
-        },
+        }
       },
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
       temp: {
         id: undefined,
         pco_custo: 0,
-        timestamp: new Date(),
+        timestamp: new Date()
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -243,7 +243,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           create('produtos', this.temp).then((ret) => {
-            console.log('ret:',ret.data);
+            console.log('ret:', ret.data)
             this.temp.id = ret.data.id
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
@@ -292,32 +292,30 @@ export default {
       })
     },
     handleDelete(row) {
-        this.$confirm('Excluir registro?', 'Aviso', {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancelar',
-          type: 'warning'
-        }).then(() => {
-
-            this.$notify({
-              title: 'Sucesso',
-              message: 'Exclusão de registro',
-              type: 'success',
-              duration: 2000
-            })
-            const index = this.list.indexOf(row)
-            this.list.splice(index, 1)
-
-            // Server order
-            deleteItem('produtos', row).then(() => {
-              console.log('Deleted:--->', row.id)
-            })
-         
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: 'Exclusão cancelada'
-          });          
+      this.$confirm('Excluir registro?', 'Aviso', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancelar',
+        type: 'warning'
+      }).then(() => {
+        this.$notify({
+          title: 'Sucesso',
+          message: 'Exclusão de registro',
+          type: 'success',
+          duration: 2000
         })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
+
+        // Server order
+        deleteItem('produtos', row).then(() => {
+          console.log('Deleted:--->', row.id)
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Exclusão cancelada'
+        })
+      })
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {

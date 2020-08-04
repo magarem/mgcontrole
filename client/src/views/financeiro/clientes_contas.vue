@@ -1,10 +1,10 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" v-if="info">
     <!-- <div v-if="selected" style="padding-top:10px; width: 100%;">
       You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
       </div> -->
     <h1 v-if="list[0]">{{ list[0].cliente }}</h1>
-    Token:<h2>{{token}}</h2>
+    <!-- <h2>{{ info.name }}</h2> -->
     <el-form ref="form" :model="filter" label-width="120px">
       <el-row :gutter="20">
         <el-col :span="5">
@@ -21,8 +21,7 @@
                 @focus="focusMe"
                 @click="clickHandler"
                 @input="onInputChange"
-                @selected="onSelected"
-              >
+                @selected="onSelected">
                 <div slot-scope="{suggestion}" style="display: flex; align-items: center;">
                   <div style="{ display: 'flex', color: 'navyblue'}">{{ suggestion.item.cliente }}</div>
                 </div>
@@ -38,8 +37,8 @@
         </el-col>
         <el-col :span="9">
           <div style="font-size:30px;">
-            <span v-if="(list_total.credito - list_total.debito)<0" style="color: red;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
-            <span v-if="(list_total.credito - list_total.debito)>=0" style="color: green;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
+            <span v-if="(list_total && list_total.credito - list_total.debito)<0" style="color: red;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
+            <span v-if="(list_total && list_total.credito - list_total.debito)>=0" style="color: green;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
           </div>
         </el-col>
       </el-row>
@@ -132,7 +131,7 @@ import permission from '@/directive/permission/index.js'
 import checkPermission from '@/utils/permission'
 import { fetchList, create } from '@/api/generic'
 import waves from '@/directive/waves' // waves directive
-
+import { getInfo } from '@/api/user'
 import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table'
 import { VueAutosuggest } from 'vue-autosuggest'
@@ -174,6 +173,7 @@ export default {
   },
   data() {
     return {
+      info: null,
       token: null,
       user_id: '',
       list_total: {
@@ -290,6 +290,7 @@ export default {
   },
 
   mounted() {
+    this.getUser()
     this.getList()
     this.getList_original()
     this.token = getToken()
@@ -300,6 +301,13 @@ export default {
   },
   methods: {
     checkPermission,
+    getUser(){
+      var self = this
+      getInfo().then(function(x){
+          self.info = x.data;
+          console.log(self.info);
+      })
+    },
     clickHandler(item) {
       // event fired when clicking on the input
     },

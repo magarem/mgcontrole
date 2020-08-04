@@ -44,21 +44,13 @@ export default {
   },
 
   methods: {
-    emitToParent(event) {
-      console.log('emit');
-      this.search = ""
-      this.$emit('childToParent', this.selected_id)
-    },
-    getSelected_item_id(){
-      return this.selected_id
-    },
-    setFocus(){
-      this.search = ""
+    setFocus() {
+      this.search = ''
       this.$refs.searchTerm_.focus()
     },
     onChange() {
       // Let's warn the parent that a change was made
-      this.$emit('input', this.search)
+      // this.$emit('input', this.search)
 
       // Is the data given by an outside ajax request?
       if (this.isAsync) {
@@ -74,14 +66,15 @@ export default {
       this.results = this.items.filter((item) => {
         // console.log('item:', item);
         return item.name.toLowerCase().indexOf(this.search.toLowerCase()) > -1
-      })
+      }).slice(0, 4)
     },
     setResult(result) {
       this.search = result.name
       this.selected_id = result.id
       this.isOpen = false
       this.arrowCounter = -1
-      this.emitToParent()
+      this.$emit('input', this.selected_id)
+      this.search = ''
     },
     onArrowDown(evt) {
       if (this.arrowCounter < this.results.length) {
@@ -97,8 +90,10 @@ export default {
       this.search = this.results[this.arrowCounter].name
       this.selected_id = this.results[this.arrowCounter].id
       this.isOpen = false
-      this.arrowCounter = -1
-      this.emitToParent()
+      this.arrowCounter = 0
+      this.$emit('input', this.selected_id)
+      this.search = ''
+      // this.emitToParent()
     },
     handleClickOutside(evt) {
       if (!this.$el.contains(evt.target)) {
@@ -112,15 +107,16 @@ export default {
 
 <template>
   <div class="autocomplete">
+
     <input
       ref="searchTerm_"
       v-model="search"
       type="text"
+      style="width: 100%"
       @input="onChange"
       @keydown.down="onArrowDown"
       @keydown.up="onArrowUp"
       @keydown.enter="onEnter"
-      style="width: 200px"
     >
     <ul
       v-show="isOpen"
@@ -129,8 +125,7 @@ export default {
     >
       <li
         v-if="isLoading"
-        class="loading"
-      >
+        class="loading">
         Loading results...
       </li>
       <li
@@ -139,15 +134,21 @@ export default {
         :key="i"
         class="autocomplete-result"
         :class="{ 'is-active': i === arrowCounter }"
-        @click="setResult(result)"
-      >
+        @click="setResult(result)">
         {{ result.name }}
       </li>
     </ul>
   </div>
 </template>
 
-<style>
+<style scoped>
+  div.ex1 {
+      background-color: lightblue;
+      width: 110px;
+      height: 110px;
+      overflow: auto;
+  }
+
   .autocomplete {
     position: relative;
   }
@@ -156,7 +157,7 @@ export default {
     padding: 0;
     margin: 0;
     border: 1px solid #eeeeee;
-    height: 120px;
+    height: 145px;
     overflow: auto;
     width: 100%;
   }

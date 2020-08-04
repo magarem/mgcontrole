@@ -164,12 +164,12 @@ export default {
 
           this.$store.dispatch('user/login', this.loginForm)
             .then((x) => {
-              console.log('this.redirect::', this.redirect);
+              console.log('this.redirect::', this.redirect)
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
             .catch(() => {
-              console.log('catch');
+              console.log('catch')
               this.loading = false
             })
         } else {

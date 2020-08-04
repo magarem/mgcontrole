@@ -9,7 +9,8 @@ const financeiroRouter = {
   name: 'Financeiro',
   meta: {
     title: 'Financeiro',
-    icon: 'table'
+    icon: 'table',
+    roles: ['admin', 'cliente']
   },
   children: [
     {
@@ -23,7 +24,8 @@ const financeiroRouter = {
       path: 'clientes_contas',
       component: () => import('@/views/financeiro/clientes_contas'),
       name: 'clientes_contas',
-      meta: { title: 'Clientes contas' }
+      meta: { title: 'Clientes contas',
+      roles: ['admin', 'cliente'] }
     }
   ]
 }

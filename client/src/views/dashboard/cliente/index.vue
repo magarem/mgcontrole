@@ -1,34 +1,31 @@
 <template>
-  <div class="dashboard-editor-container">
-    <div class=" clearfix">
-      <pan-thumb :image="avatar" style="float: left">
-        Your roles:
-        <span v-for="item in roles" :key="item" class="pan-info-roles">{{ item }}</span>
-      </pan-thumb>
-      <github-corner style="position: absolute; top: 0px; border: 0; right: 0;" />
-      <div class="info-container">
-        <span class="display_name">{{ name }}</span>
-        <span style="font-size:20px;padding-top:20px;display:inline-block;">Editor's Dashboard</span>
-      </div>
+  <div class="dashboard-cliente-container">
+    <div class="clearfix">
+      <h1>Área do cliente</h1>
+      <h2>Bem vindo, {{ user }}</h2>
+      <router-link to="/financeiro/clientes_contas" tag="button">Ir para minha conta</router-link>
     </div>
-    <div>
-      <img :src="emptyGif" class="emptyGif">
-    </div>
+    
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import PanThumb from '@/components/PanThumb'
-import GithubCorner from '@/components/GithubCorner'
+// import { getToken } from '@/utils/auth' // get token from cookie
+import { getInfo } from '@/api/user'
 
 export default {
-  name: 'DashboardEditor',
-  components: { PanThumb, GithubCorner },
+  name: 'Dashboardcliente',
+  components: { PanThumb},
   data() {
     return {
+      user: null,
       emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
     }
+  },
+  created() {
+    this.getUser()
   },
   computed: {
     ...mapGetters([
@@ -36,6 +33,15 @@ export default {
       'avatar',
       'roles'
     ])
+  },
+  methods: {
+    getUser(){
+      var self = this
+      getInfo().then(function(x){
+          self.user = x.data.name;
+          console.log(self.user);
+      })
+    },
   }
 }
 </script>
@@ -47,7 +53,7 @@ export default {
     margin: 0 auto;
   }
 
-  .dashboard-editor-container {
+  .dashboard-cliente-container {
     background-color: #e3e3e3;
     min-height: 100vh;
     padding: 50px 60px 0px;

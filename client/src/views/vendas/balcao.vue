@@ -1,11 +1,19 @@
 <style scoped>
   
-  @page { size: 58mm 100mm } /* output size */
+  @page { 
+    margin-left: 0cm;
+    size: 58mm 100mm } /* output size */
   .receipt .sheet { width: 58mm; _height: 100mm } /* sheet size */
   @media print { .receipt { width: 58mm } } /* fix for Chrome */
 
-  .cupom_total {
-    text-align: right; font-family: tahoma; font-size: 22px;
+  .line{
+    width: 100%;
+    height: 5px;
+    border-bottom: 1px solid #a6a6a6;
+    margin-bottom: 3px;
+  }
+  .cupom_total { 
+    text-align: right; font-family: tahoma; font-size: 13px;
   }
 
   #caixa_Status {
@@ -79,19 +87,20 @@
           <el-row :gutter="20">
             <el-col :span="24">
               <!-- Produtos --> 
+              
                 <el-card class="box-card" shadow="always" style="height: 330px">
                   <div slot="header" class="clearfix cardtitle">
                     <el-row>
-                      <el-col :span="12">
+                      <el-col :span="8">
                         <span>Produtos</span> 
                       </el-col>
-                      <el-col :span="12">
-                        <autocomplete ref="searchTerm_" :items="produtos_" v-on:childToParent="productSet" />
+                      <el-col :span="16">
+                        <autocomplete ref="searchTerm_" :items="produtos_" v-on:input="productSet"  />
                       </el-col>
                     </el-row>
                   </div>
                   <el-row>
-                    <el-col :span="24">
+                    <el-col :span="24" v-if="atalhos">
                       <button @click="productSet(5372)">Tomate</button>
                       <button @click="productSet(5373)">Cebola</button>
                       <button @click="productSet(5375)">Alho</button>
@@ -174,36 +183,85 @@
           <el-row :gutter="20">
             <el-col :span="24">
               <!-- Cupom -->
-               <el-card id=myelement_ class="box-card" shadow="always" style="height: 450px;">
+               <el-card id=myelement_ class="box-card" shadow="always" style="height: 450px; background-color: #ffffe6;">
                   <div slot="header" class="clearfix cardtitle">
-                    <div  >
-                      <el-row :gutter="5" >
-                        <el-col :span="12">
-                          <span>Cupom</span>
-                        </el-col>
-                        <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
-                          {{today}}
-                        </el-col>
-                      </el-row>
-                      <el-row>
-                        <el-col :span=12>
-                            <span style="font-family: tahoma; font-size: 70%;">
-                              <a @click="getCliente"><span v-if="cupom.cliente.id"></span>
-                                Usuário: {{ user }}</a>
-                            </span>
-                        </el-col>
-                        <el-col :span=12 style="text-align: right;">
-                            <span style="font-family: tahoma; font-size: 70%;">
-                              <a @click="getCliente"><span v-if="cupom.cliente.id"></span>
-                                Cliente: {{ cupom.cliente.nome }} ({{ cupom.cliente.id }})</a>
-                            </span>
-                        </el-col>
-                      </el-row>
-                    </div>
+                    <el-row :gutter="5" >
+                      <el-col :span="12">
+                        <span>Cupom</span>
+                      </el-col>
+                      <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
+                        {{today}}
+                      </el-col>
+                    </el-row>
+                    <el-row>
+                      <el-col :span=12>
+                          <span style="font-family: tahoma; font-size: 70%;">
+                            <a @click="getCliente"><span v-if="cupom.cliente.id"></span>
+                              Usuário: {{ user }}</a>
+                          </span>
+                      </el-col>
+                      <el-col :span=12 style="text-align: right;">
+                          <span style="font-family: tahoma; font-size: 70%;">
+                            <a @click="getCliente"><span v-if="cupom.cliente.id"></span>
+                              Cliente: {{ cupom.cliente.nome }} ({{ cupom.cliente.id }})</a>
+                          </span>
+                      </el-col>
+                    </el-row>
                   </div>
-                  <div>
-                    <div v-if="cupom.itens.length == 0" style="text-align: center; vertical-align: middle; width: 100%; _height: 300px; _background-color: green;"><br><br><br><br><h1 id="caixa_Status">Caixa livre</h1></div>
-                    <vue-good-table
+                    <div v-if="cupom.itens.length == 0" style="text-align: center; vertical-align: middle; width: 100%; _height: 300px; _background-color: green;"><br><h1 id="caixa_Status">Caixa livre</h1></div>
+                     <el-row :gutter="25" v-if="cupom.itens.length > 0" style="text-align: center; width: 100%; font-weight: bold; font-size: 20px; margin-top: -5px; margin-left:0px; _background-color: #ffffb3;">
+                        <el-col :span=2 style="text-align: center;">
+                           #
+                        </el-col>
+                        <el-col :span=3>
+                           Cod
+                        </el-col>
+                        <el-col :span=5 style="text-align: center;">
+                           Descrição
+                        </el-col>
+                        <el-col :span=4>
+                           Preço
+                        </el-col>
+                         <el-col :span=3>
+                           Uni
+                        </el-col>
+                        <el-col :span=2>
+                           Qnt
+                        </el-col>
+                        <el-col :span=5 style="text-align: center;">
+                           Total
+                        </el-col>
+                     </el-row>
+                     <el-row  v-if="cupom.itens.length > 0" :gutter="25" style=" width: 100%; margin-left:0px; font-size: 20px;">
+                        <el-col :span=24><div style=" width: 100%;" class="line"></div></el-col>
+                     </el-row>
+                     <div id="container" style="width: 100%; max-height:270px; overflow-y: auto;">
+                      <el-row  :gutter="25" v-for="(row, rindex) in cupom.itens" v-bind:key="rindex" style=" width: 100%; margin-left:0px; font-size: 20px;">
+                        <div @click="cupomRowView(row.n)">
+                        <el-col :span=2 style="text-align: center;">
+                           {{rindex + 1}}
+                        </el-col>
+                        <el-col :span=3 style="text-align: center;">
+                           {{row.id}}
+                        </el-col>
+                        <el-col :span=5 style="text-align: center;">
+                           {{row.descricao}}
+                        </el-col>
+                        <el-col :span=4 style="text-align: center;">
+                           {{row.pco_venda | money}}
+                        </el-col>
+                        <el-col :span=3 style="text-align: center;">
+                           {{row.unidade||'uni' }}
+                        </el-col>
+                        <el-col :span=2 style="text-align: center;">
+                           {{row.qnt}}
+                        </el-col>
+                        <el-col :span=5 style="text-align: center;">
+                           {{row.total | money}}
+                        </el-col>
+                        </div>
+                     </el-row>
+                    <!-- <vue-good-table
                       v-if="cupom.itens.length > 0"
                       :columns="columns_cupom"
                       :rows="cupom.itens"
@@ -213,7 +271,7 @@
                       <div slot="emptystate">
                         Caixa livre
                       </div>
-                    </vue-good-table>
+                    </vue-good-table> -->
                     <!-- <div v-if=cupom.itens.length class=cupom_total style="margin-top: 5px">
                             (Itens: {{ cupom.itens.length }}) Sub-total: {{ cupom.subtotal | money }}
                     </div> -->
@@ -273,8 +331,11 @@
     <!----                                                        ----->
 
     <!-- CUPOM view row -->
-    <el-dialog :visible.sync="dialogFormCupomView" :title="textMap[dialogStatus]" top="5vh">
+    <el-dialog :visible.sync="dialogFormCupomView" title="Item do cupom" top="5vh">
       <el-form ref="dataForm" :model="temp2" label-position="right" label-width="140px" style="_width: 400px; _margin-left:50px; font-size: 18px;">
+        <el-form-item label="#:" prop="n">
+          <el-input v-model="temp2.n" readonly/>
+        </el-form-item>
         <el-form-item label="Código:" prop="ean">
           <el-input v-model="temp2.id" readonly/>
         </el-form-item>
@@ -282,7 +343,7 @@
           <el-input v-model="temp2.descricao" readonly/>
         </el-form-item>
         <el-form-item label="Preço:" prop="preco">
-          <el-input v-model="temp2.pco_venda" readonly/>
+          <money v-model="temp2.pco_venda" v-bind="money" class="el-input__inner" readonly/>
         </el-form-item>
         <el-form-item label="Unidade:" prop="unidade">
           <el-input v-model="temp2.unidade" readonly/>
@@ -489,8 +550,9 @@
             Caixa livre
           </div>
         </vue-good-table> -->
-        <div class="cupom_total">
+        <div class="cupom_total2">
           <b>Hortifruti Nova Caraíva</b><br>
+          CNPJ: 33.042.633/0001-11<br>
           Data: {{today}}<br>
           Cliente: {{cupom.cliente.nome}} - {{cupom.cliente.id}}<br>
         </div><br>
@@ -498,20 +560,19 @@
           :data="cupom.itens"
           row-class-name="cupom_total"
           header-row-class-name="cupom_total"
-          style="width: 100%; font-size:20px;">
+          style="width: 100%; font-size:13px;">
           <el-table-column
             prop="descricao"
             label="Desc"
-            >
+            width="50px">
             <template slot-scope="scope">
               <span>{{ scope.row.id }}<br>{{ scope.row.descricao }}</span>
             </template>
           </el-table-column>
           <el-table-column
             prop="pco_venda"
-            label="pço"
-            width="90px"
-            >
+            label="Pço"
+            width="50px">
             <template slot-scope="scope">
               <span>{{ scope.row.pco_venda | money }}</span>
             </template>
@@ -519,15 +580,13 @@
           <el-table-column
             prop="unidade"
             label="Uni"
-            width="55px">
+            width="40px">
           </el-table-column>
-          
           <el-table-column
             prop="qnt"
             label="Qnt"
-            width="55px">
+            width="40px">
           </el-table-column>
-          
           <el-table-column
             prop="total"
             label="Total">
@@ -549,21 +608,28 @@
               </td>
           </tr>
         </table> -->
-
-        <div v-if=cupom.itens.length class=cupom_total style="margin-top: 5px; text-align: left; font-family: tahoma;">
+        <div v-if=cupom.itens.length class=cupom_total2 style="margin-top: 5px; text-align: left; font-family: tahoma;">
                 (Itens: {{ cupom.itens.length }})<br> Sub-total: {{ cupom.subtotal | money }}<br> Desconto:{{ desconto | money }}<br>Total: {{ cupom.subtotal - desconto | money }}
         </div>
+        <div><p>----------------------------------------------------------</p></div>
+        <div>
+          <h3>Forma de pagamento:</h3>
+          <div v-if=pago_dinheiro>Dinheiro: {{pago_dinheiro | money}}</div>
+          <div v-if=pago_debito>Cartão de débito: {{pago_debito | money}}</div>
+          <div v-if=pago_credito>Cartão de crédito: {{pago_credito | money}}</div>
+          <div v-if=pago_faturado>Faturado :{{pago_faturado | money}}</div>
+        </div>
+        <div><p>----------------------------------------------------------</p></div>
+        <div>
+          <p>Obrigado pela preferência! Volte sempre.</p>
+        </div>
       </div>
-      
     </el-dialog>
-  
-  
-  
   </div>
 </template>
 
 <script>
-import { login, logout, getInfo } from '@/api/user'
+import { getInfo } from '@/api/user'
 import { fetchList } from '@/api/generic'
 import { vendaClose } from '@/api/vendaClose'
 import waves from '@/directive/waves' // waves directive
@@ -593,6 +659,7 @@ export default {
   },
   data() {
     return {
+      atalhos: true,
       value: null,
       fromChild: null,
       search2: null,
@@ -613,6 +680,7 @@ export default {
           nome: 'Cliente'
         },
         itens: [],
+        itens_n: 0,
         subtotal: null,
         desconto: null,
         total: null
@@ -725,6 +793,7 @@ export default {
       clientesListFlg: false,
       qnt: null,
       temp2: {
+        n: null,
         id: 0
       },
       dialogStatus: '',
@@ -804,11 +873,18 @@ export default {
     })
   },
   methods: {
-    productSet2(){
-      console.log("!!!");
+    vv(x){
+      console.log(x);
     },
-    xx(){
-      console.log(this.$refs.searchTerm_.getSelected_item_id());
+    scrollToEnd: function() {    	
+      var container = this.$el.querySelector("#container");
+      container.scrollTop = container.scrollHeight;
+    },
+    scrollToElement() {
+      const el = this.$el.getElementsByClassName('scroll-to-me')[0];
+      if (el) {
+        el.scrollIntoView();
+      }
     },
     getUser(){
       var self = this
@@ -820,14 +896,14 @@ export default {
       return x
     },
      updateDateTime() {
-     var self = this
-      const today = new Date();
-      const date = today.getDate() + '/' + (today.getMonth()+1) + '/' + today.getFullYear();
-      const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      const dateTime = date +' '+ time;
-      self.today = dateTime;
-      self.today_timestamp = Date.now()
-      setTimeout(self.updateDateTime, 1000);
+      var self = this
+        const today = new Date();
+        const date = today.getDate() + '/' + (today.getMonth()+1) + '/' + today.getFullYear();
+        const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        const dateTime = date +' '+ time;
+        self.today = dateTime;
+        self.today_timestamp = Date.now()
+        setTimeout(self.updateDateTime, 1000);
     },
     getNow() {
       var self = this
@@ -897,12 +973,15 @@ export default {
       })
     },
     cupom_add() {
-      if (this.product_selected.qnt>0){
+      if (this.product_selected.qnt > 0){
         this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
         // this.product_selected.qnt = this.product_selected.qnt.replace(',', '.')
         // Procura produto pelo ID
         if (this.product_selected.id) {
+          // var n = this.cupom.itens.lenght?this.cupom.itens.lenght+1:1
+          this.cupom.itens_n++
           var auxObj = {
+            n: this.cupom.itens_n,
             id: this.product_selected.id,
             descricao: this.product_selected.descricao,
             pco_venda: this.product_selected.pco_venda,
@@ -910,7 +989,8 @@ export default {
             unidade: this.product_selected.unidade,
             total: this.product_selected.qnt * this.product_selected.pco_venda
           }
-          this.cupom.itens.unshift(auxObj)
+          // this.cupom.itens.unshift(auxObj)
+          this.cupom.itens.push(auxObj)
           this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
 
           // Total Calc
@@ -925,14 +1005,17 @@ export default {
           this.novoItem = false
           this.$nextTick(function () {
             this.novoItem = true
+             this.scrollToEnd();
           })
           this.vai()
         }
       }
     },
-    cupomRowView(params) {
+    cupomRowView(n) {
       this.dialogFormCupomView = true
-      this.temp2 = params.row
+      // this.temp2 = params.row
+      var item = this.cupom.itens.find(x => parseInt(x.n) === parseInt(n))
+      this.temp2 = item
     },
     productSet(params) {
       // event.preventDefault()
@@ -952,7 +1035,10 @@ export default {
         const d = new Printd()
         const cssText = `
           .cupom_total {
-            text-align: left; font-family: tahoma; font-size: 35px;
+            text-align: left; font-family: tahoma; font-size: 15px;
+          }
+          .cupom_total2 {
+            text-align: left; font-family: tahoma; font-size: 18px;
           }
         `
         d.print( document.getElementById('myelement'), [ cssText ])
@@ -1049,7 +1135,7 @@ export default {
       })
       console.log(row)
       this.cupom.subtotal -= row.total
-      this.cupom.itens = this.cupom.itens.filter(item => item.id !== row.id)
+      this.cupom.itens = this.cupom.itens.filter(item => item.n !== row.n)
       this.dialogFormCupomView = false
     }
   }
