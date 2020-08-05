@@ -25,7 +25,7 @@ const financeiroRouter = {
       component: () => import('@/views/financeiro/clientes_contas'),
       name: 'clientes_contas',
       meta: { title: 'Clientes contas',
-      roles: ['admin', 'cliente'] }
+        roles: ['admin', 'cliente'] }
     }
   ]
 }

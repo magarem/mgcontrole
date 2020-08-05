@@ -80,10 +80,24 @@ app.use(session({
 const history = require('connect-history-api-fallback');
 const staticFileMiddleware = express.static(__dirname);
 app.use(staticFileMiddleware);
+
+
+app.get('/oi', (req, res) => {
+  res.json({
+    name: 'Krsna!'
+  });
+});
+
+
+
 app.use(history({
   disableDotRule: true,
   verbose: true
 }));
+
+
+
+
 app.use(staticFileMiddleware);
 
 app.use(cors({
@@ -138,6 +152,9 @@ app.set('view engine', 'ejs');
 //app.use(express.static('./public'));
 console.log(__dirname)
 app.use(express.static('../client'));
+
+
+
 
 app.get(environment + '/setowner', function (req, res, next) {
    req.session.owner = req.query.owner

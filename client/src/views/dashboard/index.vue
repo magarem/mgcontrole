@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <component :is="currentRole" />
-    
+
   </div>
 </template>
 
@@ -9,7 +9,6 @@
 import { mapGetters } from 'vuex'
 import adminDashboard from './admin'
 import clienteDashboard from './cliente'
-
 
 export default {
   name: 'Dashboard',

@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container" v-if="info">
+  <div v-if="info" class="app-container">
     <!-- <div v-if="selected" style="padding-top:10px; width: 100%;">
       You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
       </div> -->
@@ -21,7 +21,8 @@
                 @focus="focusMe"
                 @click="clickHandler"
                 @input="onInputChange"
-                @selected="onSelected">
+                @selected="onSelected"
+              >
                 <div slot-scope="{suggestion}" style="display: flex; align-items: center;">
                   <div style="{ display: 'flex', color: 'navyblue'}">{{ suggestion.item.cliente }}</div>
                 </div>
@@ -301,11 +302,11 @@ export default {
   },
   methods: {
     checkPermission,
-    getUser(){
+    getUser() {
       var self = this
-      getInfo().then(function(x){
-          self.info = x.data;
-          console.log(self.info);
+      getInfo().then(function(x) {
+        self.info = x.data
+        console.log(self.info)
       })
     },
     clickHandler(item) {

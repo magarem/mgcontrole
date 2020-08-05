@@ -5,7 +5,7 @@
       <h2>Bem vindo, {{ user }}</h2>
       <router-link to="/financeiro/clientes_contas" tag="button">Ir para minha conta</router-link>
     </div>
-    
+
   </div>
 </template>
 
@@ -17,7 +17,7 @@ import { getInfo } from '@/api/user'
 
 export default {
   name: 'Dashboardcliente',
-  components: { PanThumb},
+  components: { PanThumb },
   data() {
     return {
       user: null,
@@ -35,13 +35,13 @@ export default {
     ])
   },
   methods: {
-    getUser(){
+    getUser() {
       var self = this
-      getInfo().then(function(x){
-          self.user = x.data.name;
-          console.log(self.user);
+      getInfo().then(function(x) {
+        self.user = x.data.name
+        console.log(self.user)
       })
-    },
+    }
   }
 }
 </script>

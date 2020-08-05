@@ -125,7 +125,8 @@ export default {
     >
       <li
         v-if="isLoading"
-        class="loading">
+        class="loading"
+      >
         Loading results...
       </li>
       <li
@@ -134,7 +135,8 @@ export default {
         :key="i"
         class="autocomplete-result"
         :class="{ 'is-active': i === arrowCounter }"
-        @click="setResult(result)">
+        @click="setResult(result)"
+      >
         {{ result.name }}
       </li>
     </ul>
