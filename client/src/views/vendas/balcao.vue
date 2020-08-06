@@ -192,7 +192,7 @@
                 <el-row :gutter="5">
                   <el-col :span="12">
                     <span>Cupom</span>
-                    
+
                   </el-col>
                   <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                     {{ today }}
@@ -202,13 +202,13 @@
                   <el-col :span="12">
                     <span style="font-family: tahoma; font-size: 70%;">
                       <a @click="getCliente"><span v-if="cupom.cliente.id" />
-                        <span class=bold>Usuário:</span> {{ user }}</a>
+                        <span class="bold">Usuário:</span> {{ user }}</a>
                     </span>
                   </el-col>
                   <el-col :span="12" style="text-align: right;">
                     <span style="font-family: tahoma; font-size: 70%;">
                       <a @click="getCliente"><span v-if="cupom.cliente.id" />
-                        <span class=bold>Cliente:</span> {{ cupom.cliente.nome }} ({{ cupom.cliente.id }})</a>
+                        <span class="bold">Cliente:</span> {{ cupom.cliente.nome }} ({{ cupom.cliente.id }})</a>
                     </span>
                   </el-col>
                 </el-row>
@@ -237,7 +237,7 @@
                   Total
                 </el-col>
               </el-row>
-              <el-divider v-if="cupom.itens.length > 0" ></el-divider>
+              <el-divider v-if="cupom.itens.length > 0" />
               <div id="container" style="margin-top:-15px; width: 100%; max-height:270px; overflow-y: auto;">
                 <el-row v-for="(row, rindex) in cupom.itens" :key="rindex" :gutter="25" :style="{backgroundColor: (rindex % 2 === 0? '' : '#f2f2da')}" style="width: 100%; margin-left:0px; margin-bottom: 3px;padding: 5px; font-size: 19px;">
                   <div @click="cupomRowView(row.n)">
@@ -307,7 +307,8 @@
                         v-show="cupom.total>0"
                         style="height:60px; font-size:25px; width: 100%;"
                         type="danger"
-                        @click="vendaCancel()">
+                        @click="vendaCancel()"
+                      >
                         Cancelar
                       </el-button>
                     </el-col>
@@ -594,7 +595,8 @@
           />
           <el-table-column
             prop="total"
-            label="Total">
+            label="Total"
+          >
             <template slot-scope="scope">
               <span>{{ scope.row.total | money }}</span>
             </template>

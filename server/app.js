@@ -82,10 +82,55 @@ const staticFileMiddleware = express.static(__dirname);
 app.use(staticFileMiddleware);
 
 
-app.get('/oi', (req, res) => {
-  res.json({
-    name: 'Krsna!'
-  });
+app.get('/:datafile/minhaconta/', (req, res) => {
+   const datafile = req.params.datafile
+   const user = req.query.user
+   var ret = []
+   var fields = []
+   var values = []
+   console.log('datafile:', datafile);
+   console.log('user:', user);
+   // Prepara o SQL para trazer as informações de login
+  
+
+   // Open data base file based on domain name of client
+   var db = new sqlite3.Database(datafile + '.db');
+   
+  //  var sql2 = "PRAGMA table_info(f_clientes_faturados)"
+  //  db.all(sql2, function(err, rows) {
+  //   rows.forEach(function (row) {
+  //     console.log('row:', row.name);
+  //     ret.push(row.name);
+  //   })
+  //   console.log('ret.join(','):', ret.join(','));
+  //  });
+
+   let sqlStr = `select * from f_clientes_faturados where cliente_id = ${user}`
+   console.log('sql:', sqlStr);
+   // Execute the SQL in databank stacking rows in ret var
+   db.all(sqlStr, function(err, rows) {
+    rows.forEach(function (row) {
+      console.log('row:', row);
+      values.push(row);
+    })
+
+   //totaliza
+   // get sum of msgCount prop across all objects in array
+    var total_debitos = values.reduce(function(prev, cur) {
+      return prev + cur.debito;
+    }, 0);
+
+    var total_creditos = values.reduce(function(prev, cur) {
+      return prev + cur.credito;
+    }, 0);
+
+    var total = total_debitos - total_creditos
+    
+    res.render('minhaconta', { fields: fields, items: values, total_debitos: total_debitos, total_creditos: total_creditos, total: total});
+   });	
+
+   // Close data bank
+   db.close();
 });
 
 
