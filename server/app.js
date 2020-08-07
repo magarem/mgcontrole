@@ -81,9 +81,21 @@ const history = require('connect-history-api-fallback');
 const staticFileMiddleware = express.static(__dirname);
 app.use(staticFileMiddleware);
 
+// var cors = require('cors');
+
+// app.get('/your-route', cors(), (req, res) => {
+//   // res.status(200).send('your data');
+// }
 
 app.get('/:datafile/minhaconta/', (req, res) => {
-   const datafile = req.params.datafile
+    const datafile = req.params.datafile
+    const user = req.query.user
+    const url = `/${datafile}/minhaconta/getdata?user=${user}`
+    res.render('minhaconta', { url });
+})
+
+app.get('/:datafile/minhaconta/getdata/', (req, res) => {
+   const datafile = req.params.datafile + '.db'
    const user = req.query.user
    var ret = []
    var fields = []
@@ -92,55 +104,39 @@ app.get('/:datafile/minhaconta/', (req, res) => {
    console.log('user:', user);
    // Prepara o SQL para trazer as informações de login
   
-
-   // Open data base file based on domain name of client
-   var db = new sqlite3.Database(datafile + '.db');
-   
-  //  var sql2 = "PRAGMA table_info(f_clientes_faturados)"
-  //  db.all(sql2, function(err, rows) {
-  //   rows.forEach(function (row) {
-  //     console.log('row:', row.name);
-  //     ret.push(row.name);
-  //   })
-  //   console.log('ret.join(','):', ret.join(','));
-  //  });
-
-   let sqlStr = `select * from f_clientes_faturados where cliente_id = ${user}`
-   console.log('sql:', sqlStr);
-   // Execute the SQL in databank stacking rows in ret var
-   db.all(sqlStr, function(err, rows) {
-    rows.forEach(function (row) {
-      console.log('row:', row);
-      values.push(row);
-    })
-
-   //totaliza
-   // get sum of msgCount prop across all objects in array
-    var total_debitos = values.reduce(function(prev, cur) {
-      return prev + cur.debito;
-    }, 0);
-
-    var total_creditos = values.reduce(function(prev, cur) {
-      return prev + cur.credito;
-    }, 0);
-
-    var total = total_debitos - total_creditos
-    
-    res.render('minhaconta', { fields: fields, items: values, total_debitos: total_debitos, total_creditos: total_creditos, total: total});
-   });	
-
-   // Close data bank
-   db.close();
+  try {
+    if (fs.existsSync('./' + datafile)) {
+       //file exists
+       // Open data base file based on domain name of client
+      var db = new sqlite3.Database(datafile);
+      let sqlStr = `select * from f_clientes_faturados where cliente_id = ${user}`
+      console.log('sql:', sqlStr);
+      // Execute the SQL in databank stacking rows in ret var
+      db.all(sqlStr, function(err, rows) {
+        rows.forEach(function (row) {
+          console.log('row:', row);
+          values.push(row);
+        })
+        // totaliza
+        // get sum of msgCount prop across all objects in array
+       
+        
+        // res.render('minhaconta', { items: values, total_debitos: total_debitos, total_creditos: total_creditos, total: total});
+        res.send(values) 
+    });	
+    // Close data bank
+    db.close();
+    }
+  } catch(err) {
+    console.error(err)
+  }
 });
-
 
 
 app.use(history({
   disableDotRule: true,
   verbose: true
 }));
-
-
 
 
 app.use(staticFileMiddleware);
@@ -194,9 +190,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({limit: '50mb'}));
 
 app.set('view engine', 'ejs');
-//app.use(express.static('./public'));
+app.use(express.static('./public'));
 console.log(__dirname)
-app.use(express.static('../client'));
+// app.use(express.static('../client'));
 
 
 
