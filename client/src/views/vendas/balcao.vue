@@ -10,6 +10,24 @@
     font-weight: bold;
   }
 
+  input[list] {
+    margin-left:auto;
+    margin-right:auto;
+    max-width: 600px;
+    /* background: #D2E9FF; */
+    /* padding: 20px 20px 20px 20px; */
+    font: 20px Arial, Helvetica, sans-serif;
+    color: #666;
+  }
+
+  .produto_button  {
+    width: 102px; 
+    height: 102px;
+    background-color: white;
+    border: none; 
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2), 0 1px 5px 0 rgba(0,0,0,0.19);
+  }
+
   .line{
     width: 100%;
     height: 5px;
@@ -91,7 +109,7 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <!-- Produtos -->
-
+           
             <el-card class="box-card" shadow="always" style="height: 330px">
               <div slot="header" class="clearfix cardtitle">
                 <el-row>
@@ -99,15 +117,42 @@
                     <span>Produtos</span>
                   </el-col>
                   <el-col :span="16">
-                    <autocomplete ref="searchTerm_" :items="produtos_" @input="productSet" />
+                    <!-- <autocomplete ref="searchTerm_" :items="produtos_" @input="productSet"  /> -->
+                  <input ref="searchTerm_" v-model="source" list="my-list-id" @input="productSet">
+                  <datalist id="my-list-id">
+                    <option v-for="(value, key) in produtos_" :key=key  >{{value.name}}</option>
+                  </datalist>
                   </el-col>
                 </el-row>
               </div>
-              <el-row>
-                <el-col v-if="atalhos" :span="24">
-                  <button @click="productSet(5372)">Tomate</button>
-                  <button @click="productSet(5373)">Cebola</button>
-                  <button @click="productSet(5375)">Alho</button>
+              <el-row :gutter="20" >
+                
+                <el-col v-if="atalhos" :span="6">
+                  <button @click="productSet('tomate')" class=produto_button><img :src="'tomate' | img_mini(produtos)"> </button>    
+                </el-col>
+                <el-col v-if="atalhos" :span="6" >
+                  <button @click="productSet('cebola')" class=produto_button><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
+                </el-col>
+                <el-col v-if="atalhos" :span="6" >
+                  <button @click="productSet('alho')" class=produto_button><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>  
+                </el-col>
+                <el-col v-if="atalhos" :span="6" >
+                  <button @click="productSet('pimentao')"  class=produto_button><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>  
+                </el-col>
+                
+              </el-row><br>
+              <el-row :gutter="20" >
+                <el-col v-if="atalhos" :span="6">
+                  <button @click="productSet(5372)" class=produto_button >Tomate</button>    
+                </el-col>
+                <el-col v-if="atalhos" :span="6" >
+                  <button @click="productSet(5373)" class=produto_button>Cebola</button>
+                </el-col>
+                <el-col v-if="atalhos" :span="6" >
+                  <button @click="productSet(5375)" class=produto_button>Alho</button>  
+                </el-col>
+                <el-col v-if="atalhos" :span="6" >
+                  <button @click="productSet(5375)"  class=produto_button>Alho</button>  
                 </el-col>
               </el-row>
               <!-- <el-row>
@@ -132,7 +177,7 @@
         <el-row>
           <el-col :span="24">
             <!-- Produto selected -->
-            <el-card v-show="product_selected.id" class="box-card box_product_selected" shadow="always" style="height: 250px">
+            <el-card v-show="product_selected.id" class="box-card box_product_selected" shadow="always" style="height: 260px">
               <div slot="header" class="clearfix cardtitle ">
 
                 <div id="wrapper">
@@ -187,12 +232,11 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <!-- Cupom -->
-            <el-card id="myelement_" class="box-card" shadow="always" style="height: 450px; background-color: #ffffe6;">
+            <el-card id="myelement_" class="box-card" shadow="always" style="height: 430px; background-color: #ffffe6;">
               <div slot="header" class="clearfix cardtitle">
                 <el-row :gutter="5">
                   <el-col :span="12">
                     <span>Cupom</span>
-
                   </el-col>
                   <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                     {{ today }}
@@ -286,15 +330,15 @@
         <el-row>
           <el-col :span="24">
             <!-- Venda Check-out -->
-            <el-card v-show="cupom.itens.length > 0" class="box-card cardtitle" shadow="always" style="height: 230px">
+            <el-card v-show="cupom.itens.length > 0" class="box-card cardtitle" shadow="always" style="height: 160px">
               <div slot="header" class="clearfix cardtitle">
                 <div id="wrapper">
                   <div class="left">
-                    <span>Finalização</span>
+                    <span>Itens: {{ cupom.itens.length }}</span>
                   </div>
                   <div class="right">
                     <span style="font-family: tahoma; font-size: 22px;">
-                      (Itens: {{ cupom.itens.length }}) Sub-total: {{ cupom.subtotal | money }}
+                       Sub-total: {{ cupom.subtotal | money }}
                     </span>
                   </div>
                 </div>
@@ -645,12 +689,15 @@ import { VueGoodTable } from 'vue-good-table'
 
 import { Printd } from 'printd'
 import Autocomplete from '@/components/Autocomplete'
-
 export default {
   name: 'Balcao',
-  components: { Money, VueGoodTable, Autocomplete },
+  components: { Money, VueGoodTable, Autocomplete},
   directives: { waves },
   filters: {
+    img_mini: function (value, produtos) {
+      var a = produtos.filter(item => item.descricao == value)[0]
+      if (a) return a.img_mini
+    },
     money(value) {
       if (typeof value !== 'number') {
         return value
@@ -664,6 +711,8 @@ export default {
   },
   data() {
     return {
+      audio: ["assets/audio/timer_beep.mp3","assets/audio/timer_beep.mp3"],
+      source: null,
       atalhos: true,
       value: null,
       fromChild: null,
@@ -824,9 +873,11 @@ export default {
       // if (!keysAllowed.includes(this.qnt)) {
       //     // evt.preventDefault()
       // }
-      this.qnt = this.qnt ? this.qnt.replace(',', '.') : ''
-      this.product_selected.qnt = this.qnt
-      this.product_selected.total = this.product_selected.qnt * this.product_selected.pco_venda
+      if (this.qnt){
+        this.qnt = this.qnt ? this.qnt.replace(',', '.') : ''
+        this.product_selected.qnt = this.qnt
+        this.product_selected.total = this.product_selected.qnt * this.product_selected.pco_venda
+      }
     },
     desconto: function() {
       // this.cupom.total = this.cupom.total - this.desconto
@@ -878,6 +929,9 @@ export default {
     })
   },
   methods: {
+    xx(){
+      console.log(this.source);
+    },
     vv(x) {
       console.log(x)
     },
@@ -939,10 +993,12 @@ export default {
     vai() {
       console.log(this.$refs)
       this.$nextTick(function() {
-        // this.$refs.searchTerm_.setFocus()
-        this.$refs.searchTerm_.$refs.searchTerm_.focus()
+        this.$refs.searchTerm_.focus()
+        this.source = null
+        // this.$refs.searchTerm_.value=null;
+        // this.$refs.searchTerm_.$refs.searchTerm_.focus()
         // this.$refs.searchTerm.clear()
-        this.searchTerm = null
+        // this.searchTerm_ = null
       })
     },
     vai2() {
@@ -979,7 +1035,8 @@ export default {
     },
     cupom_add() {
       if (this.product_selected.qnt > 0) {
-        this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
+       const sound = ( new Audio(require('@/assets/audio/timer_beep.mp3'))).play()
+       this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
         // this.product_selected.qnt = this.product_selected.qnt.replace(',', '.')
         // Procura produto pelo ID
         if (this.product_selected.id) {
@@ -1023,17 +1080,19 @@ export default {
       this.temp2 = item
     },
     productSet(params) {
-      // event.preventDefault()
-      console.log(params)
-      var item = this.produtos.find(x => parseInt(x.id) === parseInt(params))
-      // this.product_selected = params.row
-      this.product_selected = item
-      this.product_selected.qnt = 0.0
-      this.product_selected.total = 0
-      console.log('this.product_selected:', this.product_selected)
-      this.$nextTick(() => {
-        this.vai2()
-      })
+      //Check if is called by datalist or by product button
+      if (params === Object(params)) var params = this.source
+      // var item = this.produtos.find(x => parseInt(x.id) === parseInt(params))
+      var item = this.produtos.find(x => (x.descricao) === (params))
+      if (item){
+        this.product_selected = item
+        this.product_selected.qnt = 0.0
+        this.product_selected.total = 0
+        console.log('this.product_selected:', this.product_selected)
+        this.$nextTick(() => {
+          this.vai2()
+        })
+      }
     },
     print() {
       // Check if is needed to print
@@ -1110,6 +1169,9 @@ export default {
       this.pago_credito = 0
       this.pago_faturado = 0
       this.pago_troco = 0
+
+      this.$refs.searchTerm_.focus()
+      this.source = null
 
       // Close modal
       this.vendaCloseFlg = false

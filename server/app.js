@@ -76,7 +76,10 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }))
+// app.use(authChecker);
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
 const history = require('connect-history-api-fallback');
 const staticFileMiddleware = express.static(__dirname);
 app.use(staticFileMiddleware);
@@ -89,41 +92,43 @@ app.use(staticFileMiddleware);
 
 app.get('/:datafile/minhaconta/', (req, res) => {
     const datafile = req.params.datafile
-    const user = req.query.user
-    const url = `/${datafile}/minhaconta/getdata?user=${user}`
-    res.render('minhaconta', { url });
+    res.render('minhaconta', { datafile });
 })
 
-app.get('/:datafile/minhaconta/getdata/', (req, res) => {
-   const datafile = req.params.datafile + '.db'
-   const user = req.query.user
-   var ret = []
-   var fields = []
-   var values = []
-   console.log('datafile:', datafile);
-   console.log('user:', user);
-   // Prepara o SQL para trazer as informações de login
+app.post('/:datafile/minhaconta/getuser/', (req, res) => {
   
+  //Get form values
+ 
+  const datafile = req.params.datafile + '.db'
+  const email = req.body.email
+  const password = req.body.password
+  
+  //Def return router var
+  var ret = null
+ 
+  console.log('datafile:', datafile);
+  console.log('email, password:', email, password);
+  // Prepara o SQL para trazer as informações de login
+ 
   try {
     if (fs.existsSync('./' + datafile)) {
-       //file exists
-       // Open data base file based on domain name of client
+      //file exists
+      //Open data base file based on domain name of client
       var db = new sqlite3.Database(datafile);
-      let sqlStr = `select * from f_clientes_faturados where cliente_id = ${user}`
+      let sqlStr = `select id from clientes where email like '${email}'`
       console.log('sql:', sqlStr);
-      // Execute the SQL in databank stacking rows in ret var
+      
+      // Execute the SQL
       db.all(sqlStr, function(err, rows) {
-        rows.forEach(function (row) {
-          console.log('row:', row);
-          values.push(row);
-        })
-        // totaliza
-        // get sum of msgCount prop across all objects in array
-       
-        
-        // res.render('minhaconta', { items: values, total_debitos: total_debitos, total_creditos: total_creditos, total: total});
-        res.send(values) 
-    });	
+        if (rows.length > 0){
+          ret = rows[0].id
+        }else{
+          ret = false
+        }
+        console.log('ret:', ret);
+        ret = {cliente_id: ret}
+        res.send(ret)
+      });	
     // Close data bank
     db.close();
     }
@@ -132,6 +137,36 @@ app.get('/:datafile/minhaconta/getdata/', (req, res) => {
   }
 });
 
+app.get('/:datafile/minhaconta/getdata/', (req, res) => {
+  const datafile = req.params.datafile + '.db'
+  const cliente_id = req.query.cliente_id
+  var ret = []
+  var fields = []
+  var values = []
+  console.log('datafile:', datafile);
+  // Prepara o SQL para trazer as informações de login
+ try {
+   if (fs.existsSync('./' + datafile)) {
+      // file exists
+      // Open data base file based on domain name of client
+     var db = new sqlite3.Database(datafile);
+     let sqlStr = `select * from f_clientes_faturados where cliente_id = ${cliente_id}`
+     console.log('sql:', sqlStr);
+     // Execute the SQL in databank stacking rows in ret var
+     db.all(sqlStr, function(err, rows) {
+       rows.forEach(function (row) {
+         console.log('row:', row);
+         values.push(row);
+       })
+       res.send(values) 
+   });	
+   // Close data bank
+   db.close();
+   }
+ } catch(err) {
+   console.error(err)
+ }
+});
 
 app.use(history({
   disableDotRule: true,
@@ -184,10 +219,7 @@ app.use(cors({
 
 }
 
-// app.use(authChecker);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({limit: '50mb'}));
 
 app.set('view engine', 'ejs');
 app.use(express.static('./public'));

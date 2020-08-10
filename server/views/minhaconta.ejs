@@ -1,149 +1,464 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>login - mgcontrole</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Load required Bootstrap and BootstrapVue CSS -->
+        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
 
-<head>
-  <title></title>
-  <script src="https://unpkg.com/vue"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
-  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+        <!-- Load polyfills to support older browsers -->
+        <script src="//polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver" crossorigin="anonymous"></script>
 
-  <link
-  type="text/css"
-  rel="stylesheet"
-  href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+        <!-- Load Vue followed by BootstrapVue -->
+        <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
 
-  <link
-  type="text/css"
-  rel="stylesheet"
-  href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
-
-</head>
-
-<body>
-   
-    <!-- with veutify --> 
-    <div id="app" style="text-align: center; margin-top: 10px;">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-            <div class="container">
-              <a class="navbar-brand" href="#">MG controle</a>
-            </div>
-          </nav><br><br><br>
-        <h1>Minha conta</h1><br>
-
-        <div style="margin: auto">
-        <b-card
-        no-body
-        style="max-width: 25rem; margin: auto" >
-        <template v-slot:header>
-          <h4 class="mb-0">{{cliente}} ({{cliente_id}})</h4>
-        </template>
-    
-        <b-list-group flush>
-          <b-list-group-item>Total débitos: {{total_debitos | money}}</b-list-group-item>
-          <b-list-group-item>Total créditos: {{total_creditos | money}}</b-list-group-item>
-        </b-list-group>
-    
-       
-        <b-card-footer><span style="font-size: 30px">Saldo: {{total | money}}</span></b-card-footer>
-    
-        </b-card>
-        </div>
-
-
-        <!-- <b-card
-            title="Resumo"
-            style="max-width: 20rem;"
-            class="mb-2">
-            
-            <b-card-text>
-                Cliente: {{cliente}} ({{cliente_id}})<br>
-                Total débitos: {{total_debitos | money}}<br>
-                Total créditos: {{total_creditos | money}}<br>
-                Saldo: {{total | money}}
-            </b-card-text>
-        </b-card> -->
-        <br>
-        <b-card
-            title="Extrato detalhado"
-            style="max-width: 100rem;"
-            class="mb-2">
-            
-            <b-card-text>
-                <b-table responsive striped hover :fields="fields" :items="items">
-                    <template v-slot:cell(debito)="data">
-                        {{ data.value | money }}
-                    </template>
-                    <template v-slot:cell(credito)="data">
-                        {{ data.value | money }}
-                    </template>
-                </b-table>
-            </b-card-text>
-        </b-card>
-            
-    </div>
-    <script>
-        var app = new Vue({
-            el: '#app',
-            filters: {
-                money(value) {
-                console.log('value:',  value);
-                if (typeof value !== 'number') {
-                    return value
-                }
-                // if (value == 0) {
-                //     return 'R$ ' + value
-                // }
-                var formatter = new Intl.NumberFormat([], {
-                    style: 'currency',
-                    currency: 'BRL'
-                })
-                return formatter.format(value)
-                }
-            },
-            data: {
-                cliente: null,
-                cliente_id: null,
-                items: [],
-                total_debitos: 0,
-                total_creditos: 0,
-                total: 0,
-                fields: [{ key: 'pid', label: 'Venda (#)' }, { key: 'created', label: 'Data' }, { key: 'debito', label: 'Débito' }, { key: 'credito', label: 'Crédito' }]
-            },
-            methods: {
-                getPosts: function () {
-                    var self = this;
-                    axios.get('<%=url%>')
-                    .then(function (response) {
-                        console.log(response.data);
-                        self.items = response.data
-                        self.cliente_id = self.items[0].cliente_id
-                        self.cliente = self.items[0].cliente
-
-                        self.total_debitos = self.items.reduce(function(prev, cur) {
-                            return prev + cur.debito;
-                        }, 0);
-
-                        self.total_creditos = self.items.reduce(function(prev, cur) {
-                            return prev + cur.credito;
-                        }, 0);
-
-                        self.total =  self.total_creditos - self.total_debitos
-
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
-                    .then(function () {
-                        console.log("got the data" + self.posts)
-                    });
-                }  
-            },
-            mounted: function () {
-                this.getPosts()
+        <!-- Load the following for BootstrapVueIcons support -->
+        <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+        <style>
+            .navbar {
+            background-color: #563d7c !important;
             }
-        })
-    </script>
-</body>
+            .navbar .navbar-brand {
+            color: #ecf0f1;
+            }
+            .navbar .navbar-brand:hover,
+            .navbar .navbar-brand:focus {
+            color: #ffbbbc;
+            }
+            .navbar .navbar-text {
+            color: #ecf0f1;
+            }
+            .navbar .navbar-text a {
+            color: #ffbbbc;
+            }
+            .navbar .navbar-text a:hover,
+            .navbar .navbar-text a:focus {
+            color: #ffbbbc; 
+            }
+            .navbar .navbar-nav .nav-link {
+            color: #ecf0f1;
+            border-radius: .25rem;
+            margin: 0 0.25em;
+            }
+            .navbar .navbar-nav .nav-link:not(.disabled):hover,
+            .navbar .navbar-nav .nav-link:not(.disabled):focus {
+            color: #ffbbbc;
+            }
+            .navbar .navbar-nav .nav-item.active .nav-link,
+            .navbar .navbar-nav .nav-item.active .nav-link:hover,
+            .navbar .navbar-nav .nav-item.active .nav-link:focus,
+            .navbar .navbar-nav .nav-item.show .nav-link,
+            .navbar .navbar-nav .nav-item.show .nav-link:hover,
+            .navbar .navbar-nav .nav-item.show .nav-link:focus {
+            color: #ffbbbc;
+            background-color: #413d7c;
+            }
+            .navbar .navbar-toggle {
+            border-color: #413d7c;
+            }
+            .navbar .navbar-toggle:hover,
+            .navbar .navbar-toggle:focus {
+            background-color: #413d7c;
+            }
+            .navbar .navbar-toggle .navbar-toggler-icon {
+            color: #ecf0f1;
+            }
+            .navbar .navbar-collapse,
+            .navbar .navbar-form {
+            border-color: #ecf0f1;
+            }
+            .navbar .navbar-link {
+            color: #ecf0f1;
+            }
+            .navbar .navbar-link:hover {
+            color: #ffbbbc;
+            }
+
+            @media (max-width: 575px) {
+            .navbar-expand-sm .navbar-nav .show .dropdown-menu .dropdown-item {
+                color: #ecf0f1;
+            }
+            .navbar-expand-sm .navbar-nav .show .dropdown-menu .dropdown-item:hover,
+            .navbar-expand-sm .navbar-nav .show .dropdown-menu .dropdown-item:focus {
+                color: #ffbbbc;
+            }
+            .navbar-expand-sm .navbar-nav .show .dropdown-menu .dropdown-item.active {
+                color: #ffbbbc;
+                background-color: #413d7c;
+            }
+            }
+
+            @media (max-width: 767px) {
+            .navbar-expand-md .navbar-nav .show .dropdown-menu .dropdown-item {
+                color: #ecf0f1;
+            }
+            .navbar-expand-md .navbar-nav .show .dropdown-menu .dropdown-item:hover,
+            .navbar-expand-md .navbar-nav .show .dropdown-menu .dropdown-item:focus {
+                color: #ffbbbc;
+            }
+            .navbar-expand-md .navbar-nav .show .dropdown-menu .dropdown-item.active {
+                color: #ffbbbc;
+                background-color: #413d7c;
+            }
+            }
+
+            @media (max-width: 991px) {
+            .navbar-expand-lg .navbar-nav .show .dropdown-menu .dropdown-item {
+                color: #ecf0f1;
+            }
+            .navbar-expand-lg .navbar-nav .show .dropdown-menu .dropdown-item:hover,
+            .navbar-expand-lg .navbar-nav .show .dropdown-menu .dropdown-item:focus {
+                color: #ffbbbc;
+            }
+            .navbar-expand-lg .navbar-nav .show .dropdown-menu .dropdown-item.active {
+                color: #ffbbbc;
+                background-color: #413d7c;
+            }
+            }
+
+            @media (max-width: 1199px) {
+            .navbar-expand-xl .navbar-nav .show .dropdown-menu .dropdown-item {
+                color: #ecf0f1;
+            }
+            .navbar-expand-xl .navbar-nav .show .dropdown-menu .dropdown-item:hover,
+            .navbar-expand-xl .navbar-nav .show .dropdown-menu .dropdown-item:focus {
+                color: #ffbbbc;
+            }
+            .navbar-expand-xl .navbar-nav .show .dropdown-menu .dropdown-item.active {
+                color: #ffbbbc;
+                background-color: #413d7c;
+            }
+            }
+
+            .navbar-expand .navbar-nav .show .dropdown-menu .dropdown-item {
+            color: #ecf0f1;
+            }
+            .navbar-expand .navbar-nav .show .dropdown-menu .dropdown-item:hover,
+            .navbar-expand .navbar-nav .show .dropdown-menu .dropdown-item:focus {
+            color: #ffbbbc;
+            }
+            .navbar-expand .navbar-nav .show .dropdown-menu .dropdown-item.active {
+            color: #ffbbbc;
+            background-color: #413d7c;
+            }
+
+
+
+            :root {
+            --input-padding-x: 1.5rem;
+            --input-padding-y: 0.75rem;
+            }
+
+            .login,
+            .image {
+            min-height: 100vh;
+            }
+
+            .bg-image {
+            background-image: url('https://diaonline.ig.com.br/wp-content/uploads/2019/07/hortifruti-em-goiania_capa-1024x683.jpg');
+            background-size: cover;
+            background-position: center;
+            }
+
+            .login-heading {
+            font-weight: 300;
+            }
+
+            .btn-login {
+            font-size: 0.9rem;
+            letter-spacing: 0.05rem;
+            padding: 0.75rem 1rem;
+            border-radius: 2rem;
+            }
+
+            .form-label-group {
+            position: relative;
+            margin-bottom: 1rem;
+            }
+
+            .form-label-group>input,
+            .form-label-group>label {
+            padding: var(--input-padding-y) var(--input-padding-x);
+            height: auto;
+            border-radius: 2rem;
+            }
+
+            .form-label-group>label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            margin-bottom: 0;
+            /* Override default `<label>` margin */
+            line-height: 1.5;
+            color: #495057;
+            cursor: text;
+            /* Match the input under the label */
+            border: 1px solid transparent;
+            border-radius: .25rem;
+            transition: all .1s ease-in-out;
+            }
+
+            .form-label-group input::-webkit-input-placeholder {
+            color: transparent;
+            }
+
+            .form-label-group input:-ms-input-placeholder {
+            color: transparent;
+            }
+
+            .form-label-group input::-ms-input-placeholder {
+            color: transparent;
+            }
+
+            .form-label-group input::-moz-placeholder {
+            color: transparent;
+            }
+
+            .form-label-group input::placeholder {
+            color: transparent;
+            }
+
+            .form-label-group input:not(:placeholder-shown) {
+            padding-top: calc(var(--input-padding-y) + var(--input-padding-y) * (2 / 3));
+            padding-bottom: calc(var(--input-padding-y) / 3);
+            }
+
+            .form-label-group input:not(:placeholder-shown)~label {
+            padding-top: calc(var(--input-padding-y) / 3);
+            padding-bottom: calc(var(--input-padding-y) / 3);
+            font-size: 12px;
+            color: #777;
+            }
+
+            /* Fallback for Edge
+            -------------------------------------------------- */
+
+            @supports (-ms-ime-align: auto) {
+            .form-label-group>label {
+                display: none;
+            }
+            .form-label-group input::-ms-input-placeholder {
+                color: #777;
+            }
+            }
+
+            /* Fallback for IE
+            -------------------------------------------------- */
+
+            @media all and (-ms-high-contrast: none),
+            (-ms-high-contrast: active) {
+            .form-label-group>label {
+                display: none;
+            }
+            .form-label-group input:-ms-input-placeholder {
+                color: #777;
+            }
+            }
+        </style>
+    </head>
+    <body>
+    <div id="app">
+        <div id=login v-if="!isLogged">
+            <div class="container-fluid">
+                <div class="row no-gutter">
+                  <div class="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
+                  <div class="col-md-8 col-lg-6">
+                    <div class="login d-flex align-items-center py-5">
+                      <div class="container">
+                        <div class="row">
+                          <div class="col-md-9 col-lg-8 mx-auto">
+                            <h2 class="login-heading mb-1">MG controle</h2>
+                            <h3 class="login-heading mb-4">Bem vindo!</h3>
+                            <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>
+                                Erro de identificação
+                            </b-alert>
+                            <form>
+                              <div class="form-label-group">
+                                <input type="email" id="inputEmail" v-model="login_email" class="form-control" placeholder="Email address" required autofocus>
+                                <label for="inputEmail">Email</label>
+                              </div>
+              
+                              <div class="form-label-group">
+                                <input type="password" id="inputPassword" v-model="login_password" class="form-control" placeholder="Password" required>
+                                <label for="inputPassword">Senha</label>
+                              </div>
+              
+                              <!-- <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                <label class="custom-control-label" for="customCheck1">Remember password</label>
+                              </div> -->
+                              <button class="btn btn-lg btn-primary btn-block btn-login text-uppercase font-weight-bold mb-2" @click.prevent="authCheck">Entrar</button>
+                              <!-- <div class="text-center">
+                                <a class="small" href="#">Esqueci a senha?</a></div> -->
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+        <div v-if="isLogged">
+            <b-navbar toggleable="lg" type="dark" variant="info">
+            <b-navbar-brand href="#">MG controle</b-navbar-brand>
+            <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+            <b-collapse id="nav-collapse" is-nav>
+                <b-navbar-nav>
+                    <b-nav-item href="#" right @click="logOut">Sair</b-nav-item>
+                </b-navbar-nav>
+            </b-collapse>
+            </b-navbar>
+       
+            <!-- Page Content -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <h1 class="mt-4">Minha conta</h1>
+                        <div style="text-align: center; margin-top: 10px;">
+                            <div style="margin: auto">
+                            <b-card
+                            no-body
+                            class="bg-light"
+                            style="max-width: 25rem; margin: auto" >
+                            <template v-slot:header>
+                            <h4 class="mb-0">{{cliente}} ({{cliente_id}})</h4>
+                            </template>
+                            <b-list-group flush >
+                            <b-list-group-item>Créditos: {{total_creditos | money}}</b-list-group-item>
+                            <b-list-group-item>Débitos: {{total_debitos | money}}</b-list-group-item>
+                            </b-list-group>
+                            <b-card-footer class="bg-primary text-white" ><span style="font-size: 25px">Saldo: {{total | money}}</span></b-card-footer>
+                            </b-card>
+                            </div>
+                            <br>
+                            <b-card
+                                title="Extrato detalhado"
+                                style="max-width: 100rem;"
+                                class="mb-2">
+                                <b-card-text>
+                                    <b-table responsive striped hover :fields="fields" :items="items">
+                                        <template v-slot:cell(debito)="data">
+                                            {{ data.value | money }}
+                                        </template>
+                                        <template v-slot:cell(credito)="data">
+                                            {{ data.value | money }}
+                                        </template>
+                                    </b-table>
+                                </b-card-text>
+                            </b-card>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+        <script>
+            var app = new Vue({
+                el: '#app',
+                filters: {
+                    money(value) {
+                    console.log('value:',  value);
+                    if (typeof value !== 'number') {
+                        return value
+                    }
+                    // if (value == 0) {
+                    //     return 'R$ ' + value
+                    // }
+                    var formatter = new Intl.NumberFormat([], {
+                        style: 'currency',
+                        currency: 'BRL'
+                    })
+                    return formatter.format(value)
+                    }
+                },
+                data: {
+                    showDismissibleAlert: false,
+                    login_email: null,
+                    login_password: null,
+                    isLogged: false,
+                    cliente: null,
+                    cliente_id: null,
+                    items: [],
+                    total_debitos: 0,
+                    total_creditos: 0,
+                    total: 0,
+                    fields: [{ key: 'pid', label: 'Venda (#)' }, { key: 'created', label: 'Data' }, { key: 'debito', label: 'Débito' }, { key: 'credito', label: 'Crédito' }]
+                },
+                methods: {
+                    logOut(){
+                        this.login_email = null
+                        this.login_password = null
+                        this.isLogged = !this.isLogged
+                        this.showDismissibleAlert = false
+                    },
+                    authCheck: function(){
+                        var self = this;
+                        const url_login = '/<%=datafile%>/minhaconta/getuser'
+                        console.log('url_login:', url_login);
+                        axios.post(url_login, {
+                            email: this.login_email,
+                            password: this.login_password
+                        })
+                        .then(function (response) {
+                            
+                            self.cliente_id = response.data.cliente_id
+                            console.log(self.cliente_id);
+                            self.isLogged = self.cliente_id
+                            if (self.cliente_id > 0) {
+                                self.isLogged = true
+                            }else{
+                                self.showDismissibleAlert = true
+                            }
+                            self.getData()
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        })
+                        .then(function () {
+                            console.log("got the data")
+                        });
+                        
+                    },
+                    getData: function () {
+                        var self = this;
+                        if (this.isLogged){
+                            const url_accountdata = `/<%=datafile%>/minhaconta/getdata?cliente_id=${self.cliente_id}`
+                            axios.get(url_accountdata)
+                            .then(function (response) {
+                                console.log(response.data);
+                                self.items = response.data
+                                self.cliente_id = self.items[0].cliente_id
+                                self.cliente = self.items[0].cliente
+
+                                self.total_debitos = self.items.reduce(function(prev, cur) {
+                                    return prev + cur.debito;
+                                }, 0);
+
+                                self.total_creditos = self.items.reduce(function(prev, cur) {
+                                    return prev + cur.credito;
+                                }, 0);
+
+                                self.total =  self.total_creditos - self.total_debitos
+                            })
+                            .catch(function (error) {
+                            console.log(error);
+                            })
+                            .then(function () {
+                                console.log("got the data" + self.posts)
+                            });
+                        }
+                    }  
+                },
+                mounted: function () {
+                    // this.getPosts()
+                }
+            })
+        </script>
+        </div>
+    </body>
+</html> 

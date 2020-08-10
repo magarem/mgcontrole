@@ -106,7 +106,7 @@
         </tr>
       </table> -->
       <br>
-      <table v-if="venda_selected.pagamento" class="table1">
+      <!-- <table v-if="venda_selected.pagamento" class="table1">
         <tr>
           <th class="titulo" :colspan="venda_selected_pagamento_keys_length">Forma de pagamento</th>
         </tr>
@@ -116,14 +116,122 @@
         <tr>
           <td v-for="yy in venda_selected.pagamento">{{ yy | money }}</td>
         </tr>
-      </table>
+      </table> -->
+
+       <div v-if="venda_selected.pagamento" style="font-size: 18px;">
+          <h3>Forma de pagamento:</h3>
+          <div v-if="venda_selected.pagamento.dinheiro">Dinheiro: {{ venda_selected.pagamento.dinheiro | money }}</div>
+          <div v-if="venda_selected.pagamento.debito">Cartão de débito: {{ venda_selected.pagamento.debito | money }}</div>
+          <div v-if="venda_selected.pagamento.credito">Cartão de crédito: {{ venda_selected.pagamento.credito | money }}</div>
+          <div v-if="venda_selected.pagamento.faturado">Faturado: {{ venda_selected.pagamento.faturado | money }}</div>
+        </div>
       <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="vendaPrintFlg = true">Imprimir</el-button>
         <el-button type="primary" @click="dialogPvVisible = false">Fechar</el-button>
       </span>
     </el-dialog>
+
+
+  <!-- Print venda -->
+    <el-dialog :visible.sync="vendaPrintFlg" title="Impressão de ticket" width="45%" align="left">
+      <span align="center">
+        <el-button type="primary" @click="print">Imprimir</el-button>
+        <el-button type="primary" @click="vendaPrintFlg = false">Fechar</el-button>
+      </span><br><br>
+      <div id="myelement" class="receipt">
+        <div class="cupom_total2">
+          <b>Hortifruti Nova Caraíva</b><br>
+          CNPJ: 33.042.633/0001-11<br>
+          Cupom número: {{venda_selected.id}}<br>
+          Data: {{ venda_selected.data }}<br>
+          {{ venda_selected.cliente }} - {{ venda_selected.nome }}
+          Cliente: {{ venda_selected.cliente }} - {{ venda_selected.nome }}<br>
+        </div><br>
+        <el-table
+          border
+          :data="venda_selected.itens"
+          row-class-name="cupom_total"
+          header-row-class-name="cupom_total"
+          style="width: 100%; font-size:13px;"
+        >
+          <el-table-column
+            prop="descricao"
+            label="Desc"
+            width="50px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.id }}<br>{{ scope.row.descricao }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="pco_venda"
+            label="Pço"
+            width="50px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.pco_venda | money }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="unidade"
+            label="Uni"
+            width="40px"
+          />
+          <el-table-column
+            prop="qnt"
+            label="Qnt"
+            width="40px"
+          />
+          <el-table-column
+            prop="total"
+            label="Total"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.total | money }}</span>
+            </template>
+          </el-table-column>
+        </el-table><br>
+        <!-- <table class="table1 sheet" border=1 v-if=cupom.itens style="margin-left:0px; _width: 100%;">
+          <tr>
+              <th class=titulo colspan="6">Produtos comprados</th>
+          </tr>
+          <tr>
+              <th v-for="y,t in cupom.itens[0]" >{{ t }}</th>
+          </tr>
+          <tr v-for="j in cupom.itens" >
+              <td  v-for="yy in j"  >
+                {{ yy }}
+              </td>
+          </tr>
+        </table> -->
+        <div v-if="venda_selected.itens" class="cupom_total2" style="margin-top: 5px; text-align: left; font-family: tahoma;">
+          (Itens: {{ venda_selected.itens.length }})<br> Sub-total: {{ venda_selected.subtotal | money }}<br> Desconto:{{ venda_selected.desconto | money }}<br>Total: {{ venda_selected.total | money }}
+        </div>
+        <div v-if="venda_selected.pagamento">
+          <h3>Forma de pagamento:</h3>
+          <div v-if="venda_selected.pagamento.dinheiro">Dinheiro: {{ venda_selected.pagamento.dinheiro | money }}</div>
+          <div v-if="venda_selected.pagamento.debito">Cartão de débito: {{ venda_selected.pagamento.debito | money }}</div>
+          <div v-if="venda_selected.pagamento.credito">Cartão de crédito: {{ venda_selected.pagamento.credito | money }}</div>
+          <div v-if="venda_selected.pagamento.faturado">Faturado: {{ venda_selected.pagamento.faturado | money }}</div>
+        </div>
+        <div>
+          <p>Obrigado pela preferência! Volte sempre.</p>
+        </div>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 <style scoped>
+  @page {
+      margin-left: 0cm;
+      size: 58mm 100mm } /* output size */
+    .receipt .sheet { width: 58mm; _height: 100mm } /* sheet size */
+  @media print { .receipt { width: 58mm } } /* fix for Chrome */
+
+  .cupom_total {
+      text-align: right; font-family: tahoma; font-size: 13px;
+    }
 
   .table1 td, th {
     background-color: #F8F8F8;
@@ -174,6 +282,7 @@
 import { fetchList } from '@/api/generic'
 import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table'
+import { Printd } from 'printd'
 
 export default {
   name: 'Vendas',
@@ -192,6 +301,7 @@ export default {
   },
   data() {
     return {
+      vendaPrintFlg: false,
       tableKey: null,
       sortChange: null,
       dialogPvVisible: false,
@@ -323,6 +433,20 @@ export default {
     this.getVendas()
   },
   methods: {
+    print() {
+      // Check if is needed to print
+      const d = new Printd()
+      const cssText = `
+          .cupom_total {
+            text-align: left; font-family: tahoma; font-size: 15px;
+          }
+          .cupom_total2 {
+            text-align: left; font-family: tahoma; font-size: 18px;
+          }
+        `
+      d.print(document.getElementById('myelement'), [cssText])
+      this.check_out_print_option = false
+    },
     getVendas() {
       this.listLoading = true
       console.log(this.listQuery)
