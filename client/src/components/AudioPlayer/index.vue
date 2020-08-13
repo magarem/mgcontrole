@@ -1,9 +1,9 @@
 <script>
-  import VueHowler from 'vue-howler'
+import VueHowler from 'vue-howler'
 
-  export default {
-    mixins: [VueHowler]
-  }
+export default {
+  mixins: [VueHowler]
+}
 </script>
 
 <template>

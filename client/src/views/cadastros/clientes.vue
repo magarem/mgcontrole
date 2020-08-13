@@ -6,7 +6,6 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <span class=teste>teste</span>
       <el-input v-model="listQuery.find.nome" placeholder="Nome" style="width: 300px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
       <el-input v-model="listQuery.find.doc" placeholder="Doc" style="width: 250px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
@@ -69,124 +68,53 @@
         Janelas
 
     -->
-    <el-dialog :title="textMap[dialogStatus]" align="left" :visible.sync="dialogFormVisible" top="2vh" :width="tela" >
-     <div slot=title style="font-size: 30px;">{{textMap[dialogStatus]}}</div>
-      <!-- <el-form ref="dataForm" :rules="rules" :model="temp" label-position="top"  > -->
-      <b-form  >
-{{temp.nome}}<br>
-<label for="myBrowser">Choose a browser from this list:</label>
-<input list="browsers" id="myBrowser" v-model=temp.nome name="myBrowser" />
-<datalist id="browsers" >
-  <option value="12121" label="Banana Pratal"></option>
-  <option value="1212122" label="Banana terra"></option>
-  <option value="Internet Explorer">teste3</option>
-  <option value="Opera">teste4</option>
-  <option value="Safari">teste5</option>
-  <option value="Microsoft Edge">teste6</option>
-</datalist>
-
-
-        <label for="input-with-list">Input with datalist</label>
-          <b-form-input list="input-list" id="input-with-list"></b-form-input>
-          <b-form-datalist id="input-list" :options="options"></b-form-datalist>
-        <b-form-group
-          id="input-group-1"
-          label="Nome"
-          label-for="input-1"
-          style="font-size: 17px;">
-          <b-form-input
-            style="margin-top:5px; font-size: 20px; width: 90%;"
-            id="input-1"
-            v-model="temp.nome"
-            type="nome"
-            required>
-          </b-form-input>
-        </b-form-group>
-        <b-form-group
-          id="input-group-2"
-          label="Tipo"
-          label-for="input-2"
-          style="font-size: 22px; margin-top: 15px;">
-          <b-form-select style="width: 90%; font-size: 22px; margin-top: 5px;" id="input-2" v-model="temp.tipo" class="mt-3">
-            <b-form-select-option value="Física">Física</b-form-select-option>
-            <b-form-select-option value="Jurídica">Jurídica</b-form-select-option>
-            <b-form-select-option value="Estrangeira">Estrangeira</b-form-select-option>
-          </b-form-select>
-        </b-form-group>
-      </b-form>
-      <b-form-group
-          id="input-group-3"
-          label="Doc"
-          label-for="input-3"
-          style="font-size: 22px; margin-top: 15px;">
-          <b-form-input
-            style="margin-top:5px; font-size: 22px; width: 90%;"
-            id="input-3"
-            v-model="temp.doc"
-            type="nome"
-            required>
-          </b-form-input>
-        </b-form-group>
-       
-        <b-form-group
-          id="input-group-4"
-          label="Contato"
-          label-for="input-4"
-          style="font-size: 22px; margin-top: 15px;">
-          <b-form-input
-            style="margin-top:5px; font-size: 22px; width: 90%;"
-            id="input-4"
-            v-model="temp.contato"
-            type="nome"
-            required>
-          </b-form-input>
-        </b-form-group>
-
-         <b-form-group
-          id="input-group-4"
-          label="Telefone (1)"
-          label-for="input-4"
-          style="font-size: 22px; margin-top: 15px;">
-          <b-form-input
-            style="margin-top:5px; font-size: 22px; width: 90%;"
-            id="input-4"
-            v-model="temp.fone"
-            type="nome"
-            required>
-          </b-form-input>
-        </b-form-group>
-
-         <b-form-group
-          id="input-group-5"
-          label="Telefone (2)"
-          label-for="input-5"
-          style="font-size: 22px; margin-top: 15px;">
-          <b-form-input
-            style="margin-top:5px; font-size: 22px; width: 90%;"
-            id="input-5"
-            v-model="temp.fone2"
-            type="nome"
-            required>
-          </b-form-input>
-        </b-form-group>
-
-         <b-form-group
-          id="input-group-6"
-          label="Endereço"
-          label-for="input-6"
-          style="font-size: 22px; margin-top: 15px;">
-          <b-form-input
-            style="margin-top:5px; font-size: 22px; width: 90%;"
-            id="input-6"
-            v-model="temp.Fone2"
-            type="nome"
-            required>
-          </b-form-input>
-        </b-form-group>
-            <!-- <el-form-item label="Nome" prop="nome">
+    <el-dialog :title="textMap[dialogStatus]" align="left" :visible.sync="dialogFormVisible" top="2vh" :width="tela">
+      <div slot="title" style="font-size: 30px;">{{ textMap[dialogStatus] }}</div>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="top"  >
+        <b-field label="Name" >
+            <b-input v-model="temp.nome" style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="Tipo">
+            <b-select placeholder="Select a character" rounded  style="width: 100%; height: 35px;">
+                <option value="Física">Física</option>
+                <option value="Jurídica">Jurídica</option>
+            </b-select>
+        </b-field>
+         <b-field label="Doc" >
+            <b-input v-model="temp.doc"  style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="Contato" >
+            <b-input v-model="temp.contato"  style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="Telefone (1)" >
+            <b-input v-model="temp.fone" style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="Telefone (2)" >
+            <b-input v-model="temp.fone2" style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="Endereço" >
+            <b-input v-model="temp.endereco" style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="Email" >
+            <b-input v-model="temp.email" style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="CEP" >
+            <b-input v-model="temp.cep" style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+        <b-field label="Obs" >
+            <b-input v-model="temp.Obs" style="width: 100%; height: 35px;"></b-input>
+        </b-field>
+         <el-button @click="dialogFormVisible = false">
+                      Cancela
+              </el-button>
+              <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
+                    Confirma
+              </el-button>
+      </el-form>
+      <!-- <el-form-item label="Nome" prop="nome">
               <el-input v-model="temp.nome" autofocus />
             </el-form-item> -->
-            <!-- <el-form-item label="Tipo" prop="tipo">
+      <!-- <el-form-item label="Tipo" prop="tipo">
               <el-select v-model="temp.tipo" placeholder="Select" >
                 <el-option label="Física" value="fisica" />
                 <el-option label="Jurídica" value="juridica" />
@@ -311,7 +239,8 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { Money } from 'v-money'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-
+// import buef from 'buefy'
+// import 'buefy/dist/buefy.css'
 export default {
   name: 'Clientes',
   components: { Pagination, Money },
@@ -344,11 +273,22 @@ export default {
   },
   data() {
     return {
-      options: [{ value: null, text: 'Please select an option' },
-          { value: 'a', text: 'This is First option' },
-          { value: 'b', text: 'Selected Option' },
-          { value: { C: '3PO' }, text: 'This is an option with object value' },
-          { value: 'd', text: 'This one is disabled', disabled: true }],
+        schema: {
+        $id: "https://example.com/person.schema.json",
+        $schema: "http://json-schema.org/draft-07/schema#",
+        title: "Cliente",
+        type: "object",
+        properties: {
+          nome: {
+            type: "string",
+            title: "Nome",
+          },
+          contato: {
+            type: "string",
+            title: "Contato",
+          }
+        }
+      },
       tela: '40%',
       money: {
         decimal: ',',
@@ -395,8 +335,8 @@ export default {
     this.x()
   },
   methods: {
-    x(){
-      if (screen.width < 400) { this.tela = '90%' } else { this.tela = '40%'}
+    x() {
+      if (screen.width < 400) { this.tela = '90%' } else { this.tela = '40%' }
     },
     getList() {
       // this.listLoading = true

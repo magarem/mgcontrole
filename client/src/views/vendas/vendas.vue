@@ -21,7 +21,7 @@
 
         <el-table-column label="Data" prop="data" sortable="custom" align="center" width="200">
           <template slot-scope="scope">
-            <span>{{ scope.row.data }}</span>
+            <span>{{ timeConverter(scope.row.data) }}</span>
           </template>
         </el-table-column>
 
@@ -58,15 +58,8 @@
         </template>
       </el-table-column> -->
       </el-table>
-
-      <!-- <vue-good-table
-        :columns="columns"
-        :rows="vendas"
-        :search-options="{enabled: true}"
-        theme="black-rhino"
-        :line-numbers="true"
-        @on-row-click="getList_vendaItens"
-      /> -->
+      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" layout="prev, pager, next" @pagination="getVendas" />
+     
     </div>
     <!--
 
@@ -77,7 +70,7 @@
       <span slot="title" style="font-size: 30px; margin-bottom: 100px;">Venda detalhada</span>
       <el-row :gutter="10" type="flex" class="row-bg">
         <el-col :span="2"><div class="grid-content bg-purple"><b>#:</b> {{ venda_selected.id }}</div></el-col>
-        <el-col :span="7"><div class="grid-content bg-purple"><b>Data:</b> {{ venda_selected.data }}</div></el-col>
+        <el-col :span="7"><div class="grid-content bg-purple"><b>Data:</b> {{ timeConverter(venda_selected.data) }}</div></el-col>
         <el-col :span="5"><div class="grid-content bg-purple"><b>Subtotal:</b> {{ venda_selected.subtotal | money }}</div></el-col>
         <el-col :span="5"><div class="grid-content bg-purple"><b>Desconto:</b> {{ venda_selected.desconto | money }}</div></el-col>
         <el-col :span="5"><div class="grid-content bg-purple"><b>Total:</b> {{ venda_selected.total | money }}</div></el-col>
@@ -118,21 +111,20 @@
         </tr>
       </table> -->
 
-       <div v-if="venda_selected.pagamento" style="font-size: 18px;">
-          <h3>Forma de pagamento:</h3>
-          <div v-if="venda_selected.pagamento.dinheiro">Dinheiro: {{ venda_selected.pagamento.dinheiro | money }}</div>
-          <div v-if="venda_selected.pagamento.debito">Cartão de débito: {{ venda_selected.pagamento.debito | money }}</div>
-          <div v-if="venda_selected.pagamento.credito">Cartão de crédito: {{ venda_selected.pagamento.credito | money }}</div>
-          <div v-if="venda_selected.pagamento.faturado">Faturado: {{ venda_selected.pagamento.faturado | money }}</div>
-        </div>
+      <div v-if="venda_selected.pagamento" style="font-size: 18px;">
+        <h3>Forma de pagamento:</h3>
+        <div v-if="venda_selected.pagamento.dinheiro">Dinheiro: {{ venda_selected.pagamento.dinheiro | money }}</div>
+        <div v-if="venda_selected.pagamento.debito">Cartão de débito: {{ venda_selected.pagamento.debito | money }}</div>
+        <div v-if="venda_selected.pagamento.credito">Cartão de crédito: {{ venda_selected.pagamento.credito | money }}</div>
+        <div v-if="venda_selected.pagamento.faturado">Faturado: {{ venda_selected.pagamento.faturado | money }}</div>
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="vendaPrintFlg = true">Imprimir</el-button>
         <el-button type="primary" @click="dialogPvVisible = false">Fechar</el-button>
       </span>
     </el-dialog>
 
-
-  <!-- Print venda -->
+    <!-- Print venda -->
     <el-dialog :visible.sync="vendaPrintFlg" title="Impressão de ticket" width="45%" align="left">
       <span align="center">
         <el-button type="primary" @click="print">Imprimir</el-button>
@@ -142,7 +134,7 @@
         <div class="cupom_total2">
           <b>Hortifruti Nova Caraíva</b><br>
           CNPJ: 33.042.633/0001-11<br>
-          Cupom número: {{venda_selected.id}}<br>
+          Cupom número: {{ venda_selected.id }}<br>
           Data: {{ venda_selected.data }}<br>
           {{ venda_selected.cliente }} - {{ venda_selected.nome }}
           Cliente: {{ venda_selected.cliente }} - {{ venda_selected.nome }}<br>
@@ -283,11 +275,27 @@ import { fetchList } from '@/api/generic'
 import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table'
 import { Printd } from 'printd'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
   name: 'Vendas',
-  components: { VueGoodTable },
+  components: { Pagination, VueGoodTable },
   filters: {
+     timeConverter(UNIX_timestamp){
+      var a = new Date(UNIX_timestamp);
+      console.log('a:', a);
+      var months = ['Jan','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      var year = a.getFullYear();
+      // var month = months[a.getMonth()];
+      var month = a.getMonth()+1;
+      var date = a.getDate();
+      var hour = a.getHours();
+      var min = a.getMinutes();
+      var sec = a.getSeconds();
+      var time = date + '/' + month + '/' + year + ' - ' + hour + ':' + min + ':' + sec ;
+      console.log('log:', time);
+      return time;
+    },
     money(value) {
       if (typeof value !== 'number') {
         return value
@@ -404,13 +412,17 @@ export default {
         precision: 2,
         masked: false /* doesn't work with directive */
       },
-      total: 0,
+       total: 0,
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
-        sort: 'id DESC'
-      },
+        limit: 10,
+        sort: 'id DESC',
+        find: {
+          nome: '',
+          doc: ''
+        }
+      },  
       temp: {
         id: undefined,
         timestamp: new Date()
@@ -457,7 +469,7 @@ export default {
 
         this.total = response.data.total
 
-        // Just to simulate the time of the request
+        //Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 0)

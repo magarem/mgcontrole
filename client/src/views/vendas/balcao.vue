@@ -21,10 +21,10 @@
   }
 
   .produto_button  {
-    width: 102px; 
+    width: 102px;
     height: 102px;
     background-color: white;
-    border: none; 
+    border: none;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2), 0 1px 5px 0 rgba(0,0,0,0.19);
   }
 
@@ -67,7 +67,7 @@
   }
 
   .body {
-    background-color: #f5f5ff;
+    /* background-color: #f5f5ff; */
   }
 
   .box_product_selected {
@@ -109,8 +109,8 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <!-- Produtos -->
-           
-            <el-card class="box-card" shadow="always" style="height: 330px">
+
+            <el-card class="box-card" shadow="always" style="height: 330px; background-color: #f5f5ff;">
               <div slot="header" class="clearfix cardtitle">
                 <el-row>
                   <el-col :span="8">
@@ -118,41 +118,41 @@
                   </el-col>
                   <el-col :span="16">
                     <!-- <autocomplete ref="searchTerm_" :items="produtos_" @input="productSet"  /> -->
-                  <input ref="searchTerm_" v-model="source" list="my-list-id" @input="productSet">
-                  <datalist id="my-list-id">
-                    <option v-for="(value, key) in produtos_" :key=key  >{{value.name}}</option>
-                  </datalist>
+                    <input ref="searchTerm_" v-model="source" placeholder="Selecione o produto" list="my-list-id" @input="productSet" style="width: 99%; height: 35px;">
+                    <datalist id="my-list-id">
+                      <option v-for="(value, key) in produtos_" :key="key">{{ value.name }}</option>
+                    </datalist>
                   </el-col>
                 </el-row>
               </div>
-              <el-row :gutter="20" >
-                
+              <el-row :gutter="20">
+
                 <el-col v-if="atalhos" :span="6">
-                  <button @click="productSet('tomate')" class=produto_button><img :src="'tomate' | img_mini(produtos)"> </button>    
+                  <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
                 </el-col>
-                <el-col v-if="atalhos" :span="6" >
-                  <button @click="productSet('cebola')" class=produto_button><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
+                <el-col v-if="atalhos" :span="6">
+                  <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
                 </el-col>
-                <el-col v-if="atalhos" :span="6" >
-                  <button @click="productSet('alho')" class=produto_button><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>  
+                <el-col v-if="atalhos" :span="6">
+                  <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
                 </el-col>
-                <el-col v-if="atalhos" :span="6" >
-                  <button @click="productSet('pimentao')"  class=produto_button><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>  
+                <el-col v-if="atalhos" :span="6">
+                  <button class="produto_button" @click="productSet('pimentao')"><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>
                 </el-col>
-                
+
               </el-row><br>
-              <el-row :gutter="20" >
+              <el-row :gutter="20">
                 <el-col v-if="atalhos" :span="6">
-                  <button @click="productSet(5372)" class=produto_button >Tomate</button>    
+                  <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
                 </el-col>
-                <el-col v-if="atalhos" :span="6" >
-                  <button @click="productSet(5373)" class=produto_button>Cebola</button>
+                <el-col v-if="atalhos" :span="6">
+                  <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
                 </el-col>
-                <el-col v-if="atalhos" :span="6" >
-                  <button @click="productSet(5375)" class=produto_button>Alho</button>  
+                <el-col v-if="atalhos" :span="6">
+                  <button class="produto_button" @click="productSet('banana prata')"><img style="margin-left:-5px;" :src="'banana prata' | img_mini(produtos)"></button>
                 </el-col>
-                <el-col v-if="atalhos" :span="6" >
-                  <button @click="productSet(5375)"  class=produto_button>Alho</button>  
+                <el-col v-if="atalhos" :span="6">
+                  <button class="produto_button" @click="productSet('coentro')"><img style="margin-left:-5px;" :src="'coentro' | img_mini(produtos)"></button>
                 </el-col>
               </el-row>
               <!-- <el-row>
@@ -330,7 +330,7 @@
         <el-row>
           <el-col :span="24">
             <!-- Venda Check-out -->
-            <el-card v-show="cupom.itens.length > 0" class="box-card cardtitle" shadow="always" style="height: 160px">
+            <el-card v-show="cupom.itens.length > 0" class="box-card cardtitle" shadow="always" style="height: 160px; font-family: arial;">
               <div slot="header" class="clearfix cardtitle">
                 <div id="wrapper">
                   <div class="left">
@@ -338,7 +338,7 @@
                   </div>
                   <div class="right">
                     <span style="font-family: tahoma; font-size: 22px;">
-                       Sub-total: {{ cupom.subtotal | money }}
+                      Sub-total: {{ cupom.subtotal | money }}
                     </span>
                   </div>
                 </div>
@@ -351,8 +351,7 @@
                         v-show="cupom.total>0"
                         style="height:60px; font-size:25px; width: 100%;"
                         type="danger"
-                        @click="vendaCancel()"
-                      >
+                        @click="vendaCancel()">
                         Cancelar
                       </el-button>
                     </el-col>
@@ -544,12 +543,25 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="pago_falta <= 0" @click="vendaPrintFlg=true">Imprimir</el-button>
         <el-button v-if="pago_falta <= 0.04" style="margin-left: 10px; width: 250px; font-size: 25px;" type="success" @click="vendaCloseOk();">Confirma</el-button>
         <el-button style="font-size: 25px" @click="vendaCloseFlg = false">
           Cancela
         </el-button>
       </span>
+    </el-dialog>
+
+    <!-- Venda fechada! -->
+    <el-dialog :visible.sync="vendaCloseEndFlg" width="50%" center top="5vh">
+      <el-card class="box-card">
+            <div slot="header" class="clearfix" style="text-align: center;">
+              <span style="font-size: 30px;">Venda Registrada com sucesso!</span>
+            </div>
+            <div style="text-align: center;">
+              <img src="@/assets/img/ok.png" style="width:200px; height:200px; margin-bottom: 20px;"><br>
+              <el-button @click="vendaPrintFlg=true" type="primary" style="width: 200px;" round>Imprimir cupom</el-button>
+              <el-button @click="vendaCloseOkFim" v-on:keyup.enter="vendaCloseOkFim" type="success"  style="width: 200px; z-index: -1;" round autofocus>Nova venda</el-button>   
+            </div>
+      </el-card>
     </el-dialog>
 
     <!-- Clientes busca lista -->
@@ -575,6 +587,7 @@
         @on-row-click="clienteSet"
       />
       <span slot="footer" class="dialog-footer" align="center">
+        <el-button type="primary" v-if="searchTermClient" @click="handleCliente_insert">Incluir novo cliente</el-button>
         <el-button type="primary" @click="clientesListFlg = false">Fechar</el-button>
       </span>
     </el-dialog>
@@ -586,16 +599,6 @@
         <el-button type="primary" @click="vendaPrintFlg = false">Fechar</el-button>
       </span><br><br>
       <div id="myelement" class="receipt">
-        <!-- <vue-good-table
-          :columns="columns_cupom"
-          :rows="cupom.itens"
-          theme="nocturnal"
-          max-height="330px"
-          @on-row-click="cupomRowView">
-          <div slot="emptystate">
-            Caixa livre
-          </div>
-        </vue-good-table> -->
         <div class="cupom_total2">
           <b>Hortifruti Nova Caraíva</b><br>
           CNPJ: 33.042.633/0001-11<br>
@@ -607,13 +610,11 @@
           :data="cupom.itens"
           row-class-name="cupom_total"
           header-row-class-name="cupom_total"
-          style="width: 100%; font-size:13px;"
-        >
+          style="width: 100%; font-size:13px;">
           <el-table-column
             prop="descricao"
             label="Desc"
-            width="50px"
-          >
+            width="50px">
             <template slot-scope="scope">
               <span>{{ scope.row.id }}<br>{{ scope.row.descricao }}</span>
             </template>
@@ -621,8 +622,7 @@
           <el-table-column
             prop="pco_venda"
             label="Pço"
-            width="50px"
-          >
+            width="50px">
             <template slot-scope="scope">
               <span>{{ scope.row.pco_venda | money }}</span>
             </template>
@@ -646,19 +646,6 @@
             </template>
           </el-table-column>
         </el-table><br>
-        <!-- <table class="table1 sheet" border=1 v-if=cupom.itens style="margin-left:0px; _width: 100%;">
-          <tr>
-              <th class=titulo colspan="6">Produtos comprados</th>
-          </tr>
-          <tr>
-              <th v-for="y,t in cupom.itens[0]" >{{ t }}</th>
-          </tr>
-          <tr v-for="j in cupom.itens" >
-              <td  v-for="yy in j"  >
-                {{ yy }}
-              </td>
-          </tr>
-        </table> -->
         <div v-if="cupom.itens.length" class="cupom_total2" style="margin-top: 5px; text-align: left; font-family: tahoma;">
           (Itens: {{ cupom.itens.length }})<br> Sub-total: {{ cupom.subtotal | money }}<br> Desconto:{{ desconto | money }}<br>Total: {{ cupom.subtotal - desconto | money }}
         </div>
@@ -679,7 +666,7 @@
 
 <script>
 import { getInfo } from '@/api/user'
-import { fetchList } from '@/api/generic'
+import { fetchList, create } from '@/api/generic'
 import { vendaClose } from '@/api/vendaClose'
 import waves from '@/directive/waves' // waves directive
 import { Money } from 'v-money'
@@ -689,12 +676,13 @@ import { VueGoodTable } from 'vue-good-table'
 
 import { Printd } from 'printd'
 import Autocomplete from '@/components/Autocomplete'
+
 export default {
   name: 'Balcao',
-  components: { Money, VueGoodTable, Autocomplete},
+  components: { Money, VueGoodTable, Autocomplete },
   directives: { waves },
   filters: {
-    img_mini: function (value, produtos) {
+    img_mini: function(value, produtos) {
       var a = produtos.filter(item => item.descricao == value)[0]
       if (a) return a.img_mini
     },
@@ -711,7 +699,7 @@ export default {
   },
   data() {
     return {
-      audio: ["assets/audio/timer_beep.mp3","assets/audio/timer_beep.mp3"],
+      vendaCloseEndFlg: false,
       source: null,
       atalhos: true,
       value: null,
@@ -857,23 +845,9 @@ export default {
       }
     }
   },
-  // computed: {
-  //   // a computed getter
-  //   ttt: function () {
-  //     // `this` points to the vm instance
-  //     if (this.$refs.searchTerm_.getSelected_item_id()){
-  //       return this.$refs.searchTerm_.getSelected_item_id()
-  //     }
-  //   }
-  // },
   watch: {
-
     qnt: function() {
-      // const keysAllowed = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
-      // if (!keysAllowed.includes(this.qnt)) {
-      //     // evt.preventDefault()
-      // }
-      if (this.qnt){
+      if (this.qnt) {
         this.qnt = this.qnt ? this.qnt.replace(',', '.') : ''
         this.product_selected.qnt = this.qnt
         this.product_selected.total = this.product_selected.qnt * this.product_selected.pco_venda
@@ -929,8 +903,35 @@ export default {
     })
   },
   methods: {
-    xx(){
-      console.log(this.source);
+    handleCliente_insert(){
+        this.$confirm(`Confirma a inclusão do cliente: ${this.searchTermClient}`, 'Warning', {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }).then(() => {
+            create('clientes', {nome: this.searchTermClient}).then((ret) => {
+              console.log('response.data:', ret.data.id)
+              var params = {
+                row:{
+                  id: ret.data.id,
+                  nome: this.searchTermClient 
+                }
+              }
+              this.clienteSet(params)
+              this.$message({
+                type: 'success',
+                message: 'Cliente inserido com sucesso!'
+              });
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Cancelado'
+          });          
+      });
+    },
+    xx() {
+      console.log(this.source)
     },
     vv(x) {
       console.log(x)
@@ -963,16 +964,6 @@ export default {
       self.today = dateTime
       self.today_timestamp = Date.now()
       setTimeout(self.updateDateTime, 1000)
-    },
-    getNow() {
-      var self = this
-      const today = new Date()
-      const date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear()
-      const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
-      const dateTime = date + ' ' + time
-      self.today = dateTime
-      // self.today_timestamp = new Date.now()
-      setTimeout(self.getNow(), 1000)
     },
     pagamento_ops_reset() {
       this.pago_dinheiro = 0
@@ -1034,13 +1025,12 @@ export default {
       })
     },
     cupom_add() {
-      if (this.product_selected.qnt > 0) {
-       const sound = ( new Audio(require('@/assets/audio/timer_beep.mp3'))).play()
-       this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
-        // this.product_selected.qnt = this.product_selected.qnt.replace(',', '.')
+      if (this.product_selected.qnt > -1) {
+        if (this.product_selected.qnt == 0) this.product_selected.qnt = 1
+        const sound = (new Audio(require('@/assets/audio/timer_beep.mp3'))).play()
+        this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
         // Procura produto pelo ID
         if (this.product_selected.id) {
-          // var n = this.cupom.itens.lenght?this.cupom.itens.lenght+1:1
           this.cupom.itens_n++
           var auxObj = {
             n: this.cupom.itens_n,
@@ -1075,16 +1065,15 @@ export default {
     },
     cupomRowView(n) {
       this.dialogFormCupomView = true
-      // this.temp2 = params.row
       var item = this.cupom.itens.find(x => parseInt(x.n) === parseInt(n))
       this.temp2 = item
     },
     productSet(params) {
-      //Check if is called by datalist or by product button
+      // Check if is called by datalist or by product button
       if (params === Object(params)) var params = this.source
       // var item = this.produtos.find(x => parseInt(x.id) === parseInt(params))
       var item = this.produtos.find(x => (x.descricao) === (params))
-      if (item){
+      if (item) {
         this.product_selected = item
         this.product_selected.qnt = 0.0
         this.product_selected.total = 0
@@ -1120,14 +1109,15 @@ export default {
     },
     vendaCloseOk() {
       console.log('this.cupom', this.cupom)
+      const sound = (new Audio(require('@/assets/audio/caixa_registradora.mp3'))).play()
 
       this.cupom.total = this.cupom.subtotal - this.desconto
 
       this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito + this.pago_faturado
-
+      console.log('this.cupom.date:', this.cupom.date);
       // this.falta_pagar = this.cupom.total - this.totalpago
       const auxObj = {
-        date: this.cupom.date,
+        date: + new Date(),
         cliente: this.cupom.cliente.id,
         subtotal: this.cupom.subtotal,
         desconto: this.desconto,
@@ -1143,25 +1133,24 @@ export default {
 
       // Try save operation in server
       vendaClose({ json_data: auxJson }).then((ret) => {
-        console.log('response:', ret)
-        this.cupom = {
-          date: this.today_timestamp,
-          cliente: {
-            id: 1,
-            nome: 'Cliente'
-          },
-          itens: [],
-          subtotal: 0,
-          total: 0
-        }
-        this.$notify({
-          title: 'Sucesso',
-          message: 'Venda registrada com sucesso!',
-          type: 'success',
-          duration: 2000
-        })
+        console.log('response:', ret)   
       })
+      // Close modal
+      this.vendaCloseFlg = false
+      this.vendaCloseEndFlg = true
+    },
+    vendaCloseOkFim(){
       // Clean up form
+      this.cupom = {
+        date: this.today_timestamp,
+        cliente: {
+          id: 1,
+          nome: 'Cliente'
+        },
+        itens: [],
+        subtotal: 0,
+        total: 0
+      }
       this.desconto = 0
       this.acrescimo = 0
       this.pago_dinheiro = 0
@@ -1170,11 +1159,9 @@ export default {
       this.pago_faturado = 0
       this.pago_troco = 0
 
+      this.vendaCloseEndFlg = false
       this.$refs.searchTerm_.focus()
       this.source = null
-
-      // Close modal
-      this.vendaCloseFlg = false
     },
     vendaCancel() {
       this.cupom = {

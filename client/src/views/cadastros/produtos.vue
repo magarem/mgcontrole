@@ -87,6 +87,9 @@
         <el-form-item label="Unidade" prop="unidade">
           <el-input v-model="temp.unidade" />
         </el-form-item>
+        <el-form-item label="Imagem mini" prop="img_mini">
+          <el-input v-model="temp.img_mini" />
+        </el-form-item>
         <el-form-item label="Estoque" prop="estoque">
           <el-input v-model="temp.estoque" />
         </el-form-item>

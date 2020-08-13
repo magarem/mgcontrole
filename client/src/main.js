@@ -25,10 +25,34 @@ import vSelect from 'vue-select'
 Vue.component('v-select', vSelect)
 import 'vue-select/dist/vue-select.css'
 
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+// import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import Buefy from 'buefy'
+// import 'buefy/dist/buefy.css'
 
+Vue.use(Buefy)
+
+Vue.mixin({
+  methods: {
+    capitalizeFirstLetter: str => str.charAt(0).toUpperCase() + str.slice(1),
+    timeConverter(UNIX_timestamp){
+      var a = new Date(+UNIX_timestamp);
+      console.log('a:', a);
+      var months = ['Jan','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      var year = a.getFullYear();
+      // var month = months[a.getMonth()];
+      var month = a.getMonth()+1;
+      var date = a.getDate();
+      var hour = a.getHours();
+      var min = a.getMinutes();
+      var sec = a.getSeconds();
+      var time = date + '/' + month + '/' + year + ' - ' + hour + ':' + min + ':' + sec ;
+      console.log('log:', time);
+      return time;
+    }
+  }
+})
 // Install BootstrapVue
-Vue.use(BootstrapVue)
+// Vue.use(BootstrapVue)
 
 /**
  * If you don't want to use mock-server
@@ -47,8 +71,6 @@ Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
   locale: enLang // 如果使用中文，无需设置，请删除
 })
-
-
 
 // register global utility filters
 Object.keys(filters).forEach(key => {
