@@ -10,6 +10,18 @@
     font-weight: bold;
   }
 
+  #page-container {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 2.5rem; 
+  }
+
   input[list] {
     margin-left:auto;
     margin-right:auto;
@@ -109,7 +121,6 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <!-- Produtos -->
-
             <el-card class="box-card" shadow="always" style="height: 330px; background-color: #f5f5ff;">
               <div slot="header" class="clearfix cardtitle">
                 <el-row>
@@ -118,7 +129,7 @@
                   </el-col>
                   <el-col :span="16">
                     <!-- <autocomplete ref="searchTerm_" :items="produtos_" @input="productSet"  /> -->
-                    <input ref="searchTerm_" v-model="source" placeholder="Selecione o produto" list="my-list-id" @input="productSet" style="width: 99%; height: 35px;">
+                    <input ref="searchTerm_" v-model="source" placeholder="Selecione o produto" list="my-list-id" style="width: 99%; height: 35px;" @input="productSet">
                     <datalist id="my-list-id">
                       <option v-for="(value, key) in produtos_" :key="key">{{ value.name }}</option>
                     </datalist>
@@ -177,9 +188,8 @@
         <el-row>
           <el-col :span="24">
             <!-- Produto selected -->
-            <el-card v-show="product_selected.id" class="box-card box_product_selected" shadow="always" style="height: 260px">
+            <el-card v-show="product_selected.id" class="box-card box_product_selected" shadow="always" style="height: 260px; background-color: #F2F6FC;">
               <div slot="header" class="clearfix cardtitle ">
-
                 <div id="wrapper">
                   <div class="left" style="width: 70%">
                     <span>{{ product_selected.descricao }} ({{ product_selected.id }})</span>
@@ -232,13 +242,13 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <!-- Cupom -->
-            <el-card id="myelement_" class="box-card" shadow="always" style="height: 430px; background-color: #ffffe6;">
-              <div slot="header" class="clearfix cardtitle">
+            <el-card id="myelement_" class="box-card" shadow="always" style="height: 500px; background-color: #ffffe6; min-height: 450px">
+              <div slot="header" class="clearfix cardtitle" >
                 <el-row :gutter="5">
-                  <el-col :span="12">
+                  <el-col :span="8">
                     <span>Cupom</span>
                   </el-col>
-                  <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
+                  <el-col :span="16" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                     {{ today }}
                   </el-col>
                 </el-row>
@@ -257,7 +267,7 @@
                   </el-col>
                 </el-row>
               </div>
-              <div v-if="cupom.itens.length == 0" style="text-align: center; vertical-align: middle; width: 100%; _height: 300px; _background-color: green;"><br><h1 id="caixa_Status">Caixa livre</h1></div>
+              <div v-if="cupom.itens.length == 0" style="text-align: center; vertical-align: middle; width: 100%;"><br><h1 id="caixa_Status">Caixa livre</h1></div>
               <el-row v-if="cupom.itens.length > 0" :gutter="25" style="text-align: center; width: 100%; font-weight: bold; font-size: 16px; margin-top: -5px; margin-bottom: -15px; margin-left:0px; _background-color: #ffffb3;">
                 <el-col :span="2" style="text-align: center;">
                   #
@@ -281,8 +291,8 @@
                   Total
                 </el-col>
               </el-row>
-              <el-divider v-if="cupom.itens.length > 0" />
-              <div id="container" style="margin-top:-15px; width: 100%; max-height:270px; overflow-y: auto;">
+              <el-divider v-if="cupom.itens.length > 0" _style="margin-bottom:-150px;"/>
+              <div id="container" style="margin-top:-15px; margin-bottom:-15px; width: 100%; max-height:280px; min-height: 280px; overflow-y: auto; ">
                 <el-row v-for="(row, rindex) in cupom.itens" :key="rindex" :gutter="25" :style="{backgroundColor: (rindex % 2 === 0? '' : '#f2f2da')}" style="width: 100%; margin-left:0px; margin-bottom: 3px;padding: 5px; font-size: 19px;">
                   <div @click="cupomRowView(row.n)">
                     <el-col :span="2" style="text-align: center;">
@@ -308,62 +318,50 @@
                     </el-col>
                   </div>
                 </el-row>
-                <!-- <vue-good-table
-                      v-if="cupom.itens.length > 0"
-                      :columns="columns_cupom"
-                      :rows="cupom.itens"
-                      theme="nocturnal"
-                      max-height="330px"
-                      @on-row-click="cupomRowView">
-                      <div slot="emptystate">
-                        Caixa livre
-                      </div>
-                    </vue-good-table> -->
-                <!-- <div v-if=cupom.itens.length class=cupom_total style="margin-top: 5px">
-                            (Itens: {{ cupom.itens.length }}) Sub-total: {{ cupom.subtotal | money }}
-                    </div> -->
               </div>
-            </el-card>
-            <!-- /Cupom -->
-          </el-col>
-        </el-row><br>
-        <el-row>
-          <el-col :span="24">
-            <!-- Venda Check-out -->
-            <el-card v-show="cupom.itens.length > 0" class="box-card cardtitle" shadow="always" style="height: 160px; font-family: arial;">
-              <div slot="header" class="clearfix cardtitle">
-                <div id="wrapper">
-                  <div class="left">
+              <el-divider/>
+              <div id="wrapper" style="margin-top:-7px; font-family: arial; font-size: 27px;">
+                  <div class="left bold" style="padding-left: 10px;">
                     <span>Itens: {{ cupom.itens.length }}</span>
                   </div>
-                  <div class="right">
-                    <span style="font-family: tahoma; font-size: 22px;">
+                  <div class="right bold">
+                    <span>
                       Sub-total: {{ cupom.subtotal | money }}
                     </span>
                   </div>
                 </div>
+            </el-card>
+            <!-- /Cupom -->
+          </el-col>
+        </el-row>
+        <el-row style="margin-top: 8px;">
+          <el-col :span="24">
+            <!-- Venda Check-out -->
+            <el-card v-show="cupom.itens.length > 0" class="box-card cardtitle" shadow="always" style="height: 100px; font-family: arial;">
+              <div style="height: 200px;">
+                <el-row type="flex" class="row-bg">
+                  <el-col :span="24">
+                    <el-row :gutter="5" type="flex" class="row-bg" style="_margin-top: 18px">
+                      <el-col :span="8">
+                        <el-button
+                          v-show="cupom.total>0"
+                          style="height:60px; font-size:25px; width: 100%;"
+                          type="danger"
+                          @click="vendaCancel()">
+                          Cancelar
+                        </el-button>
+                      </el-col>
+                      <el-col :span="16">
+                        <el-button v-show="cupom.total > 0" style="height:60px; font-size:25px; width: 100%;" type="success" icon="el-icon-check" @click="vendaClose()">
+                          Pagar
+                        </el-button>
+                      </el-col>
+                    </el-row>
+                    <br>
+                  </el-col>
+                </el-row>
               </div>
-              <el-row type="flex" class="row-bg">
-                <el-col :span="24">
-                  <el-row :gutter="5" type="flex" class="row-bg" style="_margin-top: 18px">
-                    <el-col :span="8">
-                      <el-button
-                        v-show="cupom.total>0"
-                        style="height:60px; font-size:25px; width: 100%;"
-                        type="danger"
-                        @click="vendaCancel()">
-                        Cancelar
-                      </el-button>
-                    </el-col>
-                    <el-col :span="16">
-                      <el-button v-show="cupom.total > 0" style="height:60px; font-size:25px; width: 100%;" type="success" icon="el-icon-check" @click="vendaClose()">
-                        Pagar
-                      </el-button>
-                    </el-col>
-                  </el-row>
-                  <br>
-                </el-col>
-              </el-row>
+             
             </el-card>
             <!-- /Venda Check-out -->
           </el-col>
@@ -408,7 +406,7 @@
     </el-dialog>
 
     <!-- Venda close -->
-    <el-dialog :visible.sync="vendaCloseFlg" width="60%" center top="5vh">
+    <el-dialog :visible.sync="vendaCloseFlg" width="60%" center top="5vh" >
       <span slot="title" style="font-size: 30px">Fechamento de venda</span>
       <el-form ref="form" style="font-size: 20px" :model="form" label-width="0px" label-position="top">
         <el-row :gutter="10">
@@ -451,12 +449,23 @@
                 </div>
                 <!-- </el-form-item> -->
               </div>
-            </el-card>
-
+            </el-card><br>
+            <el-collapse accordion v-if="parametros_flg">
+              <el-collapse-item title="Parâmetros" name="1">
+                <el-row :gutter="13">
+                  <el-col :span="14" style="_padding-top: 5px; text-align: right;">
+                    <div style="font-size: 17px;">Data de referência:</div>
+                  </el-col>
+                  <el-col :span="10" style="_text-align: right; _padding-top: 3px">
+                    <input type="tel" style="width: 130px; font-size: 20px;" v-model="date_ref" v-mask="'##/##/####'" />
+                  </el-col>
+                </el-row>
+                 
+              </el-collapse-item>
+            </el-collapse>
+           
           </el-col>
-
           <el-col :span="12">
-
             <el-card class="box-card">
               <div slot="header" class="clearfix">
                 <span>Forma de pagamento</span>
@@ -543,24 +552,24 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="pago_falta <= 0.04" style="margin-left: 10px; width: 250px; font-size: 25px;" type="success" @click="vendaCloseOk();">Confirma</el-button>
         <el-button style="font-size: 25px" @click="vendaCloseFlg = false">
           Cancela
         </el-button>
+        <el-button v-if="pago_falta <= 0.04" style="margin-left: 10px; width: 250px; font-size: 25px;" type="success" @click="vendaCloseOk();">Confirma</el-button>
       </span>
     </el-dialog>
 
     <!-- Venda fechada! -->
     <el-dialog :visible.sync="vendaCloseEndFlg" width="50%" center top="5vh">
       <el-card class="box-card">
-            <div slot="header" class="clearfix" style="text-align: center;">
-              <span style="font-size: 30px;">Venda Registrada com sucesso!</span>
-            </div>
-            <div style="text-align: center;">
-              <img src="@/assets/img/ok.png" style="width:200px; height:200px; margin-bottom: 20px;"><br>
-              <el-button @click="vendaPrintFlg=true" type="primary" style="width: 200px;" round>Imprimir cupom</el-button>
-              <el-button @click="vendaCloseOkFim" v-on:keyup.enter="vendaCloseOkFim" type="success"  style="width: 200px; z-index: -1;" round autofocus>Nova venda</el-button>   
-            </div>
+        <div slot="header" class="clearfix" style="text-align: center;">
+          <span style="font-size: 30px;">Venda Registrada com sucesso!</span>
+        </div>
+        <div style="text-align: center;">
+          <img src="@/assets/img/ok.png" style="width:200px; height:200px; margin-bottom: 20px;"><br>
+          <el-button type="primary" style="width: 200px;" round @click="vendaPrintFlg=true">Imprimir cupom</el-button>
+          <el-button type="success" style="width: 200px; z-index: -1;" round autofocus @click="vendaCloseOkFim" @keyup.enter="vendaCloseOkFim">Nova venda</el-button>
+        </div>
       </el-card>
     </el-dialog>
 
@@ -587,7 +596,7 @@
         @on-row-click="clienteSet"
       />
       <span slot="footer" class="dialog-footer" align="center">
-        <el-button type="primary" v-if="searchTermClient" @click="handleCliente_insert">Incluir novo cliente</el-button>
+        <el-button v-if="searchTermClient" type="primary" @click="handleCliente_insert">Incluir novo cliente</el-button>
         <el-button type="primary" @click="clientesListFlg = false">Fechar</el-button>
       </span>
     </el-dialog>
@@ -610,11 +619,13 @@
           :data="cupom.itens"
           row-class-name="cupom_total"
           header-row-class-name="cupom_total"
-          style="width: 100%; font-size:13px;">
+          style="width: 100%; font-size:13px;"
+        >
           <el-table-column
             prop="descricao"
             label="Desc"
-            width="50px">
+            width="50px"
+          >
             <template slot-scope="scope">
               <span>{{ scope.row.id }}<br>{{ scope.row.descricao }}</span>
             </template>
@@ -622,7 +633,8 @@
           <el-table-column
             prop="pco_venda"
             label="Pço"
-            width="50px">
+            width="50px"
+          >
             <template slot-scope="scope">
               <span>{{ scope.row.pco_venda | money }}</span>
             </template>
@@ -699,7 +711,9 @@ export default {
   },
   data() {
     return {
+      parametros_flg: true,
       vendaCloseEndFlg: false,
+      date_ref: null,
       source: null,
       atalhos: true,
       value: null,
@@ -903,57 +917,53 @@ export default {
     })
   },
   methods: {
-    handleCliente_insert(){
-        this.$confirm(`Confirma a inclusão do cliente: ${this.searchTermClient}`, 'Warning', {
-            confirmButtonText: 'OK',
-            cancelButtonText: 'Cancel',
-            type: 'warning'
-          }).then(() => {
-            create('clientes', {nome: this.searchTermClient}).then((ret) => {
-              console.log('response.data:', ret.data.id)
-              var params = {
-                row:{
-                  id: ret.data.id,
-                  nome: this.searchTermClient 
-                }
-              }
-              this.clienteSet(params)
-              this.$message({
-                type: 'success',
-                message: 'Cliente inserido com sucesso!'
-              });
-          })
-        }).catch(() => {
+    vai() {
+      this.$nextTick(function() {
+        this.$refs.searchTerm_.focus()
+        this.source = null
+      })
+    },
+    set_refDate(){
+      var myDate = this.date_ref.split("/");
+      var newDate = myDate[1]+"/"+myDate[0]+"/"+myDate[2];
+      console.log(new Date(newDate).getTime());
+    },
+    handleCliente_insert() {
+      this.$confirm(`Confirma a inclusão do cliente: ${this.searchTermClient}`, 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        create('clientes', { nome: this.searchTermClient }).then((ret) => {
+          console.log('response.data:', ret.data.id)
+          var params = {
+            row: {
+              id: ret.data.id,
+              nome: this.searchTermClient
+            }
+          }
+          this.clienteSet(params)
           this.$message({
-            type: 'info',
-            message: 'Cancelado'
-          });          
-      });
+            type: 'success',
+            message: 'Cliente inserido com sucesso!'
+          })
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Cancelado'
+        })
+      })
     },
-    xx() {
-      console.log(this.source)
-    },
-    vv(x) {
-      console.log(x)
-    },
-    scrollToEnd: function() {
+    scrollToEnd() {
       var container = this.$el.querySelector('#container')
       container.scrollTop = container.scrollHeight
-    },
-    scrollToElement() {
-      const el = this.$el.getElementsByClassName('scroll-to-me')[0]
-      if (el) {
-        el.scrollIntoView()
-      }
     },
     getUser() {
       var self = this
       getInfo().then(function(x) {
         self.user = x.data.name
       })
-    },
-    getZeroPad(x) {
-      return x
     },
     updateDateTime() {
       var self = this
@@ -978,26 +988,6 @@ export default {
         evt.preventDefault()
       }
     },
-    teste(x) {
-      console.log(x)
-    },
-    vai() {
-      console.log(this.$refs)
-      this.$nextTick(function() {
-        this.$refs.searchTerm_.focus()
-        this.source = null
-        // this.$refs.searchTerm_.value=null;
-        // this.$refs.searchTerm_.$refs.searchTerm_.focus()
-        // this.$refs.searchTerm.clear()
-        // this.searchTerm_ = null
-      })
-    },
-    vai2() {
-      this.$refs.qnt.focus()
-    },
-    vai3() {
-      this.$refs.searchClient.focus()
-    },
     getCliente() {
       const self = this
       self.clientesList = []
@@ -1010,7 +1000,7 @@ export default {
       this.clientesListFlg = true
       this.$nextTick(() => {
         this.searchTermClient = null
-        this.vai3()
+        this.$refs.searchClient.focus()
       })
     },
     clienteSet(params) {
@@ -1074,12 +1064,13 @@ export default {
       // var item = this.produtos.find(x => parseInt(x.id) === parseInt(params))
       var item = this.produtos.find(x => (x.descricao) === (params))
       if (item) {
+        this.qnt = ''
         this.product_selected = item
         this.product_selected.qnt = 0.0
         this.product_selected.total = 0
         console.log('this.product_selected:', this.product_selected)
         this.$nextTick(() => {
-          this.vai2()
+          this.$refs.qnt.focus()
         })
       }
     },
@@ -1110,14 +1101,13 @@ export default {
     vendaCloseOk() {
       console.log('this.cupom', this.cupom)
       const sound = (new Audio(require('@/assets/audio/caixa_registradora.mp3'))).play()
-
       this.cupom.total = this.cupom.subtotal - this.desconto
-
       this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito + this.pago_faturado
-      console.log('this.cupom.date:', this.cupom.date);
+      console.log('this.cupom.date:', this.cupom.date)
       // this.falta_pagar = this.cupom.total - this.totalpago
       const auxObj = {
-        date: + new Date(),
+        date: +new Date(),
+        date_ref: this.date_ref,
         cliente: this.cupom.cliente.id,
         subtotal: this.cupom.subtotal,
         desconto: this.desconto,
@@ -1133,13 +1123,13 @@ export default {
 
       // Try save operation in server
       vendaClose({ json_data: auxJson }).then((ret) => {
-        console.log('response:', ret)   
+        console.log('response:', ret)
       })
       // Close modal
       this.vendaCloseFlg = false
       this.vendaCloseEndFlg = true
     },
-    vendaCloseOkFim(){
+    vendaCloseOkFim() {
       // Clean up form
       this.cupom = {
         date: this.today_timestamp,
@@ -1151,6 +1141,7 @@ export default {
         subtotal: 0,
         total: 0
       }
+      this.date_ref = null
       this.desconto = 0
       this.acrescimo = 0
       this.pago_dinheiro = 0
@@ -1162,6 +1153,12 @@ export default {
       this.vendaCloseEndFlg = false
       this.$refs.searchTerm_.focus()
       this.source = null
+
+      //reset parametros board
+      this.parametros_flg = false
+      this.$nextTick(() => {
+        this.parametros_flg = true
+      })
     },
     vendaCancel() {
       this.cupom = {

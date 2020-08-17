@@ -25,29 +25,42 @@ import vSelect from 'vue-select'
 Vue.component('v-select', vSelect)
 import 'vue-select/dist/vue-select.css'
 
+import VueTheMask from 'vue-the-mask'
+Vue.use(VueTheMask)
+
 // import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import Buefy from 'buefy'
+// import Buefy from 'buefy'
 // import 'buefy/dist/buefy.css'
 
-Vue.use(Buefy)
+// Vue.use(Buefy)
 
 Vue.mixin({
   methods: {
     capitalizeFirstLetter: str => str.charAt(0).toUpperCase() + str.slice(1),
-    timeConverter(UNIX_timestamp){
-      var a = new Date(+UNIX_timestamp);
-      console.log('a:', a);
-      var months = ['Jan','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      var year = a.getFullYear();
-      // var month = months[a.getMonth()];
-      var month = a.getMonth()+1;
-      var date = a.getDate();
-      var hour = a.getHours();
-      var min = a.getMinutes();
-      var sec = a.getSeconds();
-      var time = date + '/' + month + '/' + year + ' - ' + hour + ':' + min + ':' + sec ;
-      console.log('log:', time);
-      return time;
+    timeConverter(UNIX_timestamp) {
+      console.log('UNIX_timestamp:', UNIX_timestamp);
+      if (UNIX_timestamp) {
+        if (UNIX_timestamp.indexOf('-')>-1){
+          var date = UNIX_timestamp.split(' ')[0].split('-')
+          date = date[2] + '/' + date[1] + '/' + date[0]
+          var time = UNIX_timestamp.split(' ')[1]
+          var ret = date + ' - ' + time
+        }else{
+          var a = new Date(+UNIX_timestamp)
+          console.log('a:', a)
+          var months = ['Jan', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+          var year = a.getFullYear()
+          // var month = months[a.getMonth()];
+          var month = a.getMonth() + 1
+          var date = a.getDate()
+          var hour = a.getHours()
+          var min = a.getMinutes()
+          var sec = a.getSeconds()
+          var ret = date + '/' + month + '/' + year + ' - ' + hour + ':' + min + ':' + sec
+          console.log('log:', time)
+        }
+      }
+      return ret
     }
   }
 })

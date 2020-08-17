@@ -70,46 +70,46 @@
     -->
     <el-dialog :title="textMap[dialogStatus]" align="left" :visible.sync="dialogFormVisible" top="2vh" :width="tela">
       <div slot="title" style="font-size: 30px;">{{ textMap[dialogStatus] }}</div>
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="top"  >
-        <b-field label="Name" >
-            <b-input v-model="temp.nome" style="width: 100%; height: 35px;"></b-input>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="top">
+        <b-field label="Name">
+          <b-input v-model="temp.nome" style="width: 100%; height: 35px;" />
         </b-field>
         <b-field label="Tipo">
-            <b-select placeholder="Select a character" rounded  style="width: 100%; height: 35px;">
-                <option value="Física">Física</option>
-                <option value="Jurídica">Jurídica</option>
-            </b-select>
+          <b-select placeholder="Selecione" rounded style="width: 100%; height: 35px;">
+            <option value="Física">Física</option>
+            <option value="Jurídica">Jurídica</option>
+          </b-select>
         </b-field>
-         <b-field label="Doc" >
-            <b-input v-model="temp.doc"  style="width: 100%; height: 35px;"></b-input>
+        <b-field label="Doc">
+          <b-input v-model="temp.doc" style="width: 100%; height: 35px;" />
         </b-field>
-        <b-field label="Contato" >
-            <b-input v-model="temp.contato"  style="width: 100%; height: 35px;"></b-input>
+        <b-field label="Contato">
+          <b-input v-model="temp.contato" style="width: 100%; height: 35px;" />
         </b-field>
-        <b-field label="Telefone (1)" >
-            <b-input v-model="temp.fone" style="width: 100%; height: 35px;"></b-input>
+        <b-field label="Telefone (1)">
+          <b-input v-model="temp.fone" style="width: 100%; height: 35px;" />
         </b-field>
-        <b-field label="Telefone (2)" >
-            <b-input v-model="temp.fone2" style="width: 100%; height: 35px;"></b-input>
+        <b-field label="Telefone (2)">
+          <b-input v-model="temp.fone2" style="width: 100%; height: 35px;" />
         </b-field>
-        <b-field label="Endereço" >
-            <b-input v-model="temp.endereco" style="width: 100%; height: 35px;"></b-input>
+        <b-field label="Endereço">
+          <b-input v-model="temp.endereco" style="width: 100%; height: 35px;" />
         </b-field>
-        <b-field label="Email" >
-            <b-input v-model="temp.email" style="width: 100%; height: 35px;"></b-input>
+        <b-field label="Email">
+          <b-input v-model="temp.email" style="width: 100%; height: 35px;" />
         </b-field>
-        <b-field label="CEP" >
-            <b-input v-model="temp.cep" style="width: 100%; height: 35px;"></b-input>
+        <b-field label="CEP">
+          <b-input v-model="temp.cep" style="width: 100%; height: 35px;" />
         </b-field>
-        <b-field label="Obs" >
-            <b-input v-model="temp.Obs" style="width: 100%; height: 35px;"></b-input>
+        <b-field label="Obs">
+          <b-input v-model="temp.Obs" style="width: 100%; height: 35px;" />
         </b-field>
-         <el-button @click="dialogFormVisible = false">
-                      Cancela
-              </el-button>
-              <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
-                    Confirma
-              </el-button>
+        <el-button @click="dialogFormVisible = false">
+          Cancela
+        </el-button>
+        <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
+          Confirma
+        </el-button>
       </el-form>
       <!-- <el-form-item label="Nome" prop="nome">
               <el-input v-model="temp.nome" autofocus />
@@ -273,19 +273,19 @@ export default {
   },
   data() {
     return {
-        schema: {
-        $id: "https://example.com/person.schema.json",
-        $schema: "http://json-schema.org/draft-07/schema#",
-        title: "Cliente",
-        type: "object",
+      schema: {
+        $id: 'https://example.com/person.schema.json',
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        title: 'Cliente',
+        type: 'object',
         properties: {
           nome: {
-            type: "string",
-            title: "Nome",
+            type: 'string',
+            title: 'Nome'
           },
           contato: {
-            type: "string",
-            title: "Contato",
+            type: 'string',
+            title: 'Contato'
           }
         }
       },

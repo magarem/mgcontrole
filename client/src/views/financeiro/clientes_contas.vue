@@ -3,7 +3,7 @@
     <!-- <div v-if="selected" style="padding-top:10px; width: 100%;">
       You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
       </div> -->
-    <h1 v-if="list[0]">{{ list[0].cliente }}</h1>
+    
     <!-- <h2>{{ info.name }}</h2> -->
     <el-form ref="form" :model="filter" label-width="120px">
       <el-row :gutter="20">
@@ -11,9 +11,12 @@
           <!-- <el-tag v-permission="['admin']">admin</el-tag>
           <el-tag v-permission="['cliente']">cliente</el-tag>
           <div v-if="checkPermission(['admin'])">admin</div> -->
+          
           <el-form-item v-if="checkPermission(['admin'])" label="Cliente">
             <div class="autosuggest-container">
+             
               <vue-autosuggest
+                v-if=procura
                 v-model="query"
                 :suggestions="filteredOptions"
                 :get-suggestion-value="getSuggestionValue"
@@ -31,19 +34,34 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
+          
           <el-form-item v-if="checkPermission(['admin'])">
-            <el-button type="primary" @click="filterHandle">Filtrar</el-button>
-            <el-button type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
+            <el-button type="primary" @click="clearFilterHandle">Limpar filtro</el-button>
+            <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
           </el-form-item>
         </el-col>
-        <el-col :span="9">
-          <div style="font-size:30px;">
-            <span v-if="(list_total && list_total.credito - list_total.debito)<0" style="color: red;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
-            <span v-if="(list_total && list_total.credito - list_total.debito)>=0" style="color: green;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
-          </div>
-        </el-col>
+       
       </el-row>
     </el-form>
+    
+    <el-row style="font-size:20px; width:95%; margin:auto;">
+      <el-col :span="9" :offset="0">
+          <span v-if="!selected.cliente">Todos</span>
+          <span v-if="selected.cliente">{{selected.cliente}}</span>
+      </el-col>
+      <el-col :span="5">
+          <span v-if="list_total.debito" style="color: red;"> Débitos: {{ (list_total.debito) | money }}</span>
+      </el-col>
+      <el-col :span="5">
+          <span v-if="list_total.credito" style="color: green;"> Créditos: {{ (list_total.credito) | money }}</span>
+      </el-col>
+      <el-col :span="5">
+        <div >
+          <span v-if="(list_total && list_total.credito - list_total.debito)<0" style="color: red;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
+          <span v-if="(list_total && list_total.credito - list_total.debito)>=0" style="color: green;"> Saldo: {{ (list_total.credito - list_total.debito) | money }}</span>
+        </div>
+      </el-col>
+    </el-row><br>
     <div style="width:95%; margin:auto;">
       <vue-good-table
         :columns="columns"
@@ -174,6 +192,7 @@ export default {
   },
   data() {
     return {
+      procura: true,
       info: null,
       token: null,
       user_id: '',
@@ -276,11 +295,6 @@ export default {
     },
     filteredOptions() {
       return [
-        // {
-        //   data: this.suggestions[0].data.filter(option => {
-        //     return option.name.toLowerCase().indexOf(this.query.toLowerCase()) > -1;
-        //   })
-        // }
         {
           data: this.list_original.filter(option => {
             return option.cliente.toLowerCase().indexOf(this.query.toLowerCase()) > -1
@@ -325,6 +339,21 @@ export default {
     },
     focusMe(e) {
       console.log(e) // FocusEvent
+    },
+    clearFilterHandle() {
+      // Set the Query with finders
+      this.listQuery = ''
+      this.query = ''
+      this.selected = ''
+
+      this.procura = false
+      this.$nextTick(function() {
+        this.procura = true
+      })
+      
+      // this.selected.cliente_id = null
+      // Get data in server
+      this.getList_original()
     },
     filterHandle() {
       // Set the Query with finders
@@ -402,10 +431,34 @@ export default {
       fetchList('f_clientes_faturados').then(response => {
         this.total = response.data.total
         console.log(response.data)
+        this.list = response.data.items
+        
         this.list_original = response.data.items.map(function(item) {
           return { cliente_id: item.cliente_id, cliente: item.cliente }
         })
+        
         this.list_original = this.list_original.reduce((acc, value) => acc.some(i => i.cliente_id === value.cliente_id) ? acc : acc.concat(value), []) // id your uniq key
+      })
+      // Pega o total
+      fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
+        console.log('response.data.items:', response.data.items);
+        //Do the Sum
+        this.list_total = {
+          credito: 0,
+          debito: 0
+        }
+        var v = 0
+        for (var t=0;  t < response.data.items.length; t++){
+          v = response.data.items[t]
+          console.log('v.credito:', v.credito);
+          // console.log(response.data.items[t].credito, response.data.items[t].debito)
+          // console.log('response.data.items[t].credito:', response.data.items[t].credito);
+          this.list_total.credito += v.credito
+          this.list_total.debito += v.debito
+          // this.list_total += this.list_total.credito - this.list_total.debito
+        }
+        console.log('this.list_total:', this.list_total);
+        // this.list_total = response.data.items[0]
       })
     }
   }

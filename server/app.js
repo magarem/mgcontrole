@@ -455,13 +455,19 @@ app.get(environment + '/eansearch', function (req, res, next) {
 // Cadastros
 ////////////////////////////////
 function whereSQL_string(obj){
-  let ret = null
+  let aux = null
   let t = []
   for (const [key, value] of Object.entries(obj)) {
-    if (value) t.push(key + ' like "%'  + value + '%"');
+    if (value) {
+      if (typeof value == 'number') {
+        aux = key + ' = '  + value
+      }else{
+        aux = key + ' like "%'  + value + '%"'
+      }
+      t.push(aux);
+    }
   }
-  if (t.length > 0) ret = t.join(" and ")
-  return ret
+  if (t.length > 0) return t.join(" and ")
 }
 
 function insertSQL_string(table, obj){
@@ -476,78 +482,45 @@ function updateSQL_string(table, id, obj){
 }
   // Generic
   app.get(environment + '/generic', function (req, res, next) {
-   
+    
     // Get user token
-   let token = req.headers['x-token']
-   // Get domain
-   let domain = token.split('.')[0]
-   console.log('domain:', domain);
-
-   //Get table name
-   let key = req.query.key
-   console.log('key:', key);
-   
-   
-   db_open(`./${domain}.db`).then(db => {
+    let token = req.headers['x-token']
     
-    let strLimit = ""
-    let strWhere = " where 1=1 "
+    // Get domain
+    let domain = token.split('.')[0]
+    console.log('domain:', domain);
 
-    console.log('req.query:', req.query);
-    
-    
-    if (req.query.find) {
-      console.log('!!!!');
-      w = whereSQL_string(JSON.parse(req.query.find))
-      if (w) strWhere += ' and ' + w
-    }
-
-    let strSort = " order by id"//DESC
-   
-    if (req.query.sort) {
-      strLimit = " limit " + ((parseInt(req.query.page) - 1) * req.query.limit) + ',' + req.query.limit
-      strSort = " order by " + req.query.sort.replace('+', '').replace('-', '')
-    }
-
-    // if (req.query.nome){ strWhere += " and nome like '%"+req.query.nome+"%' or doc like '%"+req.query.nome+"%'"}
-    // if (req.query.doc){ strWhere += " and doc like '%"+req.query.doc+"%'"}
-
-    sqlStr = `SELECT count(*) as total FROM ${key} ${strWhere}`
-    console.log('>>>', sqlStr);
-    
-    db.all(sqlStr, function(err, rows, fields) {
-      if (rows){
-        console.log('!!2')
-        let totGeral = rows[0].total
-        console.log('totGeral:', totGeral);
-        sqlStr = `SELECT * FROM ${key} ${strWhere} `//${strSort} ${strLimit}`;
-        console.log('sqlStr', sqlStr);
-        db.all(sqlStr, function(err, rows, fields) {
-        // console.log('rows.length:', rows.length);
-          jsonStr = {
-            "code": 20000,
-            "data": {
-                // "total": (rows||[]).length}
-                "total": totGeral}
-            }
-            jsonStr.data.items = rows
-            res.send(jsonStr);
-        });
-      }else{
-        jsonStr = {
-          "code": 20000,
-          "data": {
-              // "total": (rows||[]).length}
-              "total": 0}
-          }
-          jsonStr.data.items = []
-          res.send(jsonStr);
+    //Get table name
+    let key = req.query.key
+    console.log('key:', key);
+    db_open(`./${domain}.db`).then(db => {
+      let strLimit = ""
+      let strWhere = " where 1=1 "
+      console.log('req.query:', req.query);
+      if (req.query.find) {
+        var w = whereSQL_string(JSON.parse(req.query.find))
+        if (w) strWhere += ' and ' + w
       }
+      let strSort = '' //' order by 1 ' //DESC
+      if (req.query.sort) {
+        strLimit = " limit " + ((parseInt(req.query.page) - 1) * req.query.limit) + ',' + req.query.limit
+        strSort = " order by " + req.query.sort.replace('+', '').replace('-', '')
+      }
+      var sqlStr = `
+        SELECT *, b.total_rows tot FROM ${key} a, (
+          SELECT count(*) total_rows
+              FROM ${key} ${strWhere}
+          ) b ${strWhere} ${strSort} ${strLimit}
+      `
+      console.log('>>>', sqlStr);
+      db.all(sqlStr, function(err, rows, fields) {
+        var total = rows[0]?rows[0].total_rows:0
+        var jsonStr = {code: 20000, data: {total: total, items: rows||[]}} 
+        res.send(jsonStr);
+      });
     })
-    })
-
-
   })
+
   app.post(environment + '/generic', function (req, res, next) {
     
     // Get user token
@@ -575,8 +548,8 @@ function updateSQL_string(table, id, obj){
         }
       );
     })
-
   })
+
   app.patch(environment + '/generic', function (req, res, next) {
     
     // Get user token
@@ -701,7 +674,9 @@ function updateSQL_string(table, id, obj){
 
     //Get form data
     var json_data = JSON.parse(req.body.json_data)
-    console.log('json_data:', json_data);
+    console.log('json_data:', json_data)
+    var date = json_data.date
+    var date_ref = json_data.date_ref
     var cliente = json_data.cliente
     var itens = json_data.itens
     var subtotal = json_data.subtotal 
@@ -711,19 +686,27 @@ function updateSQL_string(table, id, obj){
     var value_debito = json_data.debito 
     var value_credito = json_data.credito 
     var value_faturado = json_data.faturado
-    var date = json_data.date
 
     if (!date){
       date = new Date().getTime()
     }
-
+  
     console.log('var date:', date);
+
+    if (date_ref){
+      var myDate = date_ref.split("/");
+      date_ref = myDate[1]+"/"+myDate[0]+"/"+myDate[2];
+      date_ref = new Date(date_ref).getTime();
+      console.log('var date_ref:', date_ref);
+    }else{
+      date_ref = date
+    }
 
     //Open database
     db_open('./' + domain + '.db').then(db => {
       
       // Register op Venda
-      register_op(null, 'vendas', null, 'usuarios', cliente, total, db)
+      register_op(null, 'vendas', null, 'clientes', cliente, total, date, db)
       .then(
         result => {
           console.log("Promise resolved: " + result)
@@ -737,16 +720,22 @@ function updateSQL_string(table, id, obj){
           }
           var pagamento = JSON.stringify(pagamento_obj)
           // Insert Venda
-          db.run(`INSERT INTO vendas (id, cliente, itens, subtotal, desconto, acrescimo, total, pagamento, created) VALUES (${top_id}, ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}', '${date}')`, function(err) {
-            if (err) {
-              return console.log(err.message);
-            }
+          
+          db.run(`
+            INSERT INTO vendas 
+              (id, cliente, itens, subtotal, desconto, acrescimo, total, pagamento, created) 
+              VALUES (${top_id}, ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}', '${date_ref}')
+            `, function(err) {
+              if (err) {
+                return console.log(err.message);
+              }
           })
+
           // Insert venda_pagamento
-          venda_pg('f_pg_dinheiro', value_dinheiro, top_id, cliente, db);
-          venda_pg('f_pg_debito', value_debito, top_id, cliente, db);
-          venda_pg('f_pg_credito', value_credito, top_id, cliente, db);
-          venda_pg('f_pg_faturado', value_faturado, top_id, cliente, db);
+          venda_pg('f_pg_dinheiro', value_dinheiro, top_id, cliente, date, db);
+          venda_pg('f_pg_debito', value_debito, top_id, cliente, date, db);
+          venda_pg('f_pg_credito', value_credito, top_id, cliente, date, db);
+          venda_pg('f_pg_faturado', value_faturado, top_id, cliente, date, db);
           jsonStr = {
             "code": 20000,
             "data": {
@@ -946,9 +935,9 @@ function updateSQL_string(table, id, obj){
   app.listen(port, () => console.log('Server start on port ${port}'))
 
 
-function register_op(pid, origem_tabela, origem_tabela_id, destino_tabela, destino_tabela_id, valor, db){
+function register_op(pid, origem_tabela, origem_tabela_id, destino_tabela, destino_tabela_id, valor, date, db){
   const promise = new Promise( (resolve, reject) => { 
-    sql = `INSERT OR REPLACE INTO financeiro_operacoes VALUES (null, ${pid}, '${origem_tabela}', '${origem_tabela_id}', '${destino_tabela}', '${destino_tabela_id}', '${valor}', null)`
+    sql = `INSERT OR REPLACE INTO financeiro_operacoes VALUES (null, ${pid}, '${origem_tabela}', '${origem_tabela_id}', '${destino_tabela}', '${destino_tabela_id}', '${valor}', '${date}')`
     db.run(sql, function(err) {
       if (err) {return console.log(err.message);}
       var id_op = this.lastID
@@ -965,10 +954,10 @@ function register_op(pid, origem_tabela, origem_tabela_id, destino_tabela, desti
 
 
 
-function venda_pg(destino_tabela, value, top_id, cliente, db) {
+function venda_pg(destino_tabela, value, top_id, cliente, date, db) {
   if (value > 0) {
     sql = `INSERT OR REPLACE INTO financeiro_operacoes
-          VALUES (null, ${top_id}, 'clientes', ${cliente}, '${destino_tabela}', null, '${value}', null)`;
+          VALUES (null, ${top_id}, 'clientes', ${cliente}, '${destino_tabela}', null, '${value}', '${date}')`;
     db.run(sql, function (err) {
       if (err) {
         return console.log(err.message);

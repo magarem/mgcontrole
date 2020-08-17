@@ -59,7 +59,7 @@
       </el-table-column> -->
       </el-table>
       <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" layout="prev, pager, next" @pagination="getVendas" />
-     
+
     </div>
     <!--
 
@@ -281,20 +281,20 @@ export default {
   name: 'Vendas',
   components: { Pagination, VueGoodTable },
   filters: {
-     timeConverter(UNIX_timestamp){
-      var a = new Date(UNIX_timestamp);
-      console.log('a:', a);
-      var months = ['Jan','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-      var year = a.getFullYear();
+    timeConverter(UNIX_timestamp) {
+      var a = new Date(UNIX_timestamp)
+      console.log('a:', a)
+      var months = ['Jan', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+      var year = a.getFullYear()
       // var month = months[a.getMonth()];
-      var month = a.getMonth()+1;
-      var date = a.getDate();
-      var hour = a.getHours();
-      var min = a.getMinutes();
-      var sec = a.getSeconds();
-      var time = date + '/' + month + '/' + year + ' - ' + hour + ':' + min + ':' + sec ;
-      console.log('log:', time);
-      return time;
+      var month = a.getMonth() + 1
+      var date = a.getDate()
+      var hour = a.getHours()
+      var min = a.getMinutes()
+      var sec = a.getSeconds()
+      var time = date + '/' + month + '/' + year + ' - ' + hour + ':' + min + ':' + sec
+      console.log('log:', time)
+      return time
     },
     money(value) {
       if (typeof value !== 'number') {
@@ -412,7 +412,7 @@ export default {
         precision: 2,
         masked: false /* doesn't work with directive */
       },
-       total: 0,
+      total: 0,
       listLoading: true,
       listQuery: {
         page: 1,
@@ -422,7 +422,7 @@ export default {
           nome: '',
           doc: ''
         }
-      },  
+      },
       temp: {
         id: undefined,
         timestamp: new Date()
@@ -469,7 +469,7 @@ export default {
 
         this.total = response.data.total
 
-        //Just to simulate the time of the request
+        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 0)
