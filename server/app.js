@@ -471,10 +471,20 @@ function whereSQL_string(obj){
 }
 
 function insertSQL_string(table, obj){
+
+  //Delete aux keys
+  if (obj.total_rows) delete obj.total_rows
+  if (obj.tot) delete obj.tot
+
   var sql = `INSERT INTO ${table} ('${Object.keys(obj).join("','")}') values ('${Object.values(obj).join("','")}')`
   return sql
 }
 function updateSQL_string(table, id, obj){
+  
+  //Delete aux keys
+  if (obj.total_rows) delete obj.total_rows
+  if (obj.tot) delete obj.tot
+
   var sql = `UPDATE ${table} SET ${Object.keys(obj).join(' = ?, ') + ' = ?'} WHERE id = ${id}`;
   console.log('updateSQL:sql->',sql);
   
@@ -693,14 +703,17 @@ function updateSQL_string(table, id, obj){
   
     console.log('var date:', date);
 
-    if (date_ref){
-      var myDate = date_ref.split("/");
-      date_ref = myDate[1]+"/"+myDate[0]+"/"+myDate[2];
-      date_ref = new Date(date_ref).getTime();
-      console.log('var date_ref:', date_ref);
-    }else{
-      date_ref = date
-    }
+    if (!date_ref){date_ref = date}
+
+    // if (date_ref){
+    //   var myDate = date_ref.split("/");
+    //   // var mes = +myDate[0] + 1
+    //   date_ref = myDate[1]+"/"+myDate[0]+"/"+myDate[2];
+    //   date_ref = new Date(date_ref).getTime();
+    //   console.log('var date_ref:', date_ref);
+    // }else{
+    //   date_ref = date
+    // }
 
     //Open database
     db_open('./' + domain + '.db').then(db => {
