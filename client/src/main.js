@@ -38,14 +38,14 @@ Vue.mixin({
   methods: {
     capitalizeFirstLetter: str => str.charAt(0).toUpperCase() + str.slice(1),
     timeConverter(UNIX_timestamp) {
-      console.log('UNIX_timestamp:', UNIX_timestamp);
+      console.log('UNIX_timestamp:', UNIX_timestamp)
       if (UNIX_timestamp) {
-        if (UNIX_timestamp.indexOf('-')>-1){
+        if (UNIX_timestamp.indexOf('-') > -1) {
           var date = UNIX_timestamp.split(' ')[0].split('-')
           date = date[2] + '/' + date[1] + '/' + date[0]
           var time = UNIX_timestamp.split(' ')[1]
           var ret = date + ' - ' + time
-        }else{
+        } else {
           var a = new Date(+UNIX_timestamp)
           console.log('a:', a)
           var months = ['Jan', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']

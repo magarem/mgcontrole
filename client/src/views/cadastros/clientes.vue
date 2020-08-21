@@ -71,7 +71,7 @@
     <el-dialog :title="textMap[dialogStatus]" align="left" :visible.sync="dialogFormVisible" top="2vh" :width="tela">
       <div slot="title" style="font-size: 30px;">{{ textMap[dialogStatus] }}</div>
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="top">
-        <b-field label="Name">
+        <!-- <b-field label="Name">
           <b-input v-model="temp.nome" style="width: 100%; height: 35px;" />
         </b-field>
         <b-field label="Tipo">
@@ -109,12 +109,12 @@
         </el-button>
         <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
           Confirma
-        </el-button>
-      </el-form>
-      <!-- <el-form-item label="Nome" prop="nome">
+        </el-button> -->
+      
+            <el-form-item label="Nome" prop="nome">
               <el-input v-model="temp.nome" autofocus />
-            </el-form-item> -->
-      <!-- <el-form-item label="Tipo" prop="tipo">
+            </el-form-item> 
+            <el-form-item label="Tipo" prop="tipo">
               <el-select v-model="temp.tipo" placeholder="Select" >
                 <el-option label="Física" value="fisica" />
                 <el-option label="Jurídica" value="juridica" />
@@ -147,8 +147,7 @@
                 v-model="temp.obs"
                 type="textarea"
                 :rows="3"
-                placeholder=""
-              />
+                placeholder=""/>
             </el-form-item>
             <el-form-item>
               <el-button @click="dialogFormVisible = false">
@@ -156,8 +155,9 @@
               </el-button>
               <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
                     Confirma
-              </el-button> -->
-      <!-- </el-form> -->
+              </el-button>
+            </el-form-item>
+         </el-form>
     </el-dialog>
     <!-- <el-dialog :title="textMap[dialogStatus]" align="center" :visible.sync="dialogFormVisible" top="5vh" width="70%">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="_width: 400px; margin:0 50px 0 50px;">
