@@ -110,54 +110,55 @@
         <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
           Confirma
         </el-button> -->
-      
-            <el-form-item label="Nome" prop="nome">
-              <el-input v-model="temp.nome" autofocus />
-            </el-form-item> 
-            <el-form-item label="Tipo" prop="tipo">
-              <el-select v-model="temp.tipo" placeholder="Select" >
-                <el-option label="Física" value="fisica" />
-                <el-option label="Jurídica" value="juridica" />
-                <el-option label="Estrangeira" value="estrangeira" />
-              </el-select>
-            </el-form-item>
-             <el-form-item label="Doc" prop="doc">
-              <el-input v-model="temp.doc" />
-            </el-form-item>
-            <el-form-item label="Contato" prop="contato">
-              <el-input v-model="temp.contato" />
-            </el-form-item>
-            <el-form-item label="Telefone (1)" prop="fone">
-              <el-input v-model="temp.fone" />
-            </el-form-item>
-             <el-form-item label="Telefone (2)" prop="fone2">
-              <el-input v-model="temp.fone2" />
-            </el-form-item>
-            <el-form-item label="Endereço" prop="endereco">
-              <el-input v-model="temp.endereco" />
-            </el-form-item>
-            <el-form-item label="Email" prop="email">
-              <el-input v-model="temp.email" />
-            </el-form-item>
-            <el-form-item label="CEP" prop="cep">
-              <el-input v-model="temp.cep" />
-            </el-form-item>
-            <el-form-item label="Obs" prop="obs">
-              <el-input
-                v-model="temp.obs"
-                type="textarea"
-                :rows="3"
-                placeholder=""/>
-            </el-form-item>
-            <el-form-item>
-              <el-button @click="dialogFormVisible = false">
-                      Cancela
-              </el-button>
-              <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
-                    Confirma
-              </el-button>
-            </el-form-item>
-         </el-form>
+
+        <el-form-item label="Nome" prop="nome">
+          <el-input v-model="temp.nome" autofocus />
+        </el-form-item>
+        <el-form-item label="Tipo" prop="tipo">
+          <el-select v-model="temp.tipo" placeholder="Select">
+            <el-option label="Física" value="fisica" />
+            <el-option label="Jurídica" value="juridica" />
+            <el-option label="Estrangeira" value="estrangeira" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Doc" prop="doc">
+          <el-input v-model="temp.doc" />
+        </el-form-item>
+        <el-form-item label="Contato" prop="contato">
+          <el-input v-model="temp.contato" />
+        </el-form-item>
+        <el-form-item label="Telefone (1)" prop="fone">
+          <el-input v-model="temp.fone" />
+        </el-form-item>
+        <el-form-item label="Telefone (2)" prop="fone2">
+          <el-input v-model="temp.fone2" />
+        </el-form-item>
+        <el-form-item label="Endereço" prop="endereco">
+          <el-input v-model="temp.endereco" />
+        </el-form-item>
+        <el-form-item label="Email" prop="email">
+          <el-input v-model="temp.email" />
+        </el-form-item>
+        <el-form-item label="CEP" prop="cep">
+          <el-input v-model="temp.cep" />
+        </el-form-item>
+        <el-form-item label="Obs" prop="obs">
+          <el-input
+            v-model="temp.obs"
+            type="textarea"
+            :rows="3"
+            placeholder=""
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="dialogFormVisible = false">
+            Cancela
+          </el-button>
+          <el-button type="primary" @click="dialogStatus==='novo'?createData():updateData()">
+            Confirma
+          </el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
     <!-- <el-dialog :title="textMap[dialogStatus]" align="center" :visible.sync="dialogFormVisible" top="5vh" width="70%">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="_width: 400px; margin:0 50px 0 50px;">

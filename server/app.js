@@ -5,6 +5,10 @@ const ejs = require('ejs')
 const path = require('path')
 const fs = require('fs');
 
+
+const pkg = require('getmac').default
+console.log('getmac:', pkg())
+
 // AEN code external site search requires
 const rp = require('request-promise');
 const $ = require('cheerio');
@@ -89,6 +93,9 @@ app.use(staticFileMiddleware);
 // app.get('/your-route', cors(), (req, res) => {
 //   // res.status(200).send('your data');
 // }
+app.get('/ip', function (req, res, next) {
+  console.log("client IP is *********************" + req.ip);
+})
 
 app.get('/:datafile/minhaconta/', (req, res) => {
     const datafile = req.params.datafile
@@ -136,6 +143,8 @@ app.post('/:datafile/minhaconta/getuser/', (req, res) => {
     console.error(err)
   }
 });
+
+
 
 app.get('/:datafile/minhaconta/getdata/', (req, res) => {
   const datafile = req.params.datafile + '.db'
@@ -225,7 +234,6 @@ app.set('view engine', 'ejs');
 app.use(express.static('./public'));
 console.log(__dirname)
 // app.use(express.static('../client'));
-
 
 
 

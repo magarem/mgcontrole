@@ -12,9 +12,9 @@
           <el-tag v-permission="['cliente']">cliente</el-tag>
           <div v-if="checkPermission(['admin'])">admin</div> -->
           <!-- <el-form-item v-if="checkPermission(['admin'])" label="Cliente"> -->
-            <!-- <div class="autosuggest-container"> -->
-              
-              <!-- <vue-autosuggest
+          <!-- <div class="autosuggest-container"> -->
+
+          <!-- <vue-autosuggest
                 v-if="procura"
                 v-model="query"
                 :suggestions="filteredOptions"
@@ -29,23 +29,23 @@
                   <div style="{ display: 'flex', color: 'navyblue'}">{{ suggestion.item.cliente }}</div>
                 </div>
               </vue-autosuggest> -->
-            <!-- </div> -->
+          <!-- </div> -->
           <!-- </el-form-item> -->
         </el-col>
       </el-row>
     </el-form>
     <el-row style="width:95%;  margin:auto;">
 
-      <el-col :span="24" >
+      <el-col :span="24">
         <div>
-                  <el-button @click="clientesListFlg=true" type="primary" icon="el-icon-search"></el-button>
+          <el-button type="primary" icon="el-icon-search" @click="clientesListFlg=true" />
 
-          <el-divider direction="vertical"></el-divider>
-                  <span v-if="selected.cliente" style="font-size:28px;"><span class=bold>Cliente:</span> {{ selected.cliente }}</span>
-                  <span v-if="!selected.cliente" style="font-size:25px;">Todos</span>
+          <el-divider direction="vertical" />
+          <span v-if="selected.cliente" style="font-size:28px;"><span class="bold">Cliente:</span> {{ selected.cliente }}</span>
+          <span v-if="!selected.cliente" style="font-size:25px;">Todos</span>
 
-          <el-divider direction="vertical"></el-divider>
-                  <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
+          <el-divider direction="vertical" />
+          <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
 
         </div>
       </el-col>
@@ -53,12 +53,12 @@
     <el-row style="font-size:20px; width:95%; margin:auto;">
       <el-col :span="24" :offset="0">
         <div>
-                         <span v-if="list_total.debito" style="color: red;"> Débitos: {{ (list_total.debito) | money }}</span>
+          <span v-if="list_total.debito" style="color: red;"> Débitos: {{ (list_total.debito) | money }}</span>
 
-          <el-divider direction="vertical"></el-divider>
-                         <span v-if="list_total.credito" style="color: green; "> Créditos: {{ (list_total.credito) | money }}</span>
+          <el-divider direction="vertical" />
+          <span v-if="list_total.credito" style="color: green; "> Créditos: {{ (list_total.credito) | money }}</span>
 
-          <el-divider direction="vertical"></el-divider>
+          <el-divider direction="vertical" />
           <span v-if="(list_total && list_total.credito - list_total.debito)<0" style="color: red;"> Saldo total: {{ (list_total.credito - list_total.debito) | money }}</span>
           <span v-if="(list_total && list_total.credito - list_total.debito)>=0" style="color: green;"> Saldo total: {{ (list_total.credito - list_total.debito) | money }}</span>
         </div>
@@ -88,37 +88,45 @@
         </tbody>
       </table> -->
 
+      <el-table
+        :data="list"
+        border
+        fit
+        highlight-current-row
+        style="width: 80%;"
+      >
 
-    <el-table :data="list" 
-      border fit highlight-current-row style="width: 80%;">
+        <el-table-column label="Data" prop="created" sortable="custom" align="center" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.created }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Data" prop="created" sortable="custom" align="center" width="200">
-        <template slot-scope="scope">
-          <span>{{ scope.row.created }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="390">
+          <template slot-scope="scope">
+            <span>{{ scope.row.cliente_id }} - {{ scope.row.cliente }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="390">
-        <template slot-scope="scope">
-          <span>{{ scope.row.cliente_id }} - {{ scope.row.cliente }}</span>
-        </template>
-      </el-table-column>
+        <el-table-column label="Doc" prop="doc" sortable="custom" align="center" width="50">
+          <template slot-scope="scope">
+            <span>{{ scope.row.pid }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Débito" prop="debito" sortable="custom" align="center" width="150">
-        <template slot-scope="scope">
-          <span>{{ scope.row.debito | money}}</span>
-        </template>
-      </el-table-column>
+        <el-table-column label="Débito" prop="debito" sortable="custom" align="center" width="150">
+          <template slot-scope="scope">
+            <span>{{ scope.row.debito | money }}</span>
+          </template>
+        </el-table-column>
 
-      <el-table-column label="Crédito" prop="credito" sortable="custom" align="center" width="150">
-        <template slot-scope="scope">
-          <span>{{ scope.row.credito  | money}}</span>
-        </template>
-      </el-table-column>
+        <el-table-column label="Crédito" prop="credito" sortable="custom" align="center" width="150">
+          <template slot-scope="scope">
+            <span>{{ scope.row.credito | money }}</span>
+          </template>
+        </el-table-column>
 
-    </el-table>
-
-
+      </el-table>
 
     </div>
     <!--
@@ -133,7 +141,7 @@
           <div style="font-size: 20px; margin: auto;">{{ selected.cliente_id }} - {{ selected.cliente }}</div>
         </el-form-item>
         <el-form-item label="Crédito Valor:" prop="fone">
-          <money v-model="temp.credito" v-bind="money" style="width: 50%; _margin-top: 5px; font-size: 22px;" class="el-input__inner" autofocus/>
+          <money v-model="temp.credito" v-bind="money" style="width: 50%; _margin-top: 5px; font-size: 22px;" class="el-input__inner" autofocus />
         </el-form-item>
         <el-form-item label="Doc:" prop="endereco">
           <el-input v-model="temp.doc" style="width: 50%; _margin-top: 5px; font-size: 22px;" />
@@ -152,14 +160,21 @@
     <!-- Clientes busca lista -->
     <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
       <el-input
-        ref="searchClient" v-model="searchTermClient" placeholder="Nome"
+        ref="searchClient"
+        v-model="searchTermClient"
+        placeholder="Nome"
         prefix-icon="el-icon-search"
         style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
-        autocomplete="nope"/>
+        autocomplete="nope"
+      />
       <vue-good-table
-        :columns="columns_clientes" :rows="filteredOptions[0].data"
+        :columns="columns_clientes"
+        :rows="filteredOptions[0].data"
         :search-options="{enabled: false, externalQuery: searchTermClient}"
-        theme="black-rhino" max-height="255px" @on-row-click="clienteSet"/>
+        theme="black-rhino"
+        max-height="255px"
+        @on-row-click="clienteSet"
+      />
       <span slot="footer" class="dialog-footer" align="center">
         <el-button type="primary" @click="clientesListFlg = false">Fechar</el-button>
       </span>
@@ -247,9 +262,6 @@ table tbody tr:nth-child(2n) td {
   background-position-y: bottom;
 }
 
-    
-
-
 .autosuggest-container {
   display: flex;
   justify-content: center;
@@ -304,10 +316,10 @@ import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table'
 import { VueAutosuggest } from 'vue-autosuggest'
 import { Money } from 'v-money'
-import swal from 'sweetalert';
+import swal from 'sweetalert'
 export default {
   name: 'ClientesContas',
-  components: {  VueGoodTable, VueAutosuggest, Money, swal },
+  components: { VueGoodTable, VueAutosuggest, Money, swal },
   directives: { waves, permission },
   filters: {
     money(value) {
@@ -456,7 +468,7 @@ export default {
   computed: {
     columns: function() {
       if (this.list.length == 0) {
-        return [];
+        return []
       }
       return Object.keys(this.list[0])
     },
@@ -620,33 +632,29 @@ export default {
 
           create('financeiro_operacoes', this.temp3).then((ret) => {
             this.dialogFormVisible = false
-            
-            
-            
+
             swal({
-                title: "Operação concluida!",
-                text: "Crédito lançado com sucesso",
-                icon: "success",
-                buttons: {
-                  cancel: {
-                    text: "ok",
-                    value: "new"
-                  },
-                  new: {
-                    text: "ok",
-                    value: "new"
-                  },
+              title: 'Operação concluida!',
+              text: 'Crédito lançado com sucesso',
+              icon: 'success',
+              buttons: {
+                cancel: {
+                  text: 'ok',
+                  value: 'new'
+                },
+                new: {
+                  text: 'ok',
+                  value: 'new'
                 }
-            })
-            .then((value) => {
-              switch (value) {
-                case "ok":
-                  break;
               }
-            });
-            
-            
-            
+            })
+              .then((value) => {
+                switch (value) {
+                  case 'ok':
+                    break
+                }
+              })
+
             // this.$notify({
             //   title: 'Sucesso',
             //   message: 'Cliente cadastrado',
@@ -664,10 +672,10 @@ export default {
       if (this.selected.cliente_id) {
         fetchList('f_clientes_faturados', this.listQuery).then(response => {
           this.total = response.data.total
-          
+
           this.list = response.data.items
-          
-          this.list.map(function(x){
+
+          this.list.map(function(x) {
             return x.created = self.timeConverter(x.created)
           })
         })
@@ -684,10 +692,10 @@ export default {
         this.total = response.data.total
         console.log(response.data)
         this.list = response.data.items
-        this.list.map(function(x){
+        this.list.map(function(x) {
           return x.created = self.timeConverter(x.created)
-         })
-         console.log('this.list_:', this.list_);
+        })
+        console.log('this.list_:', this.list_)
         this.list_original = response.data.items.map(function(item) {
           return { cliente_id: item.cliente_id, cliente: item.cliente }
         })

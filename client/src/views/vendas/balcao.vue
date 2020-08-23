@@ -1,7 +1,7 @@
 <style scoped>
   @page {
     margin-left: 0cm;
-    size: 58mm 100mm 
+    size: 58mm 100mm
   } /* output size */
   .receipt .sheet { width: 58mm; _height: 100mm } /* sheet size */
   @media print { .receipt { width: 58mm } } /* fix for Chrome */
@@ -41,12 +41,12 @@
   }
 
   .produto_button  {
-    width: 102px;
+    width: 100%;
     height: 102px;
     background-color: white;
     border: none;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2), 0 1px 5px 0 rgba(0,0,0,0.19);
-    border-radius: 5px;
+    /* border-radius: 25px; */
   }
 
   .line{
@@ -118,13 +118,13 @@
 </style>
 <template>
   <div class="app-container body">
-    <div id=main>
+    <div id="main">
       <el-row :gutter="20">
         <el-col :span="11">
           <el-row :gutter="20">
             <el-col :span="24">
               <!-- Produtos -->
-              <el-card class="box-card" shadow="always" style="height: 330px; background-color: #f5f5ff;">
+              <el-card class="box-card" shadow="always" style="height: 390px; background-color: #f5f5ff;">
                 <div slot="header" class="clearfix cardtitle">
                   <el-row>
                     <el-col :span="6">
@@ -138,26 +138,72 @@
                     </el-col>
                   </el-row>
                 </div>
-                <el-row :gutter="20">
-                  <el-col v-if="atalhos" :span="6">
-                    <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="6">
+                  <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="6">
+                  <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="6">
+                  <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('pimentao')"><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>
                   </el-col>
-                </el-row><br>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('pimentao')"><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('pimentao')"><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
+                  </el-col>
+                </el-row>
+                <br>
                 <el-row :gutter="20">
                   <el-col v-if="atalhos" :span="6">
                     <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="6">
-                    <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="6">
                     <button class="produto_button" @click="productSet('banana prata')"><img style="margin-left:-5px;" :src="'banana prata' | img_mini(produtos)"></button>
@@ -204,12 +250,12 @@
                   </el-row>
                   <el-row :gutter="5" style="margin-top: 20px">
                     <el-col :span="8">
-                      <el-button round v-waves style="width: 100%; _height: 60px; font-size: 22px;" class="filter-item" type="warning" _icon="el-icon-search" @click="product_selected = {}">
+                      <el-button v-waves round style="width: 100%; _height: 60px; font-size: 22px;" class="filter-item" type="warning" _icon="el-icon-search" @click="product_selected = {}">
                         Cancela
                       </el-button>
                     </el-col>
                     <el-col :span="16">
-                      <el-button :disabled=!product_selected.id round v-waves style="width: 100%; _height: 60px; font-size: 22px;" class="filter-item" type="primary" _icon="el-icon-search" @click="cupom_add">
+                      <el-button v-waves :disabled="!product_selected.id" round style="width: 100%; _height: 60px; font-size: 22px;" class="filter-item" type="primary" _icon="el-icon-search" @click="cupom_add">
                         Incluir
                       </el-button>
                     </el-col>
@@ -238,6 +284,8 @@
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
                         <span class="bold">Usuário:</span> {{ user }}
+                        <!-- <el-button v-if="caixa_status_.status == 'close'" @click="caixa_abertura">Abrir caixa</el-button> -->
+                        <el-button  v-if="caixa_status_.status == 'open'" @click="caixa_fechamento">Fechar caixa</el-button>
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -249,7 +297,7 @@
                     </el-col>
                   </el-row>
                 </div>
-                <div v-if="cupom.itens.length == 0" class="center" style="vertical-align: middle; width: 100%;"><h1 style="margin-top: 100px;" id="caixa_Status">caixa livre</h1></div>
+                <div v-if="cupom.itens.length == 0" class="center" style="vertical-align: middle; width: 100%;"><h1 id="caixa_Status" style="margin-top: 100px;">caixa livre</h1></div>
                 <el-row v-if="cupom.itens.length > 0" :gutter="0" class="bold center c" style="width: 100%; margin-top: -5px; margin-bottom: -15px; margin-left:0px;">
                   <el-col :span="2" class="center">#</el-col>
                   <el-col :span="2" class="center">Cod</el-col>
@@ -258,19 +306,19 @@
                   <el-col :span="3" class="center">Uni</el-col>
                   <el-col :span="2" class="center">Qnt</el-col>
                   <el-col :span="4" class="center">Total</el-col>
-                  <el-col :span="1" class="center"><i class="el-icon-view"></i></el-col>
+                  <el-col :span="1" class="center"><i class="el-icon-view" /></el-col>
                 </el-row>
                 <el-divider v-if="cupom.itens.length > 0" />
-                <div id="container" class=cupom_table style="margin-top:-15px; margin-bottom:-15px; width: 100%; max-height:280px; min-height: 280px; overflow-y: auto;">
+                <div id="container" class="cupom_table" style="margin-top:-15px; margin-bottom:-15px; width: 100%; max-height:280px; min-height: 280px; overflow-y: auto;">
                   <el-row v-for="(row, rindex) in cupom.itens" :key="rindex" :gutter="0" :style="{backgroundColor: (rindex % 2 === 0? '' : '#f9f9e0')}" style="width: 100%; margin-left:0px; margin-bottom: 3px; _padding: 5px; _font-size: 19px;">
-                    <el-col :span="2" class="center" >{{ rindex + 1 }}</el-col>
+                    <el-col :span="2" class="center">{{ rindex + 1 }}</el-col>
                     <el-col :span="2" class="center">{{ row.id.toString() }}</el-col>
                     <el-col :span="6" class="center">{{ row.descricao }}</el-col>
                     <el-col :span="4" class="center">{{ row.pco_venda | money }}</el-col>
                     <el-col :span="3" class="center">{{ row.unidade||'uni' }}</el-col>
                     <el-col :span="2" class="center">{{ row.qnt }}</el-col>
                     <el-col :span="4" class="center">{{ row.total | money }}</el-col>
-                    <el-col :span="1" class="center"><i class="el-icon-view" @click="cupomRowView(row.n)"></i></el-col>
+                    <el-col :span="1" class="center"><i class="el-icon-view" @click="cupomRowView(row.n)" /></el-col>
                   </el-row>
                 </div>
                 <el-divider />
@@ -296,7 +344,8 @@
                       <el-row :gutter="5" type="flex" class="row-bg" style="_margin-top: 18px">
                         <el-col :span="8">
                           <el-button
-                            :disabled="!cupom.total>0" round
+                            :disabled="!cupom.total>0"
+                            round
                             style="_height:60px; font-size:22px; width: 100%;"
                             type="danger"
                             @click="vendaCancel()">
@@ -321,9 +370,9 @@
       </el-row>
     </div>
 
-    <!----  Modals aux windows -->                                                      
+    <!----  Modals aux windows -->
 
-    <div id=modals>
+    <div id="modals">
       <!-- CUPOM view row -->
       <el-dialog :visible.sync="dialogFormCupomView" title="Item do cupom" top="5vh">
         <el-form ref="dataForm" :model="temp2" label-position="right" label-width="140px" style="font-size: 18px;">
@@ -355,7 +404,7 @@
       </el-dialog>
 
       <!-- Venda close -->
-      <el-dialog :visible.sync="vendaCloseFlg" width="60%" center top="5vh" >
+      <el-dialog :visible.sync="vendaCloseFlg" width="60%" center top="5vh">
         <span slot="title" style="font-size: 25px">Fechamento de venda</span>
         <el-form ref="form" style="font-size: 20px" :model="form" label-width="0px" label-position="top">
           <el-row :gutter="10">
@@ -520,14 +569,21 @@
       <!-- Clientes busca lista -->
       <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
         <el-input
-          ref="searchClient" v-model="searchTermClient" placeholder="Nome"
+          ref="searchClient"
+          v-model="searchTermClient"
+          placeholder="Nome"
           prefix-icon="el-icon-search"
           style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
-          autocomplete="nope"/>
+          autocomplete="nope"
+        />
         <vue-good-table
-          :columns="columns_clientes" :rows="clientesList"
+          :columns="columns_clientes"
+          :rows="clientesList"
           :search-options="{enabled: false, externalQuery: searchTermClient}"
-          theme="black-rhino" max-height="255px" @on-row-click="clienteSet"/>
+          theme="black-rhino"
+          max-height="255px"
+          @on-row-click="clienteSet"
+        />
         <span slot="footer" class="dialog-footer" align="center">
           <el-button v-if="searchTermClient" type="primary" @click="handleCliente_insert">
             Incluir novo cliente
@@ -552,11 +608,13 @@
             :data="cupom.itens"
             row-class-name="cupom_total"
             header-row-class-name="cupom_total"
-            style="width: 100%; font-size:13px;">
+            style="width: 100%; font-size:13px;"
+          >
             <el-table-column
               prop="descricao"
               label="Desc"
-              width="50px">
+              width="50px"
+            >
               <template slot-scope="scope">
                 <span>{{ scope.row.id }}<br>{{ scope.row.descricao }}</span>
               </template>
@@ -564,7 +622,8 @@
             <el-table-column
               prop="pco_venda"
               label="Pço"
-              width="50px">
+              width="50px"
+            >
               <template slot-scope="scope">
                 <span>{{ scope.row.pco_venda | money }}</span>
               </template>
@@ -572,14 +631,17 @@
             <el-table-column
               prop="unidade"
               label="Uni"
-              width="40px"/>
+              width="40px"
+            />
             <el-table-column
               prop="qnt"
               label="Qnt"
-              width="40px"/>
+              width="40px"
+            />
             <el-table-column
               prop="total"
-              label="Total">
+              label="Total"
+            >
               <template slot-scope="scope">
                 <span>{{ scope.row.total | money }}</span>
               </template>
@@ -605,6 +667,8 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
+import { getToken } from '@/utils/auth'
 import { getInfo } from '@/api/user'
 import { fetchList, create } from '@/api/generic'
 import { vendaClose } from '@/api/vendaClose'
@@ -615,7 +679,7 @@ import { VueGoodTable } from 'vue-good-table'
 import { Printd } from 'printd'
 import Autocomplete from '@/components/Autocomplete'
 
-import swal from 'sweetalert';
+import swal from 'sweetalert'
 
 export default {
   name: 'Balcao',
@@ -639,6 +703,12 @@ export default {
   },
   data() {
     return {
+      caixa_status_: {
+        created: null,
+        token: null,
+        status: 'close',
+        value: null
+      },
       parametros_flg: true,
       vendaCloseEndFlg: false,
       date_ref: null,
@@ -809,6 +879,13 @@ export default {
   },
   mounted() {
     this.vai()
+    this.caixa_status().get()
+    console.log(this.caixa_status_.status);
+    if (this.caixa_status_.status == 'close'){
+      this.caixa_abertura()
+    }
+    console.log('getToken():', getToken());
+    // console.log('caixa_status().get():', caixa_status().get());
   },
   created() {
     this.updateDateTime()
@@ -821,19 +898,69 @@ export default {
     })
     fetchList('produtos', '').then(response => {
       this.produtos = response.data.items
-      
-      for (var t=0; t < this.produtos.length; t++){
+
+      for (var t = 0; t < this.produtos.length; t++) {
         this.produtos[t].descricao = this.produtos[t].descricao.replace(/\s+/g, ' ').trim()
       }
 
-      console.log('this.produtos:', this.produtos);
-    
+      console.log('this.produtos:', this.produtos)
+
       this.produtos_ = response.data.items.map(function(item) {
         return { id: item.id, name: item.descricao.replace(/\s+/g, ' ').trim() }
       })
     })
   },
   methods: {
+    caixa_status(){
+      var self = this;
+      return {
+        get(){
+          if (Cookies.get('caixa_status_')){
+            self.caixa_status_ = JSON.parse(Cookies.get('caixa_status_'))
+          }
+          // return self.caixa_status_
+        },
+        set(obj){
+          console.log('set: (obj)', obj);
+          self.caixa_status_ = obj
+          Cookies.set('caixa_status_', obj)
+          
+          // Save operation in databank
+          create('caixa_status', obj).then((ret) => {
+            console.log('ret:', ret);
+          })
+       
+        }
+      }
+    },
+    caixa_abertura(){
+      var self = this
+      //Check if caixa is closed to open
+      if (self.caixa_status_.status == 'close') {
+        swal({
+          title: 'Abertura de caixa!',
+          text: 'Informe o valor de abertura do caixa',
+          content: "input",
+        }).then((value) => {
+          self.caixa_status().set({created: self.today_timestamp,token: getToken(), status: 'open', value: value})
+        })
+      }
+    },
+    caixa_fechamento(){
+      var self = this
+      //Check if caixa is opened to close
+      if (self.caixa_status_.status == 'open') {
+        swal({
+          title: 'Fechamento de caixa',
+          text: 'Informe o valor de fechamento do caixa',
+          content: "input",
+        }).then((value) => {
+            self.caixa_status().set({created: self.today_timestamp,token: getToken(), status: 'close', value: value})
+        }).then((value) => {
+          this.$router.push('/')
+        })
+      }
+    },
     vai() {
       this.$nextTick(function() {
         this.$refs.searchTerm_.focus()
@@ -971,12 +1098,12 @@ export default {
       this.temp2 = item
     },
     productSet(params) {
-      console.log(params);
+      console.log(params)
       // Check if is called by datalist or by product button
       if (params === Object(params)) var params = this.source
       // var item = this.produtos.find(x => parseInt(x.id) === parseInt(params))
       var item = this.produtos.find(x => (x.descricao) === (params))
-      console.log(item);
+      console.log(item)
       if (item) {
         this.qnt = ''
         this.product_selected = item
@@ -1003,9 +1130,9 @@ export default {
       this.check_out_print_option = false
       this.vendaCloseOkFim()
     },
-    vendaPrintClose(){
-      this.vendaPrintFlg = false; 
-      this.vendaCloseOkFim();
+    vendaPrintClose() {
+      this.vendaPrintFlg = false
+      this.vendaCloseOkFim()
     },
     vendaClose() {
       this.desconto = 0
@@ -1024,15 +1151,15 @@ export default {
       this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito + this.pago_faturado
       console.log('this.cupom.date:', this.cupom.date)
       // this.falta_pagar = this.cupom.total - this.totalpago
-     
-      //data_ref to timestamp
-      if (this.date_ref){
-        var myDate = this.date_ref.split("/");
-        myDate = myDate[1]+"/"+myDate[0]+"/"+myDate[2];
-        this.date_ref = new Date(myDate).getTime();
-        console.log('this.date_ref:', this.date_ref);
+
+      // data_ref to timestamp
+      if (this.date_ref) {
+        var myDate = this.date_ref.split('/')
+        myDate = myDate[1] + '/' + myDate[0] + '/' + myDate[2]
+        this.date_ref = new Date(myDate).getTime()
+        console.log('this.date_ref:', this.date_ref)
       }
-      
+
       const auxObj = {
         date: +new Date(),
         date_ref: this.date_ref,
@@ -1056,36 +1183,35 @@ export default {
       // Close modal
       this.vendaCloseFlg = false
       // this.vendaCloseEndFlg = true
-       swal({
-          title: "Bom trabalho!",
-          text: "Venda registrada com sucesso",
-          icon: "success",
-          buttons: {
-            cancel: {
-              text: "Nova venda",
-              value: "new"
-            },
-            print: {
-              text: "Imprimir",
-              value: "print"
-            },
-            new: {
-              text: "Nova venda",
-              value: "new"
-            },
+      swal({
+        title: 'Bom trabalho!',
+        text: 'Venda registrada com sucesso',
+        icon: 'success',
+        buttons: {
+          cancel: {
+            text: 'Nova venda',
+            value: 'new'
+          },
+          print: {
+            text: 'Imprimir',
+            value: 'print'
+          },
+          new: {
+            text: 'Nova venda',
+            value: 'new'
           }
-      })
-      .then((value) => {
-        switch (value) {
-          case "print":
-            this.vendaPrintFlg=true
-            break;
-          case "new":
-            this.vendaCloseOkFim()
-            break;
         }
-      });
-
+      })
+        .then((value) => {
+          switch (value) {
+            case 'print':
+              this.vendaPrintFlg = true
+              break
+            case 'new':
+              this.vendaCloseOkFim()
+              break
+          }
+        })
     },
     vendaCloseOkFim() {
       // Clean up form
