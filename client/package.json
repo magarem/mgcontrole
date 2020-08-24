@@ -48,6 +48,7 @@
     "vue-count-to": "1.0.13",
     "vue-good-table": "^2.19.5",
     "vue-howler": "^0.7.0",
+    "vue-js-modal": "^2.0.0-rc.6",
     "vue-json-schema-form": "^1.0.4",
     "vue-router": "3.0.2",
     "vue-search-select": "^2.9.3",

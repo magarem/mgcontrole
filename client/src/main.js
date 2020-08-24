@@ -21,6 +21,9 @@ import './utils/error-log' // error log
 import * as filters from './filters' // global filters
 
 import vSelect from 'vue-select'
+import VModal from 'vue-js-modal/dist/index.nocss.js'
+import 'vue-js-modal/dist/styles.css'
+Vue.use(VModal)
 
 Vue.component('v-select', vSelect)
 import 'vue-select/dist/vue-select.css'

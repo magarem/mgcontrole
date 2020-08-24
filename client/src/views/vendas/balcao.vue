@@ -9,6 +9,12 @@
   .center {
     text-align: center;
   }
+  .left {
+    /* text-align: right; */
+  }
+  .right {
+    text-align: right;
+  }
 
   .bold {
     font-weight: bold;
@@ -283,9 +289,9 @@
                   <el-row>
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
-                        <span class="bold">Usuário:</span> {{ user }}
-                        <!-- <el-button v-if="caixa_status_.status == 'close'" @click="caixa_abertura">Abrir caixa</el-button> -->
-                        <el-button  v-if="caixa_status_.status == 'open'" @click="caixa_fechamento">Fechar caixa</el-button>
+                        <span class="bold">Usuário:</span> {{caixaSession}} | {{ user }}/{{caixa_}}
+                        <!-- <el-button v-if="caixa_.status == 'close'" @click="caixa_abertura">Abrir caixa</el-button> -->
+                        <el-button  v-if="caixa_.status == 'opened'" @click="caixa_op('close')">Fechar caixa</el-button>
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -662,6 +668,27 @@
           </div>
         </div>
       </el-dialog>
+
+      <!-- Caixa abertura -->
+      <modal name="modal_caixa_op" :width="500" :height="300" :adaptive="true">
+        <div style="padding:20px;">
+          <div class=center style="font-size: 25px; padding-bottom: 15px;">Operação de Caixa</div>
+          <div style="font-size: 20px;">
+            
+            <table>
+              <tr v-for="(line, index) in lines" :key="index" style="padding-bottom: 10px;">
+                <td style="text-align: right; important!"><div style="width:120px; " >{{line.key}}:</div></td>
+                
+                <td v-if="line.type !== 'input'" style=""><div style="padding-left: 10px; width:320px;">{{line.value}}</div></td>
+                <td v-if="line.type == 'input'" style=""><div style="padding-left: 10px; width:320px;"><input type=text :name=line.name v-model=m[line.name]></div></td>
+              </tr>
+            </table>
+            
+            <el-button @click="caixa_op_ok">Ok</el-button>
+          </div>
+  
+        </div>
+      </modal>
     </div>
   </div>
 </template>
@@ -703,10 +730,15 @@ export default {
   },
   data() {
     return {
-      caixa_status_: {
+      m:{},
+      lines:[],
+      caixaSession: null,
+      aux_caixa_op: null,
+      caixa_: {
         created: null,
-        token: null,
-        status: 'close',
+        session: null,
+        status: 'closed',
+        op: null,
         value: null
       },
       parametros_flg: true,
@@ -879,17 +911,15 @@ export default {
   },
   mounted() {
     this.vai()
-    this.caixa_status().get()
-    console.log(this.caixa_status_.status);
-    if (this.caixa_status_.status == 'close'){
-      this.caixa_abertura()
-    }
-    console.log('getToken():', getToken());
-    // console.log('caixa_status().get():', caixa_status().get());
   },
   created() {
     this.updateDateTime()
     this.getUser()
+    this.caixa().get()
+    console.log('this.caixa_.status:', this.caixa_.status);
+    if (this.caixa_.status == 'closed'){
+      this.caixa_op('open')
+    }
     window.addEventListener('keydown', (e) => {
       if (e.key == 'F2') {
         e.preventDefault()
@@ -911,19 +941,19 @@ export default {
     })
   },
   methods: {
-    caixa_status(){
+    caixa(){
       var self = this;
       return {
         get(){
-          if (Cookies.get('caixa_status_')){
-            self.caixa_status_ = JSON.parse(Cookies.get('caixa_status_'))
+          if (Cookies.get('caixa_')){
+            self.caixa_ = JSON.parse(Cookies.get('caixa_'))
+            console.log('get: (self.caixa_)', self.caixa_);
           }
-          // return self.caixa_status_
         },
         set(obj){
           console.log('set: (obj)', obj);
-          self.caixa_status_ = obj
-          Cookies.set('caixa_status_', obj)
+          self.caixa_ = obj
+          Cookies.set('caixa_', obj)
           
           // Save operation in databank
           create('caixa_status', obj).then((ret) => {
@@ -933,18 +963,57 @@ export default {
         }
       }
     },
-    caixa_abertura(){
+    caixa_op(op){
       var self = this
-      //Check if caixa is closed to open
-      if (self.caixa_status_.status == 'close') {
-        swal({
-          title: 'Abertura de caixa!',
-          text: 'Informe o valor de abertura do caixa',
-          content: "input",
-        }).then((value) => {
-          self.caixa_status().set({created: self.today_timestamp,token: getToken(), status: 'open', value: value})
-        })
+      getInfo().then(function(x) {
+        self.user = x.data.name
+        //Check if caixa is closed to open
+        // if (self.caixa_status_.status == 'close') {
+          
+          
+          //Set caixa status by last value or open/close operation
+          // var status = null
+          // if (self.caixa_.status) status = self.caixa_.status
+         
+          // self.caixa_ = {
+          //   created: self.today_timestamp,
+          //   // session: caixa_session, 
+          //   status: self.caixa_.status
+          // }
+         
+          self.aux_caixa_op = op
+
+          self.lines = [
+            {key: 'data', value: self.today},
+            {key: 'Usuário', value: self.user},
+            {key: 'Operação', value: op},
+            {key: 'valor', value: '', type: 'input', name: 'caixa_op_value'}
+          ]
+
+          self.$modal.show('modal_caixa_op');
+        // }
+      })
+    },
+    caixa_op_ok(){
+      var status = this.caixa_.status
+      // this.caixaSession = this.caixa_.session
+     
+     if (this.aux_caixa_op == 'open') {
+        this.caixaSession = getToken() + '-' + this.today_timestamp
+        status = 'opened'
       }
+      if (this.aux_caixa_op == 'close') {
+        status = 'closed'
+      }
+
+      this.caixa_.created = this.today_timestamp
+      this.caixa_.status = status
+      this.caixa_.op = this.aux_caixa_op
+      this.caixa_.session = this.caixaSession
+      this.caixa_.value = this.m.caixa_op_value
+      console.log(this.caixa_);
+      this.caixa().set(this.caixa_)
+      this.$modal.hide('modal_caixa_op');
     },
     caixa_fechamento(){
       var self = this
@@ -955,7 +1024,10 @@ export default {
           text: 'Informe o valor de fechamento do caixa',
           content: "input",
         }).then((value) => {
-            self.caixa_status().set({created: self.today_timestamp,token: getToken(), status: 'close', value: value})
+            self.caixa_status_.created = self.today_timestamp
+            self.caixa_status_.status = 'close'
+            self.caixa_status_.value = value
+            self.caixa_status().set(self.caixa_status_)
         }).then((value) => {
           this.$router.push('/')
         })
@@ -1002,6 +1074,7 @@ export default {
       var self = this
       getInfo().then(function(x) {
         self.user = x.data.name
+        return self.user
       })
     },
     updateDateTime() {
