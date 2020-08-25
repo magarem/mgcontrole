@@ -115,15 +115,15 @@
     /* width: 100%; */
     table-layout: fixed;
   }
-  tbody tr div {
+  /* tbody tr div {
     text-align: center;
   }
   tr:nth-child(even) {
     background-color: #E6C793
-  }
+  } */
 </style>
 <template>
-  <div class="app-container body">
+  <div class="app-container body" >
     <div id="main">
       <el-row :gutter="20">
         <el-col :span="11">
@@ -146,7 +146,7 @@
                 </div>
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                    <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
@@ -166,7 +166,7 @@
                 </el-row>
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                    <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
@@ -186,7 +186,7 @@
                 </el-row>
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                    <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
@@ -209,8 +209,7 @@
                   <el-col v-if="atalhos" :span="6">
                     <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="6">
-                  </el-col>
+                  <el-col v-if="atalhos" :span="6" />
                   <el-col v-if="atalhos" :span="6">
                     <button class="produto_button" @click="productSet('banana prata')"><img style="margin-left:-5px;" :src="'banana prata' | img_mini(produtos)"></button>
                   </el-col>
@@ -289,9 +288,12 @@
                   <el-row>
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
-                        <span class="bold">Usuário:</span> {{caixaSession}} | {{ user }}/{{caixa_}}
+                        <el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button> | 
+                        <span class="bold">Usuário:</span>{{ user }}<br>
+                        
+
                         <!-- <el-button v-if="caixa_.status == 'close'" @click="caixa_abertura">Abrir caixa</el-button> -->
-                        <el-button  v-if="caixa_.status == 'opened'" @click="caixa_op('close')">Fechar caixa</el-button>
+                        <!-- <el-button v-if="caixa_.status == 'opened'" @click="caixa_op('close')">Fechar caixa</el-button> -->
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -354,7 +356,8 @@
                             round
                             style="_height:60px; font-size:22px; width: 100%;"
                             type="danger"
-                            @click="vendaCancel()">
+                            @click="vendaCancel()"
+                          >
                             Cancelar
                           </el-button>
                         </el-col>
@@ -670,23 +673,39 @@
       </el-dialog>
 
       <!-- Caixa abertura -->
-      <modal name="modal_caixa_op" :width="500" :height="300" :adaptive="true">
+      <modal name="modal_caixa_op" :clickToClose=false :width="600" :height="320" :adaptive="true">
         <div style="padding:20px;">
-          <div class=center style="font-size: 25px; padding-bottom: 15px;">Operação de Caixa</div>
+          <div class="center" style="font-size: 25px; padding-bottom: 30px;">Operação de Caixa</div>
           <div style="font-size: 20px;">
-            
-            <table>
-              <tr v-for="(line, index) in lines" :key="index" style="padding-bottom: 10px;">
-                <td style="text-align: right; important!"><div style="width:120px; " >{{line.key}}:</div></td>
-                
-                <td v-if="line.type !== 'input'" style=""><div style="padding-left: 10px; width:320px;">{{line.value}}</div></td>
-                <td v-if="line.type == 'input'" style=""><div style="padding-left: 10px; width:320px;"><input type=text :name=line.name v-model=m[line.name]></div></td>
-              </tr>
-            </table>
-            
-            <el-button @click="caixa_op_ok">Ok</el-button>
+              <table style="width: 100%; margin: auto;">
+                    <tr>
+                      <td class=bold style="text-align: right; important!">Data:</td>
+                      <td style="padding: 5px;">{{today}}</td>
+                    </tr>
+                    <tr>
+                      <td class=bold style="text-align: right; important!">Usuário:</td>
+                      <td style="padding: 5px;">{{user}}</td>
+                    </tr>
+                    <tr>
+                      <td class=bold style="text-align: right; important!">Operação:</td>
+                      <td style="padding: 5px;">
+                        <el-radio-group v-model="aux_caixa_op" @input="caixa_op">
+                          <el-radio-button  label="Abertura" :disabled="caixa_.status == 'opened'">Abertura</el-radio-button>
+                          <el-radio-button  label="Reforço" :disabled="caixa_.status == 'closed'">Reforço</el-radio-button>
+                          <el-radio-button  label="Sangria" :disabled="caixa_.status == 'closed'">Sangria</el-radio-button>
+                          <el-radio-button  label="Fechamento" :disabled="caixa_.status == 'closed'" >Fechamento</el-radio-button>
+                        </el-radio-group>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class=bold style="text-align: right; important!">Valor:</td>
+                      <td style="padding: 5px;"><money v-if=aux_caixa_op v-model="caixa_op_value" v-bind="money" class="el-input__inner" /></td>
+                    </tr>
+                    <tr>
+                      <td colspan=2 style="text-align: center; height: 70px; padding: 5px;"><el-button type=success v-if="caixa_op_value" @click="caixa_op_ok" style="width: 100%;">Confirma</el-button></td>
+                    </tr>
+              </table>
           </div>
-  
         </div>
       </modal>
     </div>
@@ -713,6 +732,10 @@ export default {
   components: { Money, VueGoodTable, Autocomplete, swal },
   directives: { waves },
   filters: {
+    caixa_op_filter(op){
+      if (op=='open') return 'Abertura'
+      if (op=='close') return 'Fechamento'
+    },
     img_mini: function(value, produtos) {
       var a = produtos.filter(item => item.descricao == value)[0]
       if (a) return a.img_mini
@@ -730,8 +753,11 @@ export default {
   },
   data() {
     return {
-      m:{},
-      lines:[],
+      caixa_op_value: 0,
+      freeToClose: false,
+      m: {},
+      item: null,
+      lines: [],
       caixaSession: null,
       aux_caixa_op: null,
       caixa_: {
@@ -916,16 +942,13 @@ export default {
     this.updateDateTime()
     this.getUser()
     this.caixa().get()
-    console.log('this.caixa_.status:', this.caixa_.status);
-    if (this.caixa_.status == 'closed'){
-      this.caixa_op('open')
-    }
     window.addEventListener('keydown', (e) => {
       if (e.key == 'F2') {
         e.preventDefault()
         this.vendaClose()
       }
     })
+
     fetchList('produtos', '').then(response => {
       this.produtos = response.data.items
 
@@ -941,97 +964,129 @@ export default {
     })
   },
   methods: {
-    caixa(){
-      var self = this;
+    caixa() {
+      var self = this
       return {
-        get(){
-          if (Cookies.get('caixa_')){
-            self.caixa_ = JSON.parse(Cookies.get('caixa_'))
-            console.log('get: (self.caixa_)', self.caixa_);
-          }
+        open(){
+          self.$modal.show('modal_caixa_op')
         },
-        set(obj){
-          console.log('set: (obj)', obj);
+        get(f) {
+           fetchList(
+             'caixa_status', 
+             {find: {"token": getToken()}, page:1, limit:1, sort: "id DESC"}
+            ).then(response => {
+              if (response.data.items[0]){
+                console.log('caixa_status:', response.data.items[0])
+                self.caixa_ = response.data.items[0]
+              }
+              if (self.caixa_){
+                if (self.caixa_.status == 'opened'){
+                  self.caixaSession = self.caixa_.session
+                }
+                delete self.caixa_.id
+                
+                if (self.caixa_.status == 'closed') {
+                  console.log('self.caixa_.status:', self.caixa_.status);
+                  self.$modal.show('modal_caixa_op')
+                }
+              }else{
+                self.caixa_op('open')
+              }
+            }).catch(function(error) {
+              console.log(error)
+            })
+
+          // if (Cookies.get('caixa_')) {
+          //   self.caixa_ = JSON.parse(Cookies.get('caixa_'))
+          //   console.log('get: (self.caixa_)', self.caixa_)
+          // }
+        },
+        set(obj) {
+          console.log('set: (obj)', obj)
           self.caixa_ = obj
-          Cookies.set('caixa_', obj)
-          
+          // Cookies.set('caixa_', obj)
           // Save operation in databank
           create('caixa_status', obj).then((ret) => {
-            console.log('ret:', ret);
+            console.log('ret:', ret)
           })
-       
         }
       }
     },
-    caixa_op(op){
+    caixa_op(op) {
       var self = this
+      console.log('op:', op);
       getInfo().then(function(x) {
-        self.user = x.data.name
-        //Check if caixa is closed to open
-        // if (self.caixa_status_.status == 'close') {
-          
-          
-          //Set caixa status by last value or open/close operation
-          // var status = null
-          // if (self.caixa_.status) status = self.caixa_.status
-         
-          // self.caixa_ = {
-          //   created: self.today_timestamp,
-          //   // session: caixa_session, 
-          //   status: self.caixa_.status
-          // }
-         
-          self.aux_caixa_op = op
+        self.caixa_op_value = 0
 
-          self.lines = [
-            {key: 'data', value: self.today},
-            {key: 'Usuário', value: self.user},
-            {key: 'Operação', value: op},
-            {key: 'valor', value: '', type: 'input', name: 'caixa_op_value'}
-          ]
-
-          self.$modal.show('modal_caixa_op');
+        // if (op=='Abertura') {
+        //   self.aux_caixa_op = "open"
         // }
+       
+        if (op=='Fechamento') {
+          self.caixa_op_value = 100
+          console.log("!!!!-!!!")
+        }
+
+        self.user = x.data.name
+        self.aux_caixa_op = op
+        self.$modal.show('modal_caixa_op')
       })
     },
-    caixa_op_ok(){
-      var status = this.caixa_.status
-      // this.caixaSession = this.caixa_.session
-     
-     if (this.aux_caixa_op == 'open') {
-        this.caixaSession = getToken() + '-' + this.today_timestamp
+    beforeOpen (event) {
+        console.log('!!!:', event.params.item);
+      },
+    caixa_op_ok(op) {
+      var self = this
+      console.log("!!!!-!!!>", self.aux_caixa_op)
+      
+      var status = self.caixa_.status
+
+      if (self.aux_caixa_op == 'Abertura') {
+        self.caixaSession = getToken() + '-' + this.today_timestamp
+        self.aux_caixa_op = "open"
         status = 'opened'
       }
-      if (this.aux_caixa_op == 'close') {
+
+      if (self.aux_caixa_op == 'Fechamento') {
+        self.aux_caixa_op = "close"
         status = 'closed'
       }
 
-      this.caixa_.created = this.today_timestamp
-      this.caixa_.status = status
-      this.caixa_.op = this.aux_caixa_op
-      this.caixa_.session = this.caixaSession
-      this.caixa_.value = this.m.caixa_op_value
-      console.log(this.caixa_);
-      this.caixa().set(this.caixa_)
-      this.$modal.hide('modal_caixa_op');
-    },
-    caixa_fechamento(){
-      var self = this
-      //Check if caixa is opened to close
-      if (self.caixa_status_.status == 'open') {
-        swal({
-          title: 'Fechamento de caixa',
-          text: 'Informe o valor de fechamento do caixa',
-          content: "input",
-        }).then((value) => {
-            self.caixa_status_.created = self.today_timestamp
-            self.caixa_status_.status = 'close'
-            self.caixa_status_.value = value
-            self.caixa_status().set(self.caixa_status_)
-        }).then((value) => {
-          this.$router.push('/')
-        })
+      self.caixa_.created = self.today_timestamp
+      self.caixa_.token = getToken()
+      self.caixa_.status = status
+      self.caixa_.op = self.aux_caixa_op
+      self.caixa_.session = self.caixaSession
+      self.caixa_.value = self.caixa_op_value
+      console.log(self.caixa_)
+
+      self.caixa().set(self.caixa_)
+      // var status = this.caixa_.status
+
+      // if (this.aux_caixa_op == 'open') {
+      //   this.caixaSession = getToken() + '-' + this.today_timestamp
+      //   status = 'opened'
+      // }
+      
+      // if (this.aux_caixa_op == 'close') {
+      //   status = 'closed'
+      // }
+
+      // this.caixa_.created = this.today_timestamp
+      // this.caixa_.token = getToken()
+      // this.caixa_.status = status
+      // this.caixa_.op = this.aux_caixa_op
+      // this.caixa_.session = this.caixaSession
+      // this.caixa_.value = this.caixa_op_value
+
+      // console.log(this.caixa_)
+      // this.caixa().set(this.caixa_)
+      
+      if (this.aux_caixa_op == 'close') {
+        this.$router.push('/');
       }
+      
+      this.$modal.hide('modal_caixa_op')
     },
     vai() {
       this.$nextTick(function() {
