@@ -290,10 +290,6 @@
                       <span style="font-family: tahoma; font-size: 70%;">
                         <el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button> | 
                         <span class="bold">Usuário:</span>{{ user }}<br>
-                        
-
-                        <!-- <el-button v-if="caixa_.status == 'close'" @click="caixa_abertura">Abrir caixa</el-button> -->
-                        <!-- <el-button v-if="caixa_.status == 'opened'" @click="caixa_op('close')">Fechar caixa</el-button> -->
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -673,7 +669,7 @@
       </el-dialog>
 
       <!-- Caixa abertura -->
-      <modal name="modal_caixa_op" :clickToClose=false :width="600" :height="320" :adaptive="true">
+      <modal name="modal_caixa_op" :clickToClose=false :width="600" :height="360" :adaptive="true">
         <div style="padding:20px;">
           <div class="center" style="font-size: 25px; padding-bottom: 30px;">Operação de Caixa</div>
           <div style="font-size: 20px;">
@@ -687,22 +683,31 @@
                       <td style="padding: 5px;">{{user}}</td>
                     </tr>
                     <tr>
+                      <td class=bold style="text-align: right; important!">Posição:</td>
+                      <td style="padding: 5px;">{{caixa_.status | caixa_op_filter}}</td>
+                    </tr>
+                    <tr>
                       <td class=bold style="text-align: right; important!">Operação:</td>
                       <td style="padding: 5px;">
                         <el-radio-group v-model="aux_caixa_op" @input="caixa_op">
-                          <el-radio-button  label="Abertura" :disabled="caixa_.status == 'opened'">Abertura</el-radio-button>
-                          <el-radio-button  label="Reforço" :disabled="caixa_.status == 'closed'">Reforço</el-radio-button>
-                          <el-radio-button  label="Sangria" :disabled="caixa_.status == 'closed'">Sangria</el-radio-button>
-                          <el-radio-button  label="Fechamento" :disabled="caixa_.status == 'closed'" >Fechamento</el-radio-button>
+                          <el-radio-button label="abertura" :disabled="caixa_.status == 'opened'">Abertura</el-radio-button>
+                          <el-radio-button label="reforco" :disabled="caixa_.status == 'closed'">Reforço</el-radio-button>
+                          <el-radio-button label="sangria" :disabled="caixa_.status == 'closed'">Sangria</el-radio-button>
+                          <el-radio-button label="fechamento" :disabled="caixa_.status == 'closed'" >Fechamento</el-radio-button>
                         </el-radio-group>
                       </td>
                     </tr>
                     <tr>
                       <td class=bold style="text-align: right; important!">Valor:</td>
-                      <td style="padding: 5px;"><money v-if=aux_caixa_op v-model="caixa_op_value" v-bind="money" class="el-input__inner" /></td>
+                      <td style="padding: 5px;"><money v-if=aux_caixa_op v-model="caixa_op_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" /></td>
                     </tr>
                     <tr>
-                      <td colspan=2 style="text-align: center; height: 70px; padding: 5px;"><el-button type=success v-if="caixa_op_value" @click="caixa_op_ok" style="width: 100%;">Confirma</el-button></td>
+                      <td colspan=1 style="text-align: center; height: 70px; padding: 5px;">
+                        <el-button type=primary @click="caixa().close()" style="width: 100%;" :disabled="caixa_.status=='closed'">Cancela</el-button>
+                      </td>
+                      <td colspan=1 style="text-align: center; height: 70px; padding: 5px;">
+                        <el-button type=success v-if="aux_caixa_op" @click="caixa_op_ok" style="width: 100%;">Confirma</el-button>
+                      </td>
                     </tr>
               </table>
           </div>
@@ -733,8 +738,8 @@ export default {
   directives: { waves },
   filters: {
     caixa_op_filter(op){
-      if (op=='open') return 'Abertura'
-      if (op=='close') return 'Fechamento'
+      if (op=='opened') return 'Aberta'
+      if (op=='closed') return 'Fechada'
     },
     img_mini: function(value, produtos) {
       var a = produtos.filter(item => item.descricao == value)[0]
@@ -753,6 +758,7 @@ export default {
   },
   data() {
     return {
+      caixa_op_selected: null,
       caixa_op_value: 0,
       freeToClose: false,
       m: {},
@@ -968,7 +974,15 @@ export default {
       var self = this
       return {
         open(){
+          // self.caixa_op = null
+          self.caixa_op_value = 0
           self.$modal.show('modal_caixa_op')
+        },
+        close(){
+          console.log(self.caixa_op);
+          self.caixa_op(null)
+          self.caixa_op_value = 0
+          self.$modal.hide('modal_caixa_op')
         },
         get(f) {
            fetchList(
@@ -987,7 +1001,8 @@ export default {
                 
                 if (self.caixa_.status == 'closed') {
                   console.log('self.caixa_.status:', self.caixa_.status);
-                  self.$modal.show('modal_caixa_op')
+                //  self.caixa_op = null
+                 self.$modal.show('modal_caixa_op')
                 }
               }else{
                 self.caixa_op('open')
@@ -1017,13 +1032,26 @@ export default {
       console.log('op:', op);
       getInfo().then(function(x) {
         self.caixa_op_value = 0
+        self.caixa_op_selected = op
+        if (op=='fechamento') {
+          fetchList('vendas', {find:{session: self.caixaSession}}).then(response => {
+            console.log('response.data:', response.data)
+            self.clientesList = response.data.items
 
-        // if (op=='Abertura') {
-        //   self.aux_caixa_op = "open"
-        // }
-       
-        if (op=='Fechamento') {
-          self.caixa_op_value = 100
+            function amount(item) {
+              return item.total
+            }
+
+            function sum(prev, next) {
+              return prev + next
+            }
+
+            self.caixa_op_value = response.data.items.map(amount).reduce(sum)
+      
+
+          }).catch(function(error) {
+            console.log(error)
+          })
           console.log("!!!!-!!!")
         }
 
@@ -1041,13 +1069,13 @@ export default {
       
       var status = self.caixa_.status
 
-      if (self.aux_caixa_op == 'Abertura') {
+      if (self.aux_caixa_op == 'abertura') {
         self.caixaSession = getToken() + '-' + this.today_timestamp
         self.aux_caixa_op = "open"
         status = 'opened'
       }
 
-      if (self.aux_caixa_op == 'Fechamento') {
+      if (self.aux_caixa_op == 'fechamento') {
         self.aux_caixa_op = "close"
         status = 'closed'
       }
@@ -1291,6 +1319,7 @@ export default {
       const auxObj = {
         date: +new Date(),
         date_ref: this.date_ref,
+        session: this.caixaSession,
         cliente: this.cupom.cliente.id,
         subtotal: this.cupom.subtotal,
         desconto: this.desconto,

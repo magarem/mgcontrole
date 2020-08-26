@@ -182,7 +182,6 @@ app.use(history({
   verbose: true
 }));
 
-
 app.use(staticFileMiddleware);
 
 app.use(cors({
@@ -228,14 +227,9 @@ app.use(cors({
 
 }
 
-
-
 app.set('view engine', 'ejs');
 app.use(express.static('./public'));
 console.log(__dirname)
-// app.use(express.static('../client'));
-
-
 
 app.get(environment + '/setowner', function (req, res, next) {
    req.session.owner = req.query.owner
@@ -272,18 +266,6 @@ app.get(environment + '/eansearch', function (req, res, next) {
 
 
 })
-
-// app.get(/.*/,(req,res)=>res.sendFile(path.resolve(__dirname,'public/index.html')))
-// app.get(/.*/,(req,res)=>res.sendFile(path.resolve(__dirname,'public/index.html')))
-// app.get('/init',(req,res)=>res.sendFile(path.resolve(__dirname)))
-
-// // Begin
-// app.get('/init', function (req, res, next) {
-//  res.render('index', {user: 0});
-// //  res.redirect('/');
-// })
-
-
 
 ////////////////////////////////
 // Auth
@@ -477,7 +459,6 @@ function whereSQL_string(obj){
   }
   if (t.length > 0) return t.join(" and ")
 }
-
 function insertSQL_string(table, obj){
 
   //Delete aux keys
@@ -695,6 +676,7 @@ function updateSQL_string(table, id, obj){
     console.log('json_data:', json_data)
     var date = json_data.date
     var date_ref = json_data.date_ref
+    var session = json_data.session
     var cliente = json_data.cliente
     var itens = json_data.itens
     var subtotal = json_data.subtotal 
@@ -709,19 +691,9 @@ function updateSQL_string(table, id, obj){
       date = new Date().getTime()
     }
   
-    console.log('var date:', date);
+    console.log('var session:', session);
 
     if (!date_ref){date_ref = date}
-
-    // if (date_ref){
-    //   var myDate = date_ref.split("/");
-    //   // var mes = +myDate[0] + 1
-    //   date_ref = myDate[1]+"/"+myDate[0]+"/"+myDate[2];
-    //   date_ref = new Date(date_ref).getTime();
-    //   console.log('var date_ref:', date_ref);
-    // }else{
-    //   date_ref = date
-    // }
 
     //Open database
     db_open('./' + domain + '.db').then(db => {
@@ -742,11 +714,11 @@ function updateSQL_string(table, id, obj){
           var pagamento = JSON.stringify(pagamento_obj)
           // Insert Venda
           
-          db.run(`
-            INSERT INTO vendas 
-              (id, cliente, itens, subtotal, desconto, acrescimo, total, pagamento, created) 
-              VALUES (${top_id}, ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}', '${date_ref}')
-            `, function(err) {
+          sql = `INSERT INTO vendas 
+          (id, session, cliente, itens, subtotal, desconto, acrescimo, total, pagamento, created) 
+          VALUES (${top_id}, '${session}', ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}', '${date_ref}')`
+          console.log(sql);
+          db.run(sql, function(err) {
               if (err) {
                 return console.log(err.message);
               }
