@@ -699,7 +699,7 @@
                     </tr>
                     <tr>
                       <td class=bold style="text-align: right; important!">Valor:</td>
-                      <td style="padding: 5px;"><money v-if=aux_caixa_op v-model="caixa_op_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" /></td>
+                      <td style="padding: 5px;"><input v-if=aux_caixa_op v-model="caixa_op_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" /></td>
                     </tr>
                     <tr>
                       <td colspan=1 style="text-align: center; height: 70px; padding: 5px;">
@@ -759,7 +759,7 @@ export default {
   data() {
     return {
       caixa_op_selected: null,
-      caixa_op_value: 0,
+      caixa_op_value: {},
       freeToClose: false,
       m: {},
       item: null,
@@ -1034,25 +1034,68 @@ export default {
         self.caixa_op_value = 0
         self.caixa_op_selected = op
         if (op=='fechamento') {
-          fetchList('vendas', {find:{session: self.caixaSession}}).then(response => {
-            console.log('response.data:', response.data)
-            self.clientesList = response.data.items
 
-            function amount(item) {
-              return item.total
+          //Get open value
+          fetchList('caixa_status', {tipo: 0, fields: ['op', 'sum(value) tot'], find:{session: self.caixaSession}, groupby: 'op'}).then(response => {
+            console.log('response.data>:', response.data)
+           
+            var open_ = response.data.items.filter(function(item){
+              return item.op == 'open'
+            })
+            var reforco_ = response.data.items.filter(function(item){
+              return item.op == 'reforco'
+            })
+            var sangria_ = response.data.items.filter(function(item){
+              return item.op == 'sangria'
+            })
+            var t1 = {
+              open: open_[0].tot,
+              reforco: reforco_[0].tot,
+              sangria: sangria_[0].tot,
             }
+            var tt = t1.open + t1.reforco - t1.sangria
+            console.log('open_>:', tt)
+            // ret = response.data.items
+            // console.log('valor de abertura:', ret.value);
+          
+            fetchList('vendas', {find:{session: self.caixaSession}}).then(response => {
+              console.log('response.data:', response.data)
+              self.clientesList = response.data.items
 
-            function sum(prev, next) {
-              return prev + next
-            }
-
-            self.caixa_op_value = response.data.items.map(amount).reduce(sum)
-      
-
+              //Calc de total
+              var amount = {
+                dinheiro(item) {
+                  console.log(JSON.parse(item.pagamento).dinheiro);
+                  return JSON.parse(item.pagamento).dinheiro
+                },
+                debito(item) {
+                  console.log(JSON.parse(item.pagamento).debito);
+                  return JSON.parse(item.pagamento).debito
+                },
+                credito(item) {
+                  console.log(JSON.parse(item.pagamento).credito);
+                  return JSON.parse(item.pagamento).credito
+                },
+                faturado(item) {
+                  console.log(JSON.parse(item.pagamento).faturado);
+                  return JSON.parse(item.pagamento).faturado
+                }
+              }
+              function sum(prev, next) {return prev + next}
+            
+              self.caixa_op_value = JSON.stringify({
+                dinheiro: response.data.items.map(amount.dinheiro).reduce(sum) + tt,
+                debito: response.data.items.map(amount.debito).reduce(sum),
+                credito: response.data.items.map(amount.credito).reduce(sum),
+                faturado: response.data.items.map(amount.faturado).reduce(sum)
+              })
+            }).catch(function(error) {
+              console.log(error)
+            })
           }).catch(function(error) {
-            console.log(error)
+              console.log(error)
           })
-          console.log("!!!!-!!!")
+            console.log("!!!!-!!!")
         }
 
         self.user = x.data.name
@@ -1060,9 +1103,6 @@ export default {
         self.$modal.show('modal_caixa_op')
       })
     },
-    beforeOpen (event) {
-        console.log('!!!:', event.params.item);
-      },
     caixa_op_ok(op) {
       var self = this
       console.log("!!!!-!!!>", self.aux_caixa_op)

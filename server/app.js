@@ -484,7 +484,9 @@ function updateSQL_string(table, id, obj){
     
     // Get user token
     let token = req.headers['x-token']
-    
+    var sqlFields = '*'
+    var strGroupBy = ''
+
     // Get domain
     let domain = token.split('.')[0]
     console.log('domain:', domain);
@@ -496,9 +498,16 @@ function updateSQL_string(table, id, obj){
       let strLimit = ""
       let strWhere = " where 1=1 "
       console.log('req.query:', req.query);
+      if (req.query.fields) {
+         sqlFields = req.query.fields.join(',')
+      }
       if (req.query.find) {
         var w = whereSQL_string(JSON.parse(req.query.find))
         if (w) strWhere += ' and ' + w
+      }
+      if (req.query.groupby) {
+        // var w = whereSQL_string(JSON.parse(req.query.find))
+        strGroupBy = ' GROUP BY ' + req.query.groupby
       }
       let strSort = '' //' order by 1 ' //DESC
       if (req.query.sort) {
@@ -509,8 +518,15 @@ function updateSQL_string(table, id, obj){
         SELECT *, b.total_rows tot FROM ${key} a, (
           SELECT count(*) total_rows
               FROM ${key} ${strWhere}
-          ) b ${strWhere} ${strSort} ${strLimit}
+          ) b ${strWhere} ${strGroupBy} ${strSort} ${strLimit}
       `
+      var sqlStrSimple = `
+        SELECT ${sqlFields} FROM ${key} ${strWhere} ${strGroupBy} ${strSort} ${strLimit}
+      `
+      if (req.query.tipo) {
+        if (req.query.tipo==0) {sqlStr = sqlStrSimple}
+      }
+
       console.log('>>>', sqlStr);
       db.all(sqlStr, function(err, rows, fields) {
         var total = rows[0]?rows[0].total_rows:0
@@ -519,7 +535,6 @@ function updateSQL_string(table, id, obj){
       });
     })
   })
-
   app.post(environment + '/generic', function (req, res, next) {
     
     // Get user token
@@ -548,7 +563,6 @@ function updateSQL_string(table, id, obj){
       );
     })
   })
-
   app.patch(environment + '/generic', function (req, res, next) {
     
     // Get user token
