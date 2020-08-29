@@ -702,7 +702,7 @@ function updateSQL_string(table, id, obj){
     var value_faturado = json_data.faturado
 
     if (!date){
-      date = new Date().getTime()
+      date = Number(new Date())//new Date().getTime()
     }
   
     console.log('var session:', session);
@@ -711,6 +711,8 @@ function updateSQL_string(table, id, obj){
 
     //Open database
     db_open('./' + domain + '.db').then(db => {
+
+     
       
       // Register op Venda
       register_op(null, 'vendas', null, 'clientes', cliente, total, date, db)
@@ -733,9 +735,39 @@ function updateSQL_string(table, id, obj){
           VALUES (${top_id}, '${session}', ${cliente}, '${JSON.stringify(itens)}', ${subtotal}, ${desconto}, null, ${total}, '${pagamento}', '${date_ref}')`
           console.log(sql);
           db.run(sql, function(err) {
-              if (err) {
-                return console.log(err.message);
+            if (err) {
+              return console.log(err.message);
+            }
+            //Register faturado_value if exists
+            if (value_faturado > 0){
+              sql = `INSERT INTO faturados 
+              (venda_id, created, cliente, tipo, valor) 
+              VALUES (${this.lastID}, ${date_ref}, ${cliente}, 0, ${subtotal * -1})`
+              console.log(sql);
+              db.run(sql, function(err) {
+                  if (err) {
+                    return console.log(err.message);
+                  }
+              })
+            }
+
+            //Check if is a client credit operation register
+            for (var t=0; t<itens.length; t++){
+              console.log("--->", itens[t]);
+              if (itens[t].ean == '1001'){
+                // console.log("--->", itens[t]);
+                //Register credit to client
+                sql = `INSERT INTO faturados 
+                (venda_id, created, cliente, tipo, valor) 
+                VALUES (${this.lastID}, ${date_ref}, ${cliente}, 1, ${subtotal})`
+                console.log(sql);
+                db.run(sql, function(err) {
+                  if (err) {
+                    return console.log(err.message);
+                  }
+                })
               }
+            }
           })
 
           // Insert venda_pagamento
