@@ -5,62 +5,31 @@
       </div> -->
 
     <!-- <h2>{{ info.name }}</h2> -->
-    <el-form ref="form" :model="filter" label-width="120px">
-      <el-row :gutter="20">
-        <el-col :span="5">
-          <!-- <el-tag v-permission="['admin']">admin</el-tag>
-          <el-tag v-permission="['cliente']">cliente</el-tag>
-          <div v-if="checkPermission(['admin'])">admin</div> -->
-          <!-- <el-form-item v-if="checkPermission(['admin'])" label="Cliente"> -->
-          <!-- <div class="autosuggest-container"> -->
-
-          <!-- <vue-autosuggest
-                v-if="procura"
-                v-model="query"
-                :suggestions="filteredOptions"
-                :get-suggestion-value="getSuggestionValue"
-                :input-props="{id:'autosuggest__input', placeholder:'Cliente'}"
-                @focus="focusMe"
-                @click="clickHandler"
-                @input="onInputChange"
-                @selected="onSelected"
-              >
-                <div slot-scope="{suggestion}" style="display: flex; align-items: center;">
-                  <div style="{ display: 'flex', color: 'navyblue'}">{{ suggestion.item.cliente }}</div>
-                </div>
-              </vue-autosuggest> -->
-          <!-- </div> -->
-          <!-- </el-form-item> -->
-        </el-col>
-      </el-row>
-    </el-form>
+   
     <el-row style="width:95%;  margin:auto;">
 
       <el-col :span="24">
         <div>
-          <el-button type="primary" icon="el-icon-search" @click="clientesListFlg=true" />
+          <el-button type="primary" icon="el-icon-search" @click="list_total=0; clientesListFlg=true" />
 
           <el-divider direction="vertical" />
-          <span v-if="selected.cliente" style="font-size:28px;"><span class="bold">Cliente:</span> {{ selected.cliente }}</span>
+          <span v-if="selected.cliente" style="font-size:28px;"><span class="bold">Cliente:</span> ({{selected.cliente_id}}) {{ selected.cliente }}</span>
           <span v-if="!selected.cliente" style="font-size:25px;">Todos</span>
 
-          <el-divider direction="vertical" />
-          <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
-
+          <!-- <el-divider direction="vertical" /> -->
+          <!-- <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button> -->
         </div>
       </el-col>
     </el-row><br>
-    <el-row style="font-size:20px; width:95%; margin:auto;">
+    <el-row style="font-size:25px; width:95%; margin:auto;">
       <el-col :span="24" :offset="0">
         <div>
           <span v-if="list_total.debito" style="color: red;"> Débitos: {{ (list_total.debito) | money }}</span>
 
-          <el-divider direction="vertical" />
           <span v-if="list_total.credito" style="color: green; "> Créditos: {{ (list_total.credito) | money }}</span>
 
-          <el-divider direction="vertical" />
-          <span v-if="(list_total && list_total.credito - list_total.debito)<0" style="color: red;"> Saldo total: {{ (list_total.credito - list_total.debito) | money }}</span>
-          <span v-if="(list_total && list_total.credito - list_total.debito)>=0" style="color: green;"> Saldo total: {{ (list_total.credito - list_total.debito) | money }}</span>
+          <span v-if="(list_total) < 0" style="color: red;"> Saldo total: {{ list_total | money }}</span>
+          <span v-if="(list_total) >= 0" style="color: green;"> Saldo total: {{ list_total | money }}</span>
         </div>
       </el-col>
     </el-row><br>
@@ -93,41 +62,43 @@
         border
         fit
         highlight-current-row
-        style="width: 80%;"
+        style="width: 90%; font-size: 17px;"
       >
 
-        <el-table-column label="Data" prop="created" sortable="custom" align="center" width="200">
+        <el-table-column label="Data" prop="created" sortable="custom" align="center" width="220">
           <template slot-scope="scope">
-            <span>{{ scope.row.created }}</span>
+            <span>{{ scope.row.created | dateFormat}}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="390">
+        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="290">
           <template slot-scope="scope">
-            <span>{{ scope.row.cliente_id }} - {{ scope.row.cliente }}</span>
+            <span>{{ scope.row.cliente_id }} - {{ scope.row.cliente_nome }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Doc" prop="doc" sortable="custom" align="center" width="50">
+        <el-table-column label="Venda" prop="venda" sortable="custom" align="center" width="100">
           <template slot-scope="scope">
-            <span>{{ scope.row.pid }}</span>
+            <span>{{ scope.row.venda_id }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Débito" prop="debito" sortable="custom" align="center" width="150">
+        <el-table-column label="tipo" prop="tipo" sortable="custom" align="center" width="100">
           <template slot-scope="scope">
-            <span>{{ scope.row.debito | money }}</span>
+            <span>{{ scope.row.tipo | tipoFilter}}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Crédito" prop="credito" sortable="custom" align="center" width="150">
+        <el-table-column label="valor" prop="valor" sortable="custom" align="center" width="150">
           <template slot-scope="scope">
-            <span>{{ scope.row.credito | money }}</span>
+            <span>{{ scope.row.valor | money }}</span>
           </template>
         </el-table-column>
 
       </el-table>
-
+     
+      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+   
     </div>
     <!--
 
@@ -157,28 +128,25 @@
       </div>
     </el-dialog>
 
-    <!-- Clientes busca lista -->
-    <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
-      <el-input
-        ref="searchClient"
-        v-model="searchTermClient"
-        placeholder="Nome"
-        prefix-icon="el-icon-search"
-        style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
-        autocomplete="nope"
-      />
-      <vue-good-table
-        :columns="columns_clientes"
-        :rows="filteredOptions[0].data"
-        :search-options="{enabled: false, externalQuery: searchTermClient}"
-        theme="black-rhino"
-        max-height="255px"
-        @on-row-click="clienteSet"
-      />
-      <span slot="footer" class="dialog-footer" align="center">
-        <el-button type="primary" @click="clientesListFlg = false">Fechar</el-button>
-      </span>
-    </el-dialog>
+      <!-- Clientes busca lista -->
+      <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
+        <el-input
+          ref="searchClient"
+          v-model="searchTermClient"
+          placeholder="Nome"
+          prefix-icon="el-icon-search"
+          style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
+          autocomplete="nope"
+        />
+        <vue-good-table
+          :columns="columns_clientes"
+          :rows="clientesList"
+          :search-options="{enabled: false, externalQuery: searchTermClient}"
+          theme="black-rhino"
+          max-height="255px"
+          @on-row-click="clienteSet"
+        />
+      </el-dialog>
 
   </div>
 </template>
@@ -317,11 +285,24 @@ import { VueGoodTable } from 'vue-good-table'
 import { VueAutosuggest } from 'vue-autosuggest'
 import { Money } from 'v-money'
 import swal from 'sweetalert'
+import moment from 'moment'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+
 export default {
   name: 'ClientesContas',
-  components: { VueGoodTable, VueAutosuggest, Money, swal },
+  components: { Pagination, VueGoodTable, VueAutosuggest, Money, swal, moment },
   directives: { waves, permission },
   filters: {
+    dateFormat(val){
+      if (val) {
+        // return moment.unix(String(val))
+        
+        return moment(new Date(val)).format('DD/MM/YYYY, h:mm:ss a')
+      }
+    },
+    tipoFilter(value){
+      return value?'Crédito':'Débito'
+    },
     money(value) {
       if (typeof value !== 'number') {
         return value
@@ -330,7 +311,6 @@ export default {
         style: 'currency',
         currency: 'BRL'
       })
-
       return formatter.format(value)
     },
     booleanChange(value) {
@@ -342,27 +322,20 @@ export default {
       if (!value) return ''
       value = value.toString()
       return value.charAt(0).toUpperCase() + value.slice(1)
-    },
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
     }
   },
   data() {
     return {
-      columns_clientes: [
+      clientesList: [],
+       columns_clientes: [
         {
           label: 'Código',
-          field: 'cliente_id',
+          field: 'id',
           width: '100px'
         },
         {
           label: 'Nome',
-          field: 'cliente',
+          field: 'nome',
           type: 'string'
         }
       ],
@@ -403,47 +376,17 @@ export default {
           width: '80px'
         },
         {
-          label: 'cliente',
-          field: 'cliente',
-          type: 'string',
-          width: '200px'
-        },
-        {
-          label: 'Doc',
-          field: 'pid',
+          label: 'venda',
+          field: 'venda_id',
           type: 'integer',
           width: '80px'
         },
         {
-          label: 'Débito',
-          field: 'debito',
-          type: 'decimal',
-          width: '180px'
-        },
-        {
-          label: 'Crédito',
-          field: 'credito',
-          type: 'decimal',
+          label: 'tipo',
+          field: 'tipo',
+          type: 'integer',
           width: '180px'
         }
-        // {
-        //   label: 'Crédito',
-        //   field: 'credito',
-        //   type: 'decimal',
-        //   width: '80px'
-        // },
-        // {
-        //   label: 'Saldo',
-        //   field: 'saldo',
-        //   type: 'decimal',
-        //   width: '80px'
-        // },
-        // {
-        //   label: 'Saldo total',
-        //   field: 'total_parcial',
-        //   type: 'decimal',
-        //   width: '120px'
-        // }
       ],
       list: [],
       list_original: [],
@@ -458,10 +401,6 @@ export default {
         page: 1,
         limit: 10,
         sort: '1 DESC'
-        // find: {
-        //   nome: '',
-        //   doc: ''
-        // }
       }
     }
   },
@@ -483,29 +422,109 @@ export default {
       return [
         {
           data: this.list_original.filter(option => {
-            return option.cliente.toLowerCase().indexOf(this.query.toLowerCase()) > -1
+            return option.cliente_nome.toLowerCase().indexOf(this.query.toLowerCase()) > -1
           })
         }
       ]
     }
   },
-
   mounted() {
     this.getUser()
+    this.getCliente()
     this.getList()
-    this.getList_original()
+    // this.getList_original()
     this.token = getToken()
-    if (this.checkPermission(['cliente'])) {
-      this.selected.cliente_id = getToken().split(':')[1]
-      this.filterHandle()
-    }
   },
   methods: {
+    getList() {
+      var self = this
+      // if (this.selected.cliente_id) {
+        fetchList('faturados_completo', this.listQuery).then(response => {
+          this.total = response.data.total
+          self.list = response.data.items
+          console.log('>>>>>:', self.list);
+
+          // Pega o total
+          // fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
+          //   this.list_total = response.data.items[0]
+          // })
+          // this.list_original = self.list.map(function(item) {
+          //   return { cliente_id: item.cliente_id, cliente: item.cliente }
+          // })
+          // this.list_original = this.list_original.reduce((acc, value) => acc.some(i => i.cliente_id === value.cliente_id) ? acc : acc.concat(value), []) // id your uniq key
+          // console.log('this.list_original:>', this.list_original);
+       
+          function amount(item) {
+            return item.valor
+          }
+
+          function sum(prev, next) {
+            return prev + next
+          }
+
+          self.list_total = this.list.map(amount).reduce(sum)
+
+       })
+        
+      // }
+    },
+    getCliente() {
+      const self = this
+      self.clientesList = []
+      fetchList('clientes', '').then(response => {
+        self.clientesList = response.data.items
+        console.log('self.clientesList:', self.clientesList)
+      }).catch(function(error) {
+        console.log(error)
+      })
+      this.clientesListFlg = true
+      this.$nextTick(() => {
+        this.searchTermClient = null
+        // this.$refs.searchClient.focus()
+      })
+    },
+    getList_original() {
+      var self = this
+      fetchList('faturados').then(response => {
+        this.total = response.data.total
+        console.log(response.data)
+        this.list = response.data.items
+        this.list.map(function(x) {
+          return x.created = self.timeConverter(x.created)
+        })
+        console.log('this.list_:', this.list_)
+        this.list_original = response.data.items.map(function(item) {
+          return { cliente_id: item.cliente_id, cliente: item.cliente }
+        })
+        this.list_original = this.list_original.reduce((acc, value) => acc.some(i => i.cliente_id === value.cliente_id) ? acc : acc.concat(value), []) // id your uniq key
+      })
+      // Pega o total
+      fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
+        console.log('response.data.items:', response.data.items)
+        // Do the Sum
+        this.list_total = {
+          credito: 0,
+          debito: 0
+        }
+        var v = 0
+        for (var t = 0; t < response.data.items.length; t++) {
+          v = response.data.items[t]
+          console.log('v.credito:', v.credito)
+          // console.log(response.data.items[t].credito, response.data.items[t].debito)
+          // console.log('response.data.items[t].credito:', response.data.items[t].credito);
+          this.list_total.credito += v.credito
+          this.list_total.debito += v.debito
+          // this.list_total += this.list_total.credito - this.list_total.debito
+        }
+        console.log('this.list_total:', this.list_total)
+        // this.list_total = response.data.items[0]
+      })
+    },
     clienteSet(params) {
       var row = params.row
       console.log('row:', row)
-      this.selected.cliente_id = row.cliente_id
-      this.selected.cliente = row.cliente
+      this.selected.cliente_id = row.id
+      this.selected.cliente = row.nome
       this.clientesListFlg = false
       this.filterHandle()
     },
@@ -580,7 +599,7 @@ export default {
 
       // this.selected.cliente_id = null
       // Get data in server
-      this.getList_original()
+      // this.getList_original()
     },
     filterHandle() {
       // Set the Query with finders
@@ -665,63 +684,6 @@ export default {
 
           this.getList()
         })
-      })
-    },
-    getList() {
-      var self = this
-      if (this.selected.cliente_id) {
-        fetchList('f_clientes_faturados', this.listQuery).then(response => {
-          this.total = response.data.total
-
-          this.list = response.data.items
-
-          this.list.map(function(x) {
-            return x.created = self.timeConverter(x.created)
-          })
-        })
-
-        // Pega o total
-        fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
-          this.list_total = response.data.items[0]
-        })
-      }
-    },
-    getList_original() {
-      var self = this
-      fetchList('f_clientes_faturados').then(response => {
-        this.total = response.data.total
-        console.log(response.data)
-        this.list = response.data.items
-        this.list.map(function(x) {
-          return x.created = self.timeConverter(x.created)
-        })
-        console.log('this.list_:', this.list_)
-        this.list_original = response.data.items.map(function(item) {
-          return { cliente_id: item.cliente_id, cliente: item.cliente }
-        })
-
-        this.list_original = this.list_original.reduce((acc, value) => acc.some(i => i.cliente_id === value.cliente_id) ? acc : acc.concat(value), []) // id your uniq key
-      })
-      // Pega o total
-      fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
-        console.log('response.data.items:', response.data.items)
-        // Do the Sum
-        this.list_total = {
-          credito: 0,
-          debito: 0
-        }
-        var v = 0
-        for (var t = 0; t < response.data.items.length; t++) {
-          v = response.data.items[t]
-          console.log('v.credito:', v.credito)
-          // console.log(response.data.items[t].credito, response.data.items[t].debito)
-          // console.log('response.data.items[t].credito:', response.data.items[t].credito);
-          this.list_total.credito += v.credito
-          this.list_total.debito += v.debito
-          // this.list_total += this.list_total.credito - this.list_total.debito
-        }
-        console.log('this.list_total:', this.list_total)
-        // this.list_total = response.data.items[0]
       })
     }
   }

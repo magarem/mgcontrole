@@ -1,8 +1,13 @@
+<style scoped>
+  .teste {
+      font-size: 200px !important;
+  }
+</style>
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.find.ean" placeholder="EAN" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.find.descricao" placeholder="Descrição" style="width: 300px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.find.nome" placeholder="Nome" style="width: 300px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.find.doc" placeholder="Doc" style="width: 250px;" class="filter-item" clearable @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Procurar
       </el-button>
@@ -17,116 +22,77 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%; font-size: 18px;"
       @sort-change="sortChange">
-      <el-table-column label="ID" prop="ean" sortable="custom" align="center" width="100">
+
+      <el-table-column label="Data" prop="data" sortable="custom" align="center" width="130">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.data }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="EAN" prop="ean" sortable="custom" align="center" width="130">
+      <el-table-column label="N" prop="n" sortable="custom" align="center" width="70">
         <template slot-scope="scope">
-          <span>{{ scope.row.ean }}</span>
+          <span>{{ scope.row.n }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Descricao" prop="descricao" sortable="custom" align="center" width="390">
+     
+      <el-table-column label="Total (dinheiro)" prop="total" sortable="custom" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.descricao | capitalize }}</span>
+          <span>{{ scope.row.dinheiro | money }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Preço" prop="pco_venda" sortable="custom" align="center" width="90">
+      <el-table-column label="Total (cartão)" prop="cartao" sortable="custom" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.pco_venda | money }}</span>
+          <span>{{ scope.row.cartao | money }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Uni" prop="unidade" sortable="custom" align="center" width="70">
+       <el-table-column label="Total (a vista)" prop="avista" sortable="custom" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.unidade }}</span>
+          <span>{{ scope.row.dinheiro + scope.row.cartao | money }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Estoque" prop="estoque" sortable="custom" align="center" width="100">
+      <el-table-column label="Total (faturado)" prop="faturado" sortable="custom" align="center" width="200">
         <template slot-scope="scope">
-          <span>{{ scope.row.estoque }}</span>
+          <span>{{ scope.row.faturado | money }}</span>
         </template>
       </el-table-column>
+     
 
-      <el-table-column label="Actions" align="center" width="150" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
-          </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row)">
-            Delete
-          </el-button>
+      <el-table-column label="Total geral" prop="total" sortable="custom" align="center" width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.total | money }}</span>
         </template>
       </el-table-column>
+     
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    {{/** 
-        
-        Form 
+    <pagination _v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" layout="prev, pager, next" @pagination="getList" />
+    <!--
 
-    */}} 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="EAN" prop="ean">
-          <el-input v-model="temp.ean" />
-        </el-form-item>
-        <el-form-item label="Descrição" prop="descricao">
-          <el-input v-model="temp.descricao" />
-        </el-form-item>
-        <el-form-item label="Custo" prop="preco_custo">
-          <money v-model="temp.pco_custo" v-bind="money" class="el-input__inner" />
-        </el-form-item>
-        <el-form-item label="Preço de venda" prop="preco">
-          <money v-model="temp.pco_venda" v-bind="money" class="el-input__inner" />
-        </el-form-item>
-        <el-form-item label="Unidade" prop="unidade">
-          <el-input v-model="temp.unidade" />
-        </el-form-item>
-        <el-form-item label="Imagem mini" prop="img_mini">
-          <el-input v-model="temp.img_mini" />
-        </el-form-item>
-        <el-form-item label="Estoque" prop="estoque">
-          <el-input v-model="temp.estoque" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          Cancela
-        </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirma
-        </el-button>
-      </div>
-    </el-dialog>
+        Janelas
 
+    -->
+   
   </div>
 </template>
-<style scoped>
- table {border-collapse: collapse;}
-  td   {padding: 6px;}
-</style>
+
 <script>
 import { fetchList, create, update, deleteItem } from '@/api/generic'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { Money } from 'v-money'
-
+import { getToken, setToken, removeToken } from '@/utils/auth'
+// import buef from 'buefy'
+// import 'buefy/dist/buefy.css'
 export default {
-  name: 'Produtos',
+  name: 'Clientes',
   components: { Pagination, Money },
   directives: { waves },
   filters: {
     money(value) {
-      value = parseFloat(value).toFixed(2)
       if (!value) return ''
       value = value.toString()
       if (value.indexOf('.') == -1) {
@@ -153,6 +119,7 @@ export default {
   },
   data() {
     return {
+      tela: '40%',
       money: {
         decimal: ',',
         thousands: '.',
@@ -165,55 +132,66 @@ export default {
       total: 0,
       listLoading: true,
       listQuery: {
+        tipo: 1,
         page: 1,
-        limit: 20,
-        sort: 'id DESC',
+        limit: 10,
+        sort: '1 DESC',
         find: {
-          ean: null,
-          descricao: null
+          nome: '',
+          doc: ''
         }
       },
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
+      showReviewer: false,
       temp: {
-        id: undefined,
-        pco_custo: 0,
-        timestamp: new Date()
+        id: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        editar: 'editar',
+        novo: 'novo'
       },
-      dialogPvVisible: false,
-      pvData: [],
       rules: {
-        descricao: [{ required: true, message: 'Preencha o nome do produto', trigger: 'change' }],
+        type: [{ required: true, message: 'type is required', trigger: 'change' }],
+        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       downloadLoading: false
     }
   },
   created() {
     this.getList()
+    this.x()
   },
   methods: {
+    x() {
+      if (screen.width < 400) { this.tela = '90%' } else { this.tela = '40%' }
+    },
     getList() {
-      this.listLoading = true
-      fetchList('produtos', this.listQuery).then(response => {
-        console.log('response.data.items:', response.data.items)
+      // this.listLoading = true
+      const self = this
+      fetchList('rel_vendas_total', this.listQuery).then(response => {
         this.list = response.data.items
         this.total = response.data.total
-
+        this.listLoading = false
         // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        // setTimeout(() => {
+        //   this.listLoading = false
+        // }, 1.5 * 1000)
       })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: 'Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
       const { prop, order } = data
@@ -223,21 +201,26 @@ export default {
     },
     sortByID(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = '1 ASC'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = '1 DESC'
       }
       this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         id: undefined,
+        // importance: 1,
+        // remark: '',
         timestamp: new Date()
+        // title: '',
+        // status: 'published',
+        // type: ''
       }
     },
     handleCreate() {
       this.resetTemp()
-      this.dialogStatus = 'create'
+      this.dialogStatus = 'novo'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -246,14 +229,16 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          create('produtos', this.temp).then((ret) => {
-            console.log('ret:', ret.data)
+          // this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          create('clientes', this.temp).then((ret) => {
+            // this.temp.id = response.data
+            console.log('response.data:', ret.data.id)
             this.temp.id = ret.data.id
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Sucesso',
-              message: 'Registro inserido',
+              message: 'Cliente cadastrado',
               type: 'success',
               duration: 2000
             })
@@ -261,11 +246,22 @@ export default {
         }
       })
     },
+    deleteData() {
+      delete ('clientes', this.temp).then(() => {
+        this.list.unshift(this.temp)
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'Success',
+          message: 'Registro excluido com sucesso!',
+          type: 'success',
+          duration: 2000
+        })
+      })
+    },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.pco_custo = this.temp.pco_custo || 0
       this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
+      this.dialogStatus = 'editar'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -276,7 +272,7 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          update('produtos', tempData).then(() => {
+          update('clientes', tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v)
@@ -311,7 +307,7 @@ export default {
         this.list.splice(index, 1)
 
         // Server order
-        deleteItem('produtos', row).then(() => {
+        deleteItem('clientes', row).then(() => {
           console.log('Deleted:--->', row.id)
         })
       }).catch(() => {
@@ -319,13 +315,6 @@ export default {
           type: 'info',
           message: 'Exclusão cancelada'
         })
-      })
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        alert(response.data.pvData)
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
       })
     },
     handleDownload() {

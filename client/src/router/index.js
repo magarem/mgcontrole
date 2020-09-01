@@ -14,6 +14,7 @@ import Layout from '@/layout'
 import cadastrosRouter from './modules/cadastros'
 import vendasRouter from './modules/vendas'
 import financeiroRouter from './modules/financeiro'
+import relatoriosRouter from './modules/relatorios'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -109,6 +110,7 @@ export const asyncRoutes = [
   cadastrosRouter,
   vendasRouter,
   financeiroRouter,
+  relatoriosRouter,
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

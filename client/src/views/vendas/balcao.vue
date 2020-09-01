@@ -122,6 +122,14 @@
     background-color: #E6C793
   } */
 </style>
+<el-timeline :reverse="reverse">
+    <el-timeline-item
+      v-for="(activity, index) in activities"
+      :key="index"
+      :timestamp="activity.timestamp">
+      {{activity.content}}
+    </el-timeline-item>
+  </el-timeline>
 <template>
   <div class="app-container body" >
     <div id="main">
@@ -322,7 +330,7 @@
                     <el-col :span="3" class="center">{{ row.unidade||'uni' }}</el-col>
                     <el-col :span="2" class="center">{{ row.qnt }}</el-col>
                     <el-col :span="4" class="center">{{ row.total | money }}</el-col>
-                    <el-col :span="1" class="center"><i class="el-icon-view" @click="cupomRowView(row.n)" /></el-col>
+                    <el-col :span="1" class="center"><i class="el-icon-view" @click="cupomRowView(row)" /></el-col>
                   </el-row>
                 </div>
                 <el-divider />
@@ -668,8 +676,8 @@
         </div>
       </el-dialog>
 
-      <!-- Caixa abertura -->
-      <modal name="modal_caixa_op" :clickToClose=false :width="600" :height="360" :adaptive="true">
+      <!-- Caixa status -->
+      <modal name="modal_caixa_op" :clickToClose=false :width="700" :height="520" :adaptive="true">
         <div style="padding:20px;">
           <div class="center" style="font-size: 25px; padding-bottom: 30px;">Operação de Caixa</div>
           <div style="font-size: 20px;">
@@ -687,20 +695,125 @@
                       <td style="padding: 5px;">{{caixa_.status | caixa_op_filter}}</td>
                     </tr>
                     <tr>
-                      <td class=bold style="text-align: right; important!">Operação:</td>
-                      <td style="padding: 5px;">
-                        <el-radio-group v-model="aux_caixa_op" @input="caixa_op">
+                      <td colspan=2 style="padding: 5px;">
+
+                        <el-tabs type="card" @tab-click="caixa_op">
+                          <el-tab-pane :disabled="caixa_.status == 'opened'" label="Abertura">
+                            <table>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Valor:</td>
+                                <td style="padding: 5px;">
+                                  <money v-model="caixa_open_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Obs:</td>
+                                <td style="padding: 5px;">
+                                  <el-input
+                                    type="textarea"
+                                    :rows="4"
+                                    placeholder=""
+                                    style="font-size: 18px; width: 500px;"
+                                    v-model="caixa_status_op_obs">
+                                  </el-input>
+                                </td>
+                              </tr>
+                            </table>
+                          </el-tab-pane>
+                         
+                          <el-tab-pane :disabled="caixa_.status == 'closed'" label="Reforço">
+                            <table>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Valor:</td>
+                                <td style="padding: 5px;">
+                                  <money v-model="caixa_op_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Obs:</td>
+                                <td style="padding: 5px;">
+                                  <el-input
+                                    type="textarea"
+                                    :rows="4"
+                                    placeholder="Motivo"
+                                    style="font-size: 18px; width: 500px;"
+                                    v-model="caixa_status_op_obs">
+                                  </el-input>
+                                </td>
+                              </tr>
+                            </table>
+                          </el-tab-pane>
+                          <el-tab-pane :disabled="caixa_.status == 'closed'" label="Sangria">
+                            <table>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Valor:</td>
+                                <td style="padding: 5px;">
+                                  <money v-model="caixa_op_value" v-bind="money" class="el-input__inner"  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Obs:</td>
+                                <td style="padding: 5px;">
+                                  <el-input
+                                    type="textarea"
+                                    :rows="4"
+                                    placeholder="Motivo"
+                                    style="font-size: 18px; width: 500px;"
+                                    v-model="caixa_status_op_obs">
+                                  </el-input>
+                                </td>
+                              </tr>
+                            </table>
+
+                          </el-tab-pane>
+                          <el-tab-pane :disabled="caixa_.status == 'closed'" label="Fechamento">
+                            <table>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Valor:</td>
+                                <td style="padding: 5px;">
+                                  <money v-model="caixa_fechamento_value" v-bind="money" class="el-input__inner" readonly="true" />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Obs:</td>
+                                <td style="padding: 5px;">
+                                  <el-input
+                                    type="textarea"
+                                    :rows="4"
+                                    placeholder="obs"
+                                    style="font-size: 18px; width: 500px;"
+                                    v-model="caixa_status_op_obs">
+                                  </el-input>
+                                </td>
+                              </tr>
+                            </table>
+
+                          </el-tab-pane>
+                        </el-tabs>
+
+                        <!-- <el-radio-group v-model="aux_caixa_op" @input="caixa_op">
                           <el-radio-button label="abertura" :disabled="caixa_.status == 'opened'">Abertura</el-radio-button>
                           <el-radio-button label="reforco" :disabled="caixa_.status == 'closed'">Reforço</el-radio-button>
                           <el-radio-button label="sangria" :disabled="caixa_.status == 'closed'">Sangria</el-radio-button>
                           <el-radio-button label="fechamento" :disabled="caixa_.status == 'closed'" >Fechamento</el-radio-button>
-                        </el-radio-group>
+                        </el-radio-group> -->
                       </td>
                     </tr>
-                    <tr>
-                      <td class=bold style="text-align: right; important!">Valor:</td>
-                      <td style="padding: 5px;"><input v-if=aux_caixa_op v-model="caixa_op_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" /></td>
-                    </tr>
+                    
+                    
+                   
+                    <!-- <tr >
+                      <td class=bold style="text-align: right; important!">Posição:</td>
+                      <td>
+                        <el-input
+                          type="textarea"
+                          :rows="10"
+                          placeholder="Motivo"
+                          style="font-size: 18px;"
+                          v-model="caixa_display">
+                        </el-input>
+                      </td>
+                    </tr> -->
                     <tr>
                       <td colspan=1 style="text-align: center; height: 70px; padding: 5px;">
                         <el-button type=primary @click="caixa().close()" style="width: 100%;" :disabled="caixa_.status=='closed'">Cancela</el-button>
@@ -729,12 +842,12 @@ import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table'
 import { Printd } from 'printd'
 import Autocomplete from '@/components/Autocomplete'
-
+import moment from 'moment'
 import swal from 'sweetalert'
 
 export default {
   name: 'Balcao',
-  components: { Money, VueGoodTable, Autocomplete, swal },
+  components: { Money, VueGoodTable, Autocomplete, swal, moment },
   directives: { waves },
   filters: {
     caixa_op_filter(op){
@@ -758,8 +871,12 @@ export default {
   },
   data() {
     return {
+      caixa_open_value: 0,
+      caixa_fechamento_value: 0,
+      caixa_display: null,
+      caixa_status_op_obs: null,
       caixa_op_selected: null,
-      caixa_op_value: {},
+      caixa_op_value: 0,
       freeToClose: false,
       m: {},
       item: null,
@@ -771,7 +888,7 @@ export default {
         session: null,
         status: 'closed',
         op: null,
-        value: null
+        value: 0
       },
       parametros_flg: true,
       vendaCloseEndFlg: false,
@@ -955,17 +1072,20 @@ export default {
       }
     })
 
+    //Load products list
     fetchList('produtos', '').then(response => {
       this.produtos = response.data.items
 
       for (var t = 0; t < this.produtos.length; t++) {
-        this.produtos[t].descricao = this.produtos[t].descricao.replace(/\s+/g, ' ').trim()
+        if (this.produtos[t].descricao){
+          this.produtos[t].descricao = this.produtos[t].descricao.replace(/\s+/g, ' ').trim()
+        }
       }
 
       console.log('this.produtos:', this.produtos)
 
       this.produtos_ = response.data.items.map(function(item) {
-        return { id: item.id, name: item.descricao.replace(/\s+/g, ' ').trim() }
+        return { id: item.id, name: item.descricao?item.descricao.replace(/\s+/g, ' ').trim():'' }
       })
     })
   },
@@ -975,13 +1095,14 @@ export default {
       return {
         open(){
           // self.caixa_op = null
-          self.caixa_op_value = 0
+          self.caixa_open_value = 0
+          self.caixa_op({label:'Abertura'})
           self.$modal.show('modal_caixa_op')
         },
         close(){
           console.log(self.caixa_op);
-          self.caixa_op(null)
-          self.caixa_op_value = 0
+          // self.caixa_op(null)
+          // self.caixa_op_value = 0
           self.$modal.hide('modal_caixa_op')
         },
         get(f) {
@@ -998,14 +1119,15 @@ export default {
                   self.caixaSession = self.caixa_.session
                 }
                 delete self.caixa_.id
-                
                 if (self.caixa_.status == 'closed') {
                   console.log('self.caixa_.status:', self.caixa_.status);
-                //  self.caixa_op = null
-                 self.$modal.show('modal_caixa_op')
+                  //self.caixa_op = null
+                  self.caixa_op({label:'Abertura'})
+                  self.$modal.show('modal_caixa_op')
                 }
               }else{
-                self.caixa_op('open')
+                console.log("pp");
+                self.caixa_op({label:'Abertura'})
               }
             }).catch(function(error) {
               console.log(error)
@@ -1027,16 +1149,17 @@ export default {
         }
       }
     },
-    caixa_op(op) {
+    caixa_op(x) {
       var self = this
+      var op = x.label
       console.log('op:', op);
       getInfo().then(function(x) {
         self.caixa_op_value = 0
+        self.caixa_status_op_obs = ''
         self.caixa_op_selected = op
-        if (op=='fechamento') {
-
+        if (op=='Fechamento') {
           //Get open value
-          fetchList('caixa_status', {tipo: 0, fields: ['op', 'sum(value) tot'], find:{session: self.caixaSession}, groupby: 'op'}).then(response => {
+          fetchList('caixa_status', {tipo: 0, fields: ['op', 'created', 'sum(value) tot'], find:{session: self.caixaSession}, groupby: 'op'}).then(response => {
             console.log('response.data>:', response.data)
            
             var open_ = response.data.items.filter(function(item){
@@ -1049,9 +1172,9 @@ export default {
               return item.op == 'sangria'
             })
             var t1 = {
-              open: open_[0].tot,
-              reforco: reforco_[0].tot,
-              sangria: sangria_[0].tot,
+              open: (open_[0]?open_[0].tot:0),
+              reforco: (reforco_[0]?reforco_[0].tot:0),
+              sangria: (sangria_[0]?sangria_[0].tot:0)
             }
             var tt = t1.open + t1.reforco - t1.sangria
             console.log('open_>:', tt)
@@ -1082,13 +1205,49 @@ export default {
                 }
               }
               function sum(prev, next) {return prev + next}
-            
-              self.caixa_op_value = JSON.stringify({
-                dinheiro: response.data.items.map(amount.dinheiro).reduce(sum) + tt,
-                debito: response.data.items.map(amount.debito).reduce(sum),
-                credito: response.data.items.map(amount.credito).reduce(sum),
-                faturado: response.data.items.map(amount.faturado).reduce(sum)
-              })
+              function varExistTest(val){
+                if (val) {return val} else {return []}
+              }
+              
+              var total = {
+                dinheiro: response.data.items.map(amount.dinheiro).reduce(sum,0) + tt,
+                debito: response.data.items.map(amount.debito).reduce(sum,0),
+                credito: response.data.items.map(amount.credito).reduce(sum,0),
+                faturado: response.data.items.map(amount.faturado).reduce(sum,0)
+              } 
+
+              self.caixa_fechamento_value = total.dinheiro + total.debito + total.credito + total.faturado
+              console.log('self.caixa_op_value:', self.caixa_op_value);
+              // var fechamento = {
+              //   // data: self.today,
+              //   total: total.dinheiro + total.debito + total.credito + total.faturado,
+              //   // detalhes:{
+              //   //   total_dinheiro: total.dinheiro,
+              //   //   total_debito: total.debito,
+              //   //   total_credito: total.credito,
+              //   //   total_faturado: total.credito
+              //   // }
+              // }
+
+              // var relatorio = {
+              //   fechamento,
+              //   sangria: {
+              //     total: t1.sangria
+              //   },
+              //   reforco: {
+              //     total: t1.reforco
+              //   },
+              //   abertura: {
+              //     data: moment(new Date(open_[0].created)).format('DD/MM/YYYY, h:mm:ss a'),
+              //     total: t1.open
+              //   }
+              // }
+                  
+              // var dinheiro = response.data.items.map(amount.dinheiro).reduce(sum) + tt
+              // self.caixa_op_value = JSON.stringify(self.caixa_op_value)
+              // self.caixa_display = JSON.stringify(fechamento, null, ' ')
+
+
             }).catch(function(error) {
               console.log(error)
             })
@@ -1109,13 +1268,20 @@ export default {
       
       var status = self.caixa_.status
 
-      if (self.aux_caixa_op == 'abertura') {
+      if (self.aux_caixa_op == 'Abertura') {
         self.caixaSession = getToken() + '-' + this.today_timestamp
         self.aux_caixa_op = "open"
         status = 'opened'
       }
-
-      if (self.aux_caixa_op == 'fechamento') {
+      if (self.aux_caixa_op == 'Reforço') {
+        self.aux_caixa_op = "reforco"
+        status = 'opened'
+      }
+      if (self.aux_caixa_op == 'Sangria') {
+        self.aux_caixa_op = "sangria"
+        status = 'opened'
+      }
+      if (self.aux_caixa_op == 'Fechamento') {
         self.aux_caixa_op = "close"
         status = 'closed'
       }
@@ -1126,6 +1292,7 @@ export default {
       self.caixa_.op = self.aux_caixa_op
       self.caixa_.session = self.caixaSession
       self.caixa_.value = self.caixa_op_value
+      self.caixa_.obs = self.caixa_status_op_obs
       console.log(self.caixa_)
 
       self.caixa().set(self.caixa_)
@@ -1250,48 +1417,58 @@ export default {
       })
     },
     cupom_add() {
-      if (this.product_selected.qnt == 0) this.product_selected.qnt = 1
-      if (this.product_selected.qnt > 0) {
-        const sound = (new Audio(require('@/assets/audio/timer_beep.mp3'))).play()
-        this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
-        // Procura produto pelo ID
-        if (this.product_selected.id) {
-          this.cupom.itens_n++
-          var auxObj = {
-            n: this.cupom.itens_n,
-            id: this.product_selected.id,
-            descricao: this.product_selected.descricao,
-            pco_venda: this.product_selected.pco_venda,
-            qnt: this.product_selected.qnt,
-            unidade: this.product_selected.unidade,
-            total: this.product_selected.qnt * this.product_selected.pco_venda
+      //Check if is a register of a credit
+      if (this.product_selected.ean == '1001' && this.cupom.cliente.id == 1){
+        //Try if client not is defined
+        // swal("Defina o cliente que vai receber esse crédito")
+        this.getCliente()
+      }else{
+      if (this.product_selected.pco_venda >0){ 
+        if (this.product_selected.qnt == 0) this.product_selected.qnt = 1
+        if (this.product_selected.qnt > 0) {
+          const sound = (new Audio(require('@/assets/audio/timer_beep.mp3'))).play()
+          this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
+          // Procura produto pelo ID
+            if (this.product_selected.id) {
+              this.cupom.itens_n++
+              var auxObj = {
+                n: this.cupom.itens_n,
+                id: this.product_selected.id,
+                ean: this.product_selected.ean,
+                descricao: this.product_selected.descricao,
+                pco_venda: this.product_selected.pco_venda,
+                qnt: this.product_selected.qnt,
+                unidade: this.product_selected.unidade,
+                total: this.product_selected.qnt * this.product_selected.pco_venda
+              }
+              // this.cupom.itens.unshift(auxObj)
+              this.cupom.itens.push(auxObj)
+              this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
+
+              // Total Calc
+              this.cupom.total = this.cupom.subtotal // += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
+
+              // Reset qnt
+              this.product_selected = {}
+              this.search = {}
+              this.qnt = null
+
+              // Reset products list
+              this.novoItem = false
+              this.$nextTick(function() {
+                this.novoItem = true
+                this.scrollToEnd()
+              })
+              this.vai()
+            }
           }
-          // this.cupom.itens.unshift(auxObj)
-          this.cupom.itens.push(auxObj)
-          this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
-
-          // Total Calc
-          this.cupom.total = this.cupom.subtotal // += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
-
-          // Reset qnt
-          this.product_selected = {}
-          this.search = {}
-          this.qnt = null
-
-          // Reset products list
-          this.novoItem = false
-          this.$nextTick(function() {
-            this.novoItem = true
-            this.scrollToEnd()
-          })
-          this.vai()
         }
       }
     },
-    cupomRowView(n) {
+    cupomRowView(row) {
+      console.log('row:',row);
       this.dialogFormCupomView = true
-      var item = this.cupom.itens.find(x => parseInt(x.n) === parseInt(n))
-      this.temp2 = item
+      this.temp2 = this.cupom.itens.find(x => parseInt(x.n) === parseInt(row.n))
     },
     productSet(params) {
       console.log(params)
@@ -1398,17 +1575,16 @@ export default {
             value: 'new'
           }
         }
+      }).then((value) => {
+        switch (value) {
+          case 'print':
+            this.vendaPrintFlg = true
+            break
+          case 'new':
+            this.vendaCloseOkFim()
+            break
+        }
       })
-        .then((value) => {
-          switch (value) {
-            case 'print':
-              this.vendaPrintFlg = true
-              break
-            case 'new':
-              this.vendaCloseOkFim()
-              break
-          }
-        })
     },
     vendaCloseOkFim() {
       // Clean up form

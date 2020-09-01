@@ -523,8 +523,14 @@ function updateSQL_string(table, id, obj){
       var sqlStrSimple = `
         SELECT ${sqlFields} FROM ${key} ${strWhere} ${strGroupBy} ${strSort} ${strLimit}
       `
+      var sqlStrSimple2 = `
+        SELECT ${sqlFields} FROM ${key} ${strLimit}
+      `
       if (req.query.tipo) {
         if (req.query.tipo==0) {sqlStr = sqlStrSimple}
+      }
+      if (req.query.tipo) {
+        if (req.query.tipo==1) {sqlStr = sqlStrSimple2}
       }
 
       console.log('>>>', sqlStr);
