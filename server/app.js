@@ -5,10 +5,6 @@ const ejs = require('ejs')
 const path = require('path')
 const fs = require('fs');
 
-
-const pkg = require('getmac').default
-console.log('getmac:', pkg())
-
 // AEN code external site search requires
 const rp = require('request-promise');
 const $ = require('cheerio');
@@ -159,7 +155,16 @@ app.get('/:datafile/minhaconta/getdata/', (req, res) => {
       // file exists
       // Open data base file based on domain name of client
      var db = new sqlite3.Database(datafile);
-     let sqlStr = `select * from f_clientes_faturados where cliente_id = ${cliente_id}`
+     let sqlStr = `select f.id, f.venda_id, f.created, f.cliente cliente_id, c.nome cliente, f.tipo,
+     case 
+       WHEN f.tipo = 0 then f.valor else 0
+     end as debito, 
+     case 
+       when f.tipo = 1 then f.valor else 0
+     end as credito
+     from faturados f, clientes c where f.cliente = c.id and f.cliente = ${cliente_id} 
+     order by 1 desc
+     `
      console.log('sql:', sqlStr);
      // Execute the SQL in databank stacking rows in ret var
      db.all(sqlStr, function(err, rows) {
@@ -499,7 +504,11 @@ function updateSQL_string(table, id, obj){
       let strWhere = " where 1=1 "
       console.log('req.query:', req.query);
       if (req.query.fields) {
-         sqlFields = req.query.fields.join(',')
+        if (req.query.fields.indexOf(',')>0) {
+          sqlFields = req.query.fields.join(',')
+        }else{
+          sqlFields = req.query.fields
+        }
       }
       if (req.query.find) {
         var w = whereSQL_string(JSON.parse(req.query.find))
@@ -531,6 +540,9 @@ function updateSQL_string(table, id, obj){
       }
       if (req.query.tipo) {
         if (req.query.tipo==1) {sqlStr = sqlStrSimple2}
+      }
+      if (req.query.tipo) {
+        if (req.query.tipo=='sql') {sqlStr = key}
       }
 
       console.log('>>>', sqlStr);

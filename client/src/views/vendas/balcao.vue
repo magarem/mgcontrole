@@ -173,51 +173,53 @@
                   </el-col>
                 </el-row>
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('banana prata')"><img :src="'banana prata' | img_mini(produtos)"> </button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('banana nanica')"><img style="margin-left:-5px;" :src="'banana nanica' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('abacaxi')"><img style="margin-left:-5px;" :src="'abacaxi' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('pimentao')"><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('maça')"><img style="margin-left:-5px;" :src="'maça' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('manga')"><img style="margin-left:-5px;" :src="'manga' | img_mini(produtos)"></button>
                   </el-col>
+                
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('batatinha')"><img style="margin-left:-5px;" :src="'batatinha' | img_mini(produtos)"></button>
                   </el-col>
                 </el-row>
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                    <button class="produto_button" @click="productSet('chuchu')"><img :src="'chuchu' | img_mini(produtos)"> </button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('cenoura')"><img style="margin-left:-5px;" :src="'cenoura' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('beterraba')"><img style="margin-left:-5px;" :src="'beterraba' | img_mini(produtos)"></button>
+                  </el-col>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('salsa')"><img style="margin-left:-5px;" :src="'salsa' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('pimentao')"><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('coentro')"><img style="margin-left:-5px;" :src="'coentro' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('alface crespa')"><img style="margin-left:-5px;" :src="'alface crespa' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
                   </el-col>
                 </el-row>
                 <br>
                 <el-row :gutter="20">
                   <el-col v-if="atalhos" :span="6">
-                    <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('chuchu')"><img style="margin-left:-5px;" :src="'chuchu' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="6" />
                   <el-col v-if="atalhos" :span="6">
                     <button class="produto_button" @click="productSet('banana prata')"><img style="margin-left:-5px;" :src="'banana prata' | img_mini(produtos)"></button>
                   </el-col>
@@ -1269,19 +1271,23 @@ export default {
       var status = self.caixa_.status
 
       if (self.aux_caixa_op == 'Abertura') {
+        self.caixa_.value = self.caixa_open_value
         self.caixaSession = getToken() + '-' + this.today_timestamp
         self.aux_caixa_op = "open"
         status = 'opened'
       }
       if (self.aux_caixa_op == 'Reforço') {
+        self.caixa_.value = self.caixa_op_value
         self.aux_caixa_op = "reforco"
         status = 'opened'
       }
       if (self.aux_caixa_op == 'Sangria') {
+        self.caixa_.value = self.caixa_op_value
         self.aux_caixa_op = "sangria"
         status = 'opened'
       }
       if (self.aux_caixa_op == 'Fechamento') {
+        self.caixa_.value = self.caixa_fechamento_value
         self.aux_caixa_op = "close"
         status = 'closed'
       }
@@ -1291,7 +1297,7 @@ export default {
       self.caixa_.status = status
       self.caixa_.op = self.aux_caixa_op
       self.caixa_.session = self.caixaSession
-      self.caixa_.value = self.caixa_op_value
+     
       self.caixa_.obs = self.caixa_status_op_obs
       console.log(self.caixa_)
 
@@ -1370,7 +1376,7 @@ export default {
     updateDateTime() {
       var self = this
       const today = new Date()
-      const date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear()
+      const date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear()
       const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
       const dateTime = date + ' ' + time
       self.today = dateTime

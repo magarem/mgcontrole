@@ -387,7 +387,7 @@
                     total_debitos: 0,
                     total_creditos: 0,
                     total: 0,
-                    fields: [{ key: 'pid', label: 'Venda (#)' }, { key: 'created', label: 'Data' }, { key: 'debito', label: 'Débito' }, { key: 'credito', label: 'Crédito' }]
+                    fields: [{ key: 'venda_id', label: 'Venda (#)' }, { key: 'created', label: 'Data' }, { key: 'debito', label: 'Débito' }, { key: 'credito', label: 'Crédito' }]
                 },
                 methods: {
                     logOut(){
@@ -424,6 +424,30 @@
                         });
                         
                     },
+                    timeConverter(UNIX_timestamp) {
+                        console.log('UNIX_timestamp:', UNIX_timestamp)
+                        if (UNIX_timestamp) {
+                            if (UNIX_timestamp.indexOf('-') > -1) {
+                            var date = UNIX_timestamp.split(' ')[0].split('-')
+                            date = date[2] + '/' + date[1] + '/' + date[0]
+                            var time = UNIX_timestamp.split(' ')[1]
+                            var ret = date + ' - ' + time
+                            } else {
+                            var a = new Date(+UNIX_timestamp)
+                            console.log('a:', a)
+                            var months = ['Jan', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+                            var year = a.getFullYear()
+                            // var month = months[a.getMonth()];
+                            var month = a.getMonth() + 1
+                            var date = a.getDate()
+                            var hour = a.getHours()
+                            var min = a.getMinutes()
+                            var sec = a.getSeconds()
+                            var ret = date + '/' + month + '/' + year + ' - ' + hour + ':' + min + ':' + sec
+                            console.log('log:', time)
+                            }
+                        }
+                    },
                     getData: function () {
                         var self = this;
                         if (this.isLogged){
@@ -432,6 +456,30 @@
                             .then(function (response) {
                                 console.log(response.data);
                                 self.items = response.data
+                                
+
+                                const handleDates = (list, prop) => {
+                                    return list.map(item => {
+                                    const obj = Object.assign({}, item);
+                                    obj[prop] = new Date(obj[prop]).toLocaleDateString();
+                                    return obj;
+                                    });
+                                }
+                                
+                                self.items = handleDates(self.items, 'created')
+                                // self.items = self.items.map(function(x){
+                                //     return {
+                                //         cliente: x.cliente,
+                                //         cliente_id: x.cliente_id,
+                                //         created: timeConverter(x.created),
+                                //         credito: x.credito,
+                                //         debito: x.debito,
+                                //         id: x.id,
+                                //         tipo: x.tipo,
+                                //         venda_id: x.venda_id
+                                //     }
+                                // })
+                                
                                 self.cliente_id = self.items[0].cliente_id
                                 self.cliente = self.items[0].cliente
 
@@ -443,7 +491,8 @@
                                     return prev + cur.credito;
                                 }, 0);
 
-                                self.total =  self.total_creditos - self.total_debitos
+                                self.total =  self.total_creditos + self.total_debitos
+                           
                             })
                             .catch(function (error) {
                             console.log(error);

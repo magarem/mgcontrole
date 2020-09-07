@@ -1,155 +1,3 @@
-<template>
-  <div v-if="info" class="app-container">
-    <!-- <div v-if="selected" style="padding-top:10px; width: 100%;">
-      You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
-      </div> -->
-
-    <!-- <h2>{{ info.name }}</h2> -->
-   
-    <el-row style="width:95%;  margin:auto;">
-
-      <el-col :span="24">
-        <div>
-          <el-button type="primary" icon="el-icon-search" @click="list_total=0; clientesListFlg=true" />
-
-          <el-divider direction="vertical" />
-          <span v-if="selected.cliente" style="font-size:28px;"><span class="bold">Cliente:</span> ({{selected.cliente_id}}) {{ selected.cliente }}</span>
-          <span v-if="!selected.cliente" style="font-size:25px;">Todos</span>
-
-          <!-- <el-divider direction="vertical" /> -->
-          <!-- <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button> -->
-        </div>
-      </el-col>
-    </el-row><br>
-    <el-row style="font-size:25px; width:95%; margin:auto;">
-      <el-col :span="24" :offset="0">
-        <div>
-          <span v-if="list_total.debito" style="color: red;"> Débitos: {{ (list_total.debito) | money }}</span>
-
-          <span v-if="list_total.credito" style="color: green; "> Créditos: {{ (list_total.credito) | money }}</span>
-
-          <span v-if="(list_total) < 0" style="color: red;"> Saldo total: {{ list_total | money }}</span>
-          <span v-if="(list_total) >= 0" style="color: green;"> Saldo total: {{ list_total | money }}</span>
-        </div>
-      </el-col>
-    </el-row><br>
-    <div style="width:95%; margin:auto;">
-      <!-- <vue-good-table
-        :columns="columns"
-        :rows="list"
-        :search-options="{enabled: false}"
-        theme="black-rhino"
-      /> -->
-      <!-- <table id="fifthTable">
-        <thead>
-          <tr>
-            <th v-for="col in columns">{{col}}
-              <div class="arrow"  ></div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="row in list">
-            <td v-for="col in columns">
-              {{row[col]}}
-            </td>
-          </tr>
-        </tbody>
-      </table> -->
-
-      <el-table
-        :data="list"
-        border
-        fit
-        highlight-current-row
-        style="width: 90%; font-size: 17px;"
-      >
-
-        <el-table-column label="Data" prop="created" sortable="custom" align="center" width="220">
-          <template slot-scope="scope">
-            <span>{{ scope.row.created | dateFormat}}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="290">
-          <template slot-scope="scope">
-            <span>{{ scope.row.cliente_id }} - {{ scope.row.cliente_nome }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="Venda" prop="venda" sortable="custom" align="center" width="100">
-          <template slot-scope="scope">
-            <span>{{ scope.row.venda_id }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="tipo" prop="tipo" sortable="custom" align="center" width="100">
-          <template slot-scope="scope">
-            <span>{{ scope.row.tipo | tipoFilter}}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="valor" prop="valor" sortable="custom" align="center" width="150">
-          <template slot-scope="scope">
-            <span>{{ scope.row.valor | money }}</span>
-          </template>
-        </el-table-column>
-
-      </el-table>
-     
-      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-   
-    </div>
-    <!--
-
-                                MODAL AREA
-
-    -->
-    <el-dialog title="" :visible.sync="dialogFormVisible" top="5vh" width="40%">
-      <div slot="title" style="font-size: 21px; margin: auto;">Adicionar crédito para cliente</div>
-      <el-form ref="dataForm" :model="temp" label-position="right" label-width="170px" style="_width: 400px; _margin:0 50px 0 50px; font-size: 20px">
-        <el-form-item label="Cliente:" prop="cliente">
-          <div style="font-size: 20px; margin: auto;">{{ selected.cliente_id }} - {{ selected.cliente }}</div>
-        </el-form-item>
-        <el-form-item label="Crédito Valor:" prop="fone">
-          <money v-model="temp.credito" v-bind="money" style="width: 50%; _margin-top: 5px; font-size: 22px;" class="el-input__inner" autofocus />
-        </el-form-item>
-        <el-form-item label="Doc:" prop="endereco">
-          <el-input v-model="temp.doc" style="width: 50%; _margin-top: 5px; font-size: 22px;" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer" align="center">
-        <el-button @click="dialogFormVisible = false">
-          Cancela
-        </el-button>
-        <el-button type="success" @click="createData">
-          Confirma
-        </el-button>
-      </div>
-    </el-dialog>
-
-      <!-- Clientes busca lista -->
-      <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
-        <el-input
-          ref="searchClient"
-          v-model="searchTermClient"
-          placeholder="Nome"
-          prefix-icon="el-icon-search"
-          style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
-          autocomplete="nope"
-        />
-        <vue-good-table
-          :columns="columns_clientes"
-          :rows="clientesList"
-          :search-options="{enabled: false, externalQuery: searchTermClient}"
-          theme="black-rhino"
-          max-height="255px"
-          @on-row-click="clienteSet"
-        />
-      </el-dialog>
-
-  </div>
-</template>
 <style scoped>
 table {
   font-family: 'Open Sans', sans-serif;
@@ -272,6 +120,157 @@ table tbody tr:nth-child(2n) td {
     background-color: #f9fafc;
   }
 </style>
+<template>
+  <div v-if="info" class="app-container">
+    <!-- <div v-if="selected" style="padding-top:10px; width: 100%;">
+      You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
+      </div> -->
+
+    <!-- <h2>{{ info.name }}</h2> -->
+   
+    <el-row style="width:95%;  margin:auto;">
+
+      <el-col :span="24">
+        <div>
+          <el-button type="success" @click="clientesTotais=true">Totais</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="list_total=0; clientesListFlg=true" />
+          <el-divider direction="vertical" />
+          <span v-if="selected.cliente" style="font-size:28px;"><span class="bold">Cliente:</span> ({{selected.cliente_id}}) {{ selected.cliente }}</span>
+          <span v-if="!selected.cliente" style="font-size:25px;">Todos</span>
+
+          <el-divider direction="vertical" />
+          <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
+        </div>
+      </el-col>
+    </el-row><br>
+    <el-row style="font-size:25px; width:95%; margin:auto;">
+      <el-col :span="24" :offset="0">
+        <div>
+          <!-- <span v-if="list_total.debito" style="color: red;"> Débitos: {{ (list_total.debito) | money }}</span>
+
+          <span v-if="list_total.credito" style="color: green; "> Créditos: {{ (list_total.credito) | money }}</span> -->
+
+          <!-- <span  style="color: red;"> Saldo total: {{ saldo | money }}</span> -->
+          <span :style="[saldo>0?{color: 'green'}:{color: 'red'}]">Saldo total: {{ saldo | money }}</span>
+          <!-- <span v-if="(list_total) >= 0" style="color: green;"> Saldo total: {{ list_total | money }}</span> -->
+        </div>
+      </el-col>
+    </el-row><br>
+    <div style="width:95%; margin:auto;">
+      <el-table :data="list" border fit highlight-current-row style="width: 90%; font-size: 17px;">
+        <el-table-column label="Data" prop="created" sortable="custom" align="center" width="220">
+          <template slot-scope="scope">
+            <span>{{ scope.row.created | dateFormat}}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="290">
+          <template slot-scope="scope">
+            <span>{{ scope.row.cliente_id }} - {{ scope.row.cliente_nome }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Venda" prop="venda" sortable="custom" align="center" width="100">
+          <template slot-scope="scope">
+            <span>{{ scope.row.venda_id }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="tipo" prop="tipo" sortable="custom" align="center" width="100">
+          <template slot-scope="scope">
+            <span>{{ scope.row.tipo | tipoFilter}}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="valor" prop="valor" sortable="custom" align="center" width="150">
+          <template slot-scope="scope">
+            <span>{{ scope.row.valor | money }}</span>
+          </template>
+        </el-table-column>
+
+      </el-table>
+     
+      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+   
+    </div>
+    <!--
+
+                                MODAL AREA
+
+    -->
+    <el-dialog title="" :visible.sync="dialogFormVisible" top="5vh" width="40%">
+      <div slot="title" style="font-size: 21px; margin: auto;">Adicionar crédito para cliente</div>
+      <el-form ref="dataForm" :model="temp" label-position="right" label-width="170px" style="_width: 400px; _margin:0 50px 0 50px; font-size: 20px">
+        <el-form-item label="Cliente:" prop="cliente">
+          <div style="font-size: 20px; margin: auto;">{{ selected.cliente_id }} - {{ selected.cliente }}</div>
+        </el-form-item>
+        <el-form-item label="Crédito Valor:" prop="fone">
+          <money v-model="temp.credito" v-bind="money" style="width: 50%; _margin-top: 5px; font-size: 22px;" class="el-input__inner" autofocus />
+        </el-form-item>
+        <el-form-item label="Doc:" prop="endereco">
+          <el-input v-model="temp.doc" style="width: 50%; _margin-top: 5px; font-size: 22px;" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer" align="center">
+        <el-button @click="dialogFormVisible = false">
+          Cancela
+        </el-button>
+        <el-button type="success" @click="createData">
+          Confirma
+        </el-button>
+      </div>
+    </el-dialog>
+
+      <!-- Clientes busca lista -->
+      <el-dialog :visible.sync="clientesListFlg" title="Busca cliente" width="70%" align="center">
+        <el-input
+          ref="searchClient"
+          v-model="searchTermClient"
+          placeholder="Nome"
+          prefix-icon="el-icon-search"
+          style="padding: 5px; width: 100%; color: white; font-size: 20px; background-color: #4C5C7A"
+          autocomplete="nope"
+        />
+        <vue-good-table
+          :columns="columns_clientes"
+          :rows="clientesList"
+          :search-options="{enabled: false, externalQuery: searchTermClient}"
+          theme="black-rhino"
+          max-height="255px"
+          @on-row-click="clienteSet"
+        />
+      </el-dialog>
+
+      <!-- ClientesTotais -->
+      <el-dialog :visible.sync="clientesTotais" title="Totais por cliente" width="70%" align="center">
+       
+       <el-table :data="lista2" border fit highlight-current-row style="width: 90%; font-size: 17px;">
+        <el-table-column label="Cliente_id" prop="cliente_id" sortable="custom" align="center" width="150">
+          <template slot-scope="scope">
+            <span>{{ scope.row.cliente_id }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Cliente_nome" prop="cliente_nome" sortable="custom" align="center" width="260">
+          <template slot-scope="scope">
+            <span>{{ scope.row.cliente_nome }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Faturas" prop="faturas" sortable="custom" align="center" width="110">
+          <template slot-scope="scope">
+            <span>{{ scope.row.faturas }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Total" prop="total" sortable="custom" align="center" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.total | money}}</span>
+          </template>
+        </el-table-column>
+        </el-table>
+      </el-dialog>
+
+  </div>
+</template>
 
 <script>
 import { getToken } from '@/utils/auth'
@@ -296,7 +295,6 @@ export default {
     dateFormat(val){
       if (val) {
         // return moment.unix(String(val))
-        
         return moment(new Date(val)).format('DD/MM/YYYY, h:mm:ss a')
       }
     },
@@ -326,6 +324,9 @@ export default {
   },
   data() {
     return {
+      saldo: 0,
+      lista2: [],
+      clientesTotais: false,
       clientesList: [],
        columns_clientes: [
         {
@@ -345,6 +346,7 @@ export default {
       info: null,
       token: null,
       user_id: '',
+      total: 0,
       list_total: {
         debito: 0,
         credito: 0
@@ -388,6 +390,12 @@ export default {
           width: '180px'
         }
       ],
+      list2_columns:[
+        {label: 'cliente_id', field: 'cliente_id'},
+        {label: 'cliente_nome', field: 'cliente_nome'},
+        {label: 'faturas', field: 'faturas'},
+        {label: 'total', field: 'total', type: 'number'},
+      ],
       list: [],
       list_original: [],
       money: {
@@ -405,13 +413,13 @@ export default {
     }
   },
   computed: {
-    columns: function() {
-      if (this.list.length == 0) {
+    columns2: function() {
+      if (this.lista2 && this.lista2.length == 0) {
         return []
       }
-      return Object.keys(this.list[0])
+      return Object.keys(this.lista2[0])
     },
-    saldo: function() {
+    saldo_: function() {
       if (this.list !== null && this.list.length > 0) {
         return this.list[this.list.length - 1].total_parcial
       } else {
@@ -444,29 +452,55 @@ export default {
           self.list = response.data.items
           console.log('>>>>>:', self.list);
 
+          var lista
+          var creditos = 0
+          var debitos = 0
+
           // Pega o total
-          // fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
-          //   this.list_total = response.data.items[0]
-          // })
-          // this.list_original = self.list.map(function(item) {
-          //   return { cliente_id: item.cliente_id, cliente: item.cliente }
-          // })
-          // this.list_original = this.list_original.reduce((acc, value) => acc.some(i => i.cliente_id === value.cliente_id) ? acc : acc.concat(value), []) // id your uniq key
-          // console.log('this.list_original:>', this.list_original);
-       
-          function amount(item) {
-            return item.valor
+          // if (this.listQuery.find) this.listQuery.find.cliente = this.listQuery.find.client_id
+         var auxfind = null
+         if (this.listQuery.find) {
+           auxfind = {
+             cliente: this.listQuery.find.cliente_id
+           }
+         }
+         fetchList('faturados', {tipo: 0, fields: 'sum(valor) saldo', find: auxfind}).then(response => {
+            lista = response.data.items
+            self.saldo = lista[0].saldo
+         })
+
+          const changeValue = (list, prop) => {
+              return list.map(item => {
+              const obj = Object.assign({}, item);
+              obj[prop] = "$" + obj[prop].toFixed(2)
+              return obj;
+              });
           }
 
-          function sum(prev, next) {
-            return prev + next
-          }
-
-          self.list_total = this.list.map(amount).reduce(sum)
-
+          fetchList(`
+            select f.cliente cliente_id, c.nome cliente_nome, count() faturas, sum(f.valor) total 
+            from faturados f, clientes c 
+            WHERE f.cliente = c.id
+            GROUP by f.cliente
+            Order by total`, {tipo: 'sql'}).then(response => {
+            this.lista2 = response.data.items
+            this.lista2 = changeValue(this.lista2, total)
+            console.log('lista2:', this.lista2);
+         })
+ 
        })
         
       // }
+    },
+    formatMoney(decPlaces, thouSeparator, decSeparator) {
+    var n = this,
+        decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
+        decSeparator = decSeparator == undefined ? "." : decSeparator,
+        thouSeparator = thouSeparator == undefined ? "," : thouSeparator,
+        sign = n < 0 ? "-" : "",
+        i = parseInt(n = Math.abs(+n || 0).toFixed(decPlaces)) + "",
+        j = (j = i.length) > 3 ? j % 3 : 0;
+    return sign + (j ? i.substr(0, j) + thouSeparator : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSeparator) + (decPlaces ? decSeparator + Math.abs(n - i).toFixed(decPlaces).slice(2) : "");
     },
     getCliente() {
       const self = this
@@ -483,7 +517,7 @@ export default {
         // this.$refs.searchClient.focus()
       })
     },
-    getList_original() {
+    getList_original_() {
       var self = this
       fetchList('faturados').then(response => {
         this.total = response.data.total
@@ -499,7 +533,7 @@ export default {
         this.list_original = this.list_original.reduce((acc, value) => acc.some(i => i.cliente_id === value.cliente_id) ? acc : acc.concat(value), []) // id your uniq key
       })
       // Pega o total
-      fetchList('f_clientes_faturados_total', this.listQuery).then(response => {
+      fetchList('f_clientes_faturados_total').then(response => {
         console.log('response.data.items:', response.data.items)
         // Do the Sum
         this.list_total = {
@@ -619,39 +653,14 @@ export default {
       this.temp.debito = 0
 
       this.temp1 = {
-        pid: 0,
-        origem_tabela: 'f_pg_faturado',
-        origem_tabela_id: 0,
-        destino_tabela: 'faturas',
-        destino_tabela_id: 0,
+        venda_id: 0,
+        created: +new Date(),
+        cliente: this.temp.cliente_id,
+        tipo: 1,
         valor: this.temp.credito
       }
-      create('financeiro_operacoes', this.temp1).then((ret) => {
-        var top_id = ret.data.id
-        console.log('top_id:', top_id)
-
-        this.temp2 = {
-          pid: top_id,
-          origem_tabela: 'faturas',
-          origem_tabela_id: null,
-          destino_tabela: 'clientes',
-          destino_tabela_id: this.temp.cliente_id,
-          valor: this.temp.credito
-        }
-        create('financeiro_operacoes', this.temp2).then((ret) => {
-          var last_id = ret.data.id
-          this.temp3 = {
-            pid: last_id,
-            origem_tabela: 'clientes',
-            origem_tabela_id: this.temp.cliente_id,
-            destino_tabela: 'caixa',
-            destino_tabela_id: null,
-            valor: this.temp.credito
-          }
-
-          create('financeiro_operacoes', this.temp3).then((ret) => {
+      create('faturados', this.temp1).then((ret) => {
             this.dialogFormVisible = false
-
             swal({
               title: 'Operação concluida!',
               text: 'Crédito lançado com sucesso',
@@ -666,25 +675,15 @@ export default {
                   value: 'new'
                 }
               }
-            })
-              .then((value) => {
-                switch (value) {
-                  case 'ok':
-                    break
-                }
               })
-
-            // this.$notify({
-            //   title: 'Sucesso',
-            //   message: 'Cliente cadastrado',
-            //   type: 'success',
-            //   duration: 2000
-            // })
-          })
-
-          this.getList()
-        })
+              .then((value) => {
+              switch (value) {
+                case 'ok':
+                  break
+              }
+            })
       })
+      this.getList()
     }
   }
 }

@@ -23,7 +23,9 @@
       fit
       highlight-current-row
       style="width: 100%; font-size: 18px;"
-      @sort-change="sortChange">
+      @sort-change="sortChange"
+      @row-click="getVendas"
+      >
 
       <el-table-column label="Data" prop="data" sortable="custom" align="center" width="130">
         <template slot-scope="scope">
@@ -31,24 +33,24 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="N" prop="n" sortable="custom" align="center" width="70">
+      <el-table-column label="Vendas" prop="n" sortable="custom" align="center" width="110">
         <template slot-scope="scope">
           <span>{{ scope.row.n }}</span>
         </template>
       </el-table-column>
 
      
-      <el-table-column label="Total (dinheiro)" prop="total" sortable="custom" align="center" width="200">
+      <el-table-column label="Total (dinheiro)" prop="total" sortable="custom" align="center" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.dinheiro | money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Total (cartão)" prop="cartao" sortable="custom" align="center" width="200">
+      <el-table-column label="Total (cartão)" prop="cartao" sortable="custom" align="center" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.cartao | money }}</span>
         </template>
       </el-table-column>
-       <el-table-column label="Total (a vista)" prop="avista" sortable="custom" align="center" width="200">
+       <el-table-column label="Total (a vista)" prop="avista" sortable="custom" align="center" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.dinheiro + scope.row.cartao | money }}</span>
         </template>
@@ -65,6 +67,18 @@
           <span>{{ scope.row.total | money }}</span>
         </template>
       </el-table-column>
+
+      <el-table-column label="% a vista" prop="total" sortable="custom" align="center" width="200">
+        <template slot-scope="scope">
+          <span>{{ ((scope.row.dinheiro + scope.row.cartao) / scope.row.total * 100) | decimal}} %</span>
+        </template>
+      
+      </el-table-column>
+      <el-table-column label="% a prazo" prop="total" sortable="custom" align="center" width="200">
+        <template slot-scope="scope">
+          <span>{{ ((scope.row.faturado) / scope.row.total * 100) | decimal}} %</span>
+        </template>
+      </el-table-column>
      
     </el-table>
 
@@ -74,6 +88,78 @@
         Janelas
 
     -->
+    <el-dialog :visible.sync="dialogVendasVisible" title="Venda" width="80%" top="5vh" center>
+        <span slot="title" style="font-size: 30px; margin-bottom: 100px;">Venda detalhada</span>
+        <div style="width: 90%; margin: auto;">
+        <el-table
+            v-loading="listLoading"
+            :data="vendas"
+            border
+            stripe
+            fit
+            style="width: 100%; font-size: 16px;">
+
+            <el-table-column label="#" prop="#" sortable="custom" align="center" width="80">
+            <template slot-scope="scope">
+                <span>{{ scope.row.id }}</span>
+            </template>
+            </el-table-column>
+
+            <el-table-column label="Data" prop="data" sortable="custom" align="center" width="230">
+            <template slot-scope="scope">
+                <span>{{ scope.row.data | data}}</span>
+            </template>
+            </el-table-column>
+
+            <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="250">
+            <template slot-scope="scope">
+                <span>{{ scope.row.cliente }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="Subtotal" prop="subtotal" sortable="custom" align="center" width="150">
+            <template slot-scope="scope">
+                <span>{{ scope.row.subtotal | money }}</span>
+            </template>
+            </el-table-column>
+
+            <el-table-column label="Desconto" prop="desconto" sortable="custom" align="center" width="150">
+            <template slot-scope="scope">
+                <span>{{ scope.row.desconto | money }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="Total" prop="total" sortable="custom" align="center" width="150">
+            <template slot-scope="scope">
+                <span>{{ scope.row.total | money }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="Pg (dinheiro)" prop="pagamento" sortable="custom" align="center" width="200">
+            <template slot-scope="scope">
+                <span>{{ scope.row.pagamento.dinheiro | money  }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="Pg (cart. Débito)" prop="pagamento" sortable="custom" align="center" width="200">
+            <template slot-scope="scope">
+                <span>{{ scope.row.pagamento.debito | money  }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="Pg (cart. Crédito)" prop="pagamento" sortable="custom" align="center" width="200">
+            <template slot-scope="scope">
+                <span>{{ scope.row.pagamento.credito | money  }}</span>
+            </template>
+            </el-table-column>
+            <el-table-column label="Pg (Faturado)" prop="pagamento" sortable="custom" align="center" width="200">
+            <template slot-scope="scope">
+                <span>{{ scope.row.pagamento.faturado | money  }}</span>
+            </template>
+            </el-table-column>
+        
+        </el-table>
+        <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" layout="prev, pager, next" @pagination="getVendas" /> -->
+        </div>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="dialogVendasVisible = false">Fechar</el-button>
+        </span>
+    </el-dialog>
    
   </div>
 </template>
@@ -85,16 +171,24 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import { Money } from 'v-money'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import moment from "moment"
 // import buef from 'buefy'
 // import 'buefy/dist/buefy.css'
 export default {
   name: 'Clientes',
-  components: { Pagination, Money },
+  components: { Pagination, Money, moment },
   directives: { waves },
   filters: {
+    data(value){
+      return moment(+value).format('DD-MM-YYYY, hh:mm:ss a')
+    },
+    decimal(value) {
+      if (!value) return '0'
+      return parseFloat(value).toFixed(2)
+    },
     money(value) {
-      if (!value) return ''
-      value = value.toString()
+      if (!value) return 'R$ 0'
+      value = value.toFixed(2).toString()
       if (value.indexOf('.') == -1) {
         value += ',00'
       }
@@ -119,6 +213,8 @@ export default {
   },
   data() {
     return {
+      dialogVendasVisible:false,
+      vendas: [],
       tela: '40%',
       money: {
         decimal: ',',
@@ -180,6 +276,23 @@ export default {
         // setTimeout(() => {
         //   this.listLoading = false
         // }, 1.5 * 1000)
+      })
+    },
+    getVendas(row) {
+      this.dialogVendasVisible = true
+      this.listLoading = true
+      console.log('row:', row)
+      var date = row.data
+      fetchList('view_vendas_completo', {find:{"strftime('%d/%m/%Y', data / 1000, 'unixepoch', 'localtime')": date}}).then(response => {
+        console.log('response.data.items:', response.data.items)
+        this.vendas = response.data.items
+        console.log('Vendas:', this.vendas);
+        this.total = response.data.total
+        this.vendas = this.vendas.map(function(val){return {...val,pagamento: JSON.parse(val.pagamento)}})
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 0)
       })
     },
     handleFilter() {
