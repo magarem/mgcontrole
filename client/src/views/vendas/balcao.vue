@@ -47,10 +47,12 @@
   }
 
   .produto_button  {
-    width: 100%;
+    width: 98%;
     height: 102px;
-    background-color: white;
+    background-color: #FFFFE6;
+    /* background-color: white; */
     border: none;
+    margin: 1px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2), 0 1px 5px 0 rgba(0,0,0,0.19);
     /* border-radius: 25px; */
   }
@@ -96,7 +98,7 @@
     background-color: #44475D;
   } */
   .box_product_selected {
-    font-size: 20px;
+    font-size: 18px;
   }
   .tableBodyScroll thead {
     background-color: #B38D4F;
@@ -114,6 +116,10 @@
     align-content: center;
     /* width: 100%; */
     table-layout: fixed;
+  }
+  .el-input__inner{
+    padding-left: 5px;
+    font-size: 21px;
   }
   /* tbody tr div {
     text-align: center;
@@ -138,7 +144,7 @@
           <el-row :gutter="20">
             <el-col :span="24">
               <!-- Produtos -->
-              <el-card class="box-card" shadow="always" style="height: 390px; background-color: #f5f5ff;">
+              <el-card class="box-card" shadow="always" style="height: 490px; background-color: #a3a3c2;">
                 <div slot="header" class="clearfix cardtitle">
                   <el-row>
                     <el-col :span="6">
@@ -153,11 +159,11 @@
                   </el-row>
                 </div>
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
+                  <el-col v-if="atalhos" :span="4" >
+                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
+                    <button class="produto_button"  @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
@@ -188,7 +194,6 @@
                    <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('manga')"><img style="margin-left:-5px;" :src="'manga' | img_mini(produtos)"></button>
                   </el-col>
-                
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('batatinha')"><img style="margin-left:-5px;" :src="'batatinha' | img_mini(produtos)"></button>
                   </el-col>
@@ -215,66 +220,83 @@
                   <el-col v-if="atalhos" :span="4">
                   </el-col>
                 </el-row>
-                <br>
-                <el-row :gutter="20">
-                  <el-col v-if="atalhos" :span="6">
-                    <button class="produto_button" @click="productSet('chuchu')"><img style="margin-left:-5px;" :src="'chuchu' | img_mini(produtos)"></button>
+                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('chuchu')"><img :src="'chuchu' | img_mini(produtos)"> </button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="6">
-                    <button class="produto_button" @click="productSet('banana prata')"><img style="margin-left:-5px;" :src="'banana prata' | img_mini(produtos)"></button>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('cenoura')"><img style="margin-left:-5px;" :src="'cenoura' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="6">
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('beterraba')"><img style="margin-left:-5px;" :src="'beterraba' | img_mini(produtos)"></button>
+                  </el-col>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('salsa')"><img style="margin-left:-5px;" :src="'salsa' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('coentro')"><img style="margin-left:-5px;" :src="'coentro' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('alface crespa')"><img style="margin-left:-5px;" :src="'alface crespa' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
                   </el-col>
                 </el-row>
               </el-card>
               <!-- /Produtos -->
             </el-col>
-          </el-row><br>
+          </el-row>
           <el-row>
             <el-col :span="24">
               <!-- Produto selected -->
-              <el-card class="box-card box_product_selected" shadow="always" style="height: 260px; background-color: #F2F6FC;">
-                <div slot="header" class="clearfix cardtitle">
+              <el-card class="box-card box_product_selected" shadow="always" style="height: 150px; background-color: #a3a3c2;">
+                <!-- <div slot="header" class="clearfix cardtitle">
                   <div id="wrapper">
                     <div class="left" style="width: 70%">
                       <span v-if="!product_selected.id">Produto</span>
                       <span v-if="product_selected.id">{{ product_selected.id }} {{ product_selected.descricao }} </span>
                     </div>
-                    <div class="right" style="width: 30%">
-                      <span style="font-family: tahoma; font-size: 22px;">
-                        <money v-model="product_selected.pco_venda" v-bind="money" style="width: 100%;" class="el-input__inner" />
-                      </span>
-                    </div>
                   </div>
-                </div>
+                </div> -->
                 <div>
-                  <el-row :gutter="20">
-                    <el-col :span="8">
-                      Unidade<br>
-                      <input ref="unidade" v-model="product_selected.unidade" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner" readonly>
-                    </el-col>
-                    <el-col :span="8">
-                      Quantidade<br>
-                      <input ref="qnt" v-model="qnt" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner" @keypress="isNumber($event)" @keyup.enter="cupom_add()">
-                    </el-col>
-                    <el-col :span="8">
-                      Total<br>
-                      <money v-model="product_selected.total" v-bind="money" style="width: 100%; margin-top: 5px; font-size: 22px;" class="el-input__inner" readonly />
+                  <el-row :gutter="10" style="margin-bottom: 10px;">
+                    <el-col :span="24">
+                      <span v-if="!product_selected.id" style="font-size:25px;">Selecione o produto acima</span>
+                      <span v-if="product_selected.id" style="font-size:25px;">{{ product_selected.id }} {{ product_selected.descricao }} </span>
                     </el-col>
                   </el-row>
-                  <el-row :gutter="5" style="margin-top: 20px">
+                  <el-row :gutter="10">
+                    <el-col :span="6">
+                      Preço<br>
+                      <money v-model="product_selected.pco_venda" v-bind="money" style="width: 100%; margin-top: 5px; " class="el-input__inner" />
+                    </el-col>
+                    <el-col :span="5">
+                      Uni.<br>
+                      <input ref="unidade" v-model="product_selected.unidade" style="width: 100%; margin-top: 5px; " class="el-input__inner" readonly>
+                    </el-col>
+                    <el-col :span="4">
+                      Qnt.<br>
+                      <input ref="qnt" v-model="qnt" style="width: 100%; margin-top: 5px;" class="el-input__inner" @keypress="isNumber($event)" @keyup.enter="cupom_add()">
+                    </el-col>
+                    <el-col :span="6">
+                      Total<br>
+                      <money v-model="product_selected.total" v-bind="money" style="width: 100%; margin-top: 5px; " class="el-input__inner" readonly />
+                    </el-col>
+                    <el-col :span="3" style="padding-bottom: 15px;"><br>
+                      <el-button :disabled="!product_selected.id" circle style="font-size: 22px;" class="filter-item" type="primary" icon="el-icon-plus" @click="cupom_add">
+                      </el-button>
+                     </el-col>
+                  </el-row>
+                  <!-- <el-row :gutter="5" style="margin-top: 20px">
                     <el-col :span="8">
                       <el-button v-waves round style="width: 100%; _height: 60px; font-size: 22px;" class="filter-item" type="warning" _icon="el-icon-search" @click="product_selected = {}">
                         Cancela
                       </el-button>
                     </el-col>
-                    <el-col :span="16">
-                      <el-button v-waves :disabled="!product_selected.id" round style="width: 100%; _height: 60px; font-size: 22px;" class="filter-item" type="primary" _icon="el-icon-search" @click="cupom_add">
-                        Incluir
-                      </el-button>
+                    <el-col :span="24">
+                      
                     </el-col>
-                  </el-row>
+                  </el-row> -->
                 </div>
               </el-card>
               <!-- /Produto selected -->
@@ -285,7 +307,7 @@
           <el-row :gutter="0">
             <el-col :span="24">
               <!-- Cupom -->
-              <el-card id="myelement_" class="box-card" shadow="always" style="height: 500px; background-color: #ffffe6; min-height: 450px">
+              <el-card id="myelement_" class="box-card" shadow="always" style="height: 546px; background-color: #ffffe6; min-height: 450px">
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
                     <el-col :span="8">
@@ -323,7 +345,7 @@
                   <el-col :span="1" class="center"><i class="el-icon-view" /></el-col>
                 </el-row>
                 <el-divider v-if="cupom.itens.length > 0" />
-                <div id="container" class="cupom_table" style="margin-top:-15px; margin-bottom:-15px; width: 100%; max-height:280px; min-height: 280px; overflow-y: auto;">
+                <div id="container" class="cupom_table" style="margin-top:-15px; margin-bottom:-15px; width: 100%; max-height:325px; min-height: 325px; overflow-y: auto;">
                   <el-row v-for="(row, rindex) in cupom.itens" :key="rindex" :gutter="0" :style="{backgroundColor: (rindex % 2 === 0? '' : '#f9f9e0')}" style="width: 100%; margin-left:0px; margin-bottom: 3px; _padding: 5px; _font-size: 19px;">
                     <el-col :span="2" class="center">{{ rindex + 1 }}</el-col>
                     <el-col :span="2" class="center">{{ row.id.toString() }}</el-col>
@@ -348,7 +370,7 @@
               <!-- /Cupom -->
             </el-col>
           </el-row>
-          <el-row style="margin-top: 17px;">
+          <el-row style="margin-top: 1px;">
             <el-col :span="24">
               <!-- Venda Check-out -->
               <el-card class="box-card cardtitle" shadow="always" style="height: 90px; font-family: arial;">
@@ -362,8 +384,7 @@
                             round
                             style="_height:60px; font-size:22px; width: 100%;"
                             type="danger"
-                            @click="vendaCancel()"
-                          >
+                            @click="vendaCancel()">
                             Cancelar
                           </el-button>
                         </el-col>
@@ -1436,9 +1457,9 @@ export default {
           this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
           // Procura produto pelo ID
             if (this.product_selected.id) {
-              this.cupom.itens_n++
+              
               var auxObj = {
-                n: this.cupom.itens_n,
+                n: this.cupom.itens.length,
                 id: this.product_selected.id,
                 ean: this.product_selected.ean,
                 descricao: this.product_selected.descricao,
@@ -1449,6 +1470,7 @@ export default {
               }
               // this.cupom.itens.unshift(auxObj)
               this.cupom.itens.push(auxObj)
+              // this.cupom.itens_n++
               this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
 
               // Total Calc
@@ -1473,8 +1495,8 @@ export default {
     },
     cupomRowView(row) {
       console.log('row:',row);
-      this.dialogFormCupomView = true
       this.temp2 = this.cupom.itens.find(x => parseInt(x.n) === parseInt(row.n))
+      this.dialogFormCupomView = true
     },
     productSet(params) {
       console.log(params)

@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"sqltools.connections": [
+			{
+				"database": "${workspaceFolder:mgcontrole}/server/marcos.db",
+				"driver": "SQLite",
+				"name": "mgcontrole",
+				"previewLimit": 50
+			}
+		],
+		"sqltools.useNodeRuntime": true
+	},
+	// "files.associations": {}
+	"files.associations": {
+		"*.ejs": "html"
+	},
+	"emmet.includeLanguages": {
+		"ejs": "html"
+	}
+	
+}
