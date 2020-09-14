@@ -14,7 +14,9 @@
       >
         <sidebar-item v-for="route in permission_routes" :key="route.path" :item="route" :base-path="route.path" />
       </el-menu>
+
     </el-scrollbar>
+
   </div>
 </template>
 
@@ -26,6 +28,11 @@ import variables from '@/styles/variables.scss'
 
 export default {
   components: { SidebarItem, Logo },
+  methods:{
+    toggleSideBar() {
+      this.$store.dispatch('app/toggleSideBar')
+    }
+  },
   computed: {
     ...mapGetters([
       'permission_routes',

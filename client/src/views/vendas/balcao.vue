@@ -48,13 +48,17 @@
 
   .produto_button  {
     width: 98%;
-    height: 102px;
-    background-color: #FFFFE6;
+    height: 83px;
+    background-color: #d4d3d3;
     /* background-color: white; */
     border: none;
     margin: 1px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2), 0 1px 5px 0 rgba(0,0,0,0.19);
     /* border-radius: 25px; */
+  }
+
+  .produto_button  img{
+    width: 98%;
   }
 
   .line{
@@ -144,7 +148,7 @@
           <el-row :gutter="20">
             <el-col :span="24">
               <!-- Produtos -->
-              <el-card class="box-card" shadow="always" style="height: 490px; background-color: #a3a3c2;">
+              <el-card class="box-card" shadow="always" style="height: 505px; background-color: #a3a3c2;">
                 <div slot="header" class="clearfix cardtitle">
                   <el-row>
                     <el-col :span="6">
@@ -158,7 +162,7 @@
                     </el-col>
                   </el-row>
                 </div>
-                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
+                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -17px;">
                   <el-col v-if="atalhos" :span="4" >
                     <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
                   </el-col>
@@ -186,19 +190,28 @@
                     <button class="produto_button" @click="productSet('banana nanica')"><img style="margin-left:-5px;" :src="'banana nanica' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('banana terra')"><img style="margin-left:-5px; width:100%;" :src="'banana terra' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('mamão papaia')"><img style="margin-left:-5px;" :src="'mamão papaia' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('abacaxi')"><img style="margin-left:-5px;" :src="'abacaxi' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('maça')"><img style="margin-left:-5px;" :src="'maça' | img_mini(produtos)"></button>
                   </el-col>
+                </el-row>
+                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
                    <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('manga')"><img style="margin-left:-5px;" :src="'manga' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('pera')"><img style="margin-left:-5px;" :src="'pera' | img_mini(produtos)"></button>
+                  </el-col>
+                  <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('batatinha')"><img style="margin-left:-5px;" :src="'batatinha' | img_mini(produtos)"></button>
                   </el-col>
-                </el-row>
-                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('chuchu')"><img :src="'chuchu' | img_mini(produtos)"> </button>
                   </el-col>
@@ -208,38 +221,45 @@
                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('beterraba')"><img style="margin-left:-5px;" :src="'beterraba' | img_mini(produtos)"></button>
                   </el-col>
+                </el-row>
+                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('alface crespa')"><img style="margin-left:-5px;" :src="'alface crespa' | img_mini(produtos)"></button>
+                  </el-col>
                    <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('salsa')"><img style="margin-left:-5px;" :src="'salsa' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="4">
+                   <el-col v-if="atalhos" :span="4">
                     <button class="produto_button" @click="productSet('coentro')"><img style="margin-left:-5px;" :src="'coentro' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('alface crespa')"><img style="margin-left:-5px;" :src="'alface crespa' | img_mini(produtos)"></button>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('uva sem semente')"><img style="margin-left:-5px;" :src="'uva sem semente' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('repolho')"><img style="margin-left:-5px;" :src="'repolho' | img_mini(produtos)"></button>
+                  </el-col>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('pepino')"><img style="margin-left:-5px;" :src="'pepino' | img_mini(produtos)"></button>
                   </el-col>
                 </el-row>
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('chuchu')"><img :src="'chuchu' | img_mini(produtos)"> </button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('cenoura')"><img style="margin-left:-5px;" :src="'cenoura' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('beterraba')"><img style="margin-left:-5px;" :src="'beterraba' | img_mini(produtos)"></button>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('melancia grande')"><img style="margin-left:-5px;" :src="'melancia grande' | img_mini(produtos)"></button>
                   </el-col>
                    <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('salsa')"><img style="margin-left:-5px;" :src="'salsa' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('melão')"><img style="margin-left:-5px;" :src="'melão' | img_mini(produtos)"></button>
+                  </el-col>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('abacate')"><img style="margin-left:-5px;" :src="'abacate' | img_mini(produtos)"></button>
+                  </el-col>
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('kiwi')"><img style="margin-left:-5px;" :src="'kiwi' | img_mini(produtos)"></button>
                   </el-col>
                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('coentro')"><img style="margin-left:-5px;" :src="'coentro' | img_mini(produtos)"></button>
+                    <button class="produto_button" @click="productSet('coco verde')"><img style="margin-left:-5px;" :src="'coco verde' | img_mini(produtos)"></button>
                   </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('alface crespa')"><img style="margin-left:-5px;" :src="'alface crespa' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
+                   <el-col v-if="atalhos" :span="4">
+                    <button class="produto_button" @click="productSet('quiabo')"><img style="margin-left:-5px;" :src="'quiabo' | img_mini(produtos)"></button>
                   </el-col>
                 </el-row>
               </el-card>
@@ -249,7 +269,7 @@
           <el-row>
             <el-col :span="24">
               <!-- Produto selected -->
-              <el-card class="box-card box_product_selected" shadow="always" style="height: 150px; background-color: #a3a3c2;">
+              <el-card class="box-card box_product_selected" shadow="always" style="height: 140px; background-color: #a3a3c2;">
                 <!-- <div slot="header" class="clearfix cardtitle">
                   <div id="wrapper">
                     <div class="left" style="width: 70%">
@@ -259,7 +279,7 @@
                   </div>
                 </div> -->
                 <div>
-                  <el-row :gutter="10" style="margin-bottom: 10px;">
+                  <el-row :gutter="10" style="margin-top: -8px; margin-bottom: 10px;">
                     <el-col :span="24">
                       <span v-if="!product_selected.id" style="font-size:25px;">Selecione o produto acima</span>
                       <span v-if="product_selected.id" style="font-size:25px;">{{ product_selected.id }} {{ product_selected.descricao }} </span>
@@ -373,14 +393,14 @@
           <el-row style="margin-top: 1px;">
             <el-col :span="24">
               <!-- Venda Check-out -->
-              <el-card class="box-card cardtitle" shadow="always" style="height: 90px; font-family: arial;">
+              <el-card class="box-card cardtitle" shadow="always" style="height: 95px; font-family: arial;">
                 <div style="height: 200px;">
                   <el-row type="flex" class="row-bg">
                     <el-col :span="24">
                       <el-row :gutter="5" type="flex" class="row-bg" style="_margin-top: 18px">
                         <el-col :span="8">
                           <el-button
-                            :disabled="!cupom.total>0"
+                            :disabled="cupom.subtotal <= 0"
                             round
                             style="_height:60px; font-size:22px; width: 100%;"
                             type="danger"
@@ -389,7 +409,7 @@
                           </el-button>
                         </el-col>
                         <el-col :span="16">
-                          <el-button round :disabled="!cupom.total > 0" style="_height:60px; font-size:22px; width: 100%;" type="success" icon="el-icon-check" @click="vendaClose">
+                          <el-button round :disabled="cupom.subtotal <= 0" style="_height:60px; font-size:22px; width: 100%;" type="success" icon="el-icon-check" @click="vendaClose">
                             Pagar
                           </el-button>
                         </el-col>
@@ -421,7 +441,7 @@
           <el-form-item label="Descrição:" prop="descricao">
             <el-input v-model="temp2.descricao" readonly />
           </el-form-item>
-          <el-form-item label="Preço:" prop="preco">
+          <el-form-item label="Preço unitário:" prop="preco">
             <money v-model="temp2.pco_venda" v-bind="money" class="el-input__inner" readonly />
           </el-form-item>
           <el-form-item label="Unidade:" prop="unidade">
@@ -429,6 +449,9 @@
           </el-form-item>
           <el-form-item label="Quantidade:" prop="qnt">
             <el-input v-model="temp2.qnt" style="width: 100px;" readonly />
+          </el-form-item>
+          <el-form-item label="Total:" prop="qnt">
+            <money v-model="temp2.total" v-bind="money" style="width: 200px;" class="el-input__inner" readonly />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -1459,7 +1482,7 @@ export default {
             if (this.product_selected.id) {
               
               var auxObj = {
-                n: this.cupom.itens.length,
+                n: this.cupom.itens_n,
                 id: this.product_selected.id,
                 ean: this.product_selected.ean,
                 descricao: this.product_selected.descricao,
@@ -1470,7 +1493,7 @@ export default {
               }
               // this.cupom.itens.unshift(auxObj)
               this.cupom.itens.push(auxObj)
-              // this.cupom.itens_n++
+              this.cupom.itens_n++
               this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
 
               // Total Calc

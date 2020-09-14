@@ -3,10 +3,11 @@
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
     <sidebar v-if="!checkPermission(['cliente'])" class="sidebar-container" />
     <div :class="{hasTagsView:needTagsView}" class="main-container">
-      <!-- <div :class="{'fixed-header':fixedHeader}">
+     
+      <div v-if="x !== '/vendas/balcao'" :class="{'fixed-header':fixedHeader}">
         <navbar />
         <tags-view v-if="needTagsView" />
-      </div> -->
+      </div>
       <app-main />
       <right-panel v-if="showSettings">
         <settings />
@@ -24,6 +25,11 @@ import checkPermission from '@/utils/permission'
 
 export default {
   name: 'Layout',
+  // data(){
+  //   return {
+  //     x: null
+  //   }
+  // },
   components: {
     AppMain,
     Navbar,
@@ -41,6 +47,7 @@ export default {
       needTagsView: state => state.settings.tagsView,
       fixedHeader: state => state.settings.fixedHeader
     }),
+    
     classObj() {
       return {
         hideSidebar: !this.sidebar.opened,
@@ -48,8 +55,12 @@ export default {
         withoutAnimation: this.sidebar.withoutAnimation,
         mobile: this.device === 'mobile'
       }
+    },
+    x(){
+      return this.$route.path
     }
   },
+ 
   methods: {
     checkPermission,
     handleClickOutside() {
