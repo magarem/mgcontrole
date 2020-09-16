@@ -143,8 +143,8 @@
 <template>
   <div class="app-container body" >
     <div id="main">
-      <el-row :gutter="20">
-        <el-col :span="11">
+      <el-row :gutter="10">
+        <el-col :span="13">
           <el-row :gutter="20">
             <el-col :span="24">
               <!-- Produtos -->
@@ -162,106 +162,13 @@
                     </el-col>
                   </el-row>
                 </div>
+
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -17px;">
-                  <el-col v-if="atalhos" :span="4" >
-                    <button class="produto_button"  @click="productSet('tomate')"><img :src="'tomate' | img_mini(produtos)"> </button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button"  @click="productSet('cebola')"><img style="margin-left:-5px;" :src="'cebola' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('alho')"><img style="margin-left:-5px;" :src="'alho' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('pimentao')"><img style="margin-left:-5px;" :src="'pimentao' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('laranja')"><img style="margin-left:-5px;" :src="'laranja' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('limao')"><img style="margin-left:-5px;" :src="'limao' | img_mini(produtos)"></button>
+                  <el-col :span="3" v-for="(item, rindex) in atalhos.itens" :key="rindex">
+                      <button class="produto_button" @click="productSet(item)"><img :src="img_mini(item)"> </button>
                   </el-col>
                 </el-row>
-                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('banana prata')"><img :src="'banana prata' | img_mini(produtos)"> </button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('banana nanica')"><img style="margin-left:-5px;" :src="'banana nanica' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('banana terra')"><img style="margin-left:-5px; width:100%;" :src="'banana terra' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('mamão papaia')"><img style="margin-left:-5px;" :src="'mamão papaia' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('abacaxi')"><img style="margin-left:-5px;" :src="'abacaxi' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('maça')"><img style="margin-left:-5px;" :src="'maça' | img_mini(produtos)"></button>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('manga')"><img style="margin-left:-5px;" :src="'manga' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('pera')"><img style="margin-left:-5px;" :src="'pera' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('batatinha')"><img style="margin-left:-5px;" :src="'batatinha' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('chuchu')"><img :src="'chuchu' | img_mini(produtos)"> </button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('cenoura')"><img style="margin-left:-5px;" :src="'cenoura' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('beterraba')"><img style="margin-left:-5px;" :src="'beterraba' | img_mini(produtos)"></button>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('alface crespa')"><img style="margin-left:-5px;" :src="'alface crespa' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('salsa')"><img style="margin-left:-5px;" :src="'salsa' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('coentro')"><img style="margin-left:-5px;" :src="'coentro' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('uva sem semente')"><img style="margin-left:-5px;" :src="'uva sem semente' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('repolho')"><img style="margin-left:-5px;" :src="'repolho' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('pepino')"><img style="margin-left:-5px;" :src="'pepino' | img_mini(produtos)"></button>
-                  </el-col>
-                </el-row>
-                <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -12px;">
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('melancia grande')"><img style="margin-left:-5px;" :src="'melancia grande' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('melão')"><img style="margin-left:-5px;" :src="'melão' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('abacate')"><img style="margin-left:-5px;" :src="'abacate' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('kiwi')"><img style="margin-left:-5px;" :src="'kiwi' | img_mini(produtos)"></button>
-                  </el-col>
-                  <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('coco verde')"><img style="margin-left:-5px;" :src="'coco verde' | img_mini(produtos)"></button>
-                  </el-col>
-                   <el-col v-if="atalhos" :span="4">
-                    <button class="produto_button" @click="productSet('quiabo')"><img style="margin-left:-5px;" :src="'quiabo' | img_mini(produtos)"></button>
-                  </el-col>
-                </el-row>
+               
               </el-card>
               <!-- /Produtos -->
             </el-col>
@@ -278,9 +185,14 @@
                     </div>
                   </div>
                 </div> -->
+                <el-row>
+                  <el-col :span="5"><img style="width: 80%;" :src=product_selected.img_mini>
+                  </el-col>
+                  <el-col :span="19">
                 <div>
                   <el-row :gutter="10" style="margin-top: -8px; margin-bottom: 10px;">
-                    <el-col :span="24">
+                 
+                  <el-col :span="24">
                       <span v-if="!product_selected.id" style="font-size:25px;">Selecione o produto acima</span>
                       <span v-if="product_selected.id" style="font-size:25px;">{{ product_selected.id }} {{ product_selected.descricao }} </span>
                     </el-col>
@@ -318,29 +230,30 @@
                     </el-col>
                   </el-row> -->
                 </div>
+                  </el-col>
+                </el-row>
               </el-card>
               <!-- /Produto selected -->
             </el-col>
           </el-row>
         </el-col>
-        <el-col :span="13">
+        <el-col :span="11">
           <el-row :gutter="0">
             <el-col :span="24">
               <!-- Cupom -->
-              <el-card id="myelement_" class="box-card" shadow="always" style="height: 546px; background-color: #ffffe6; min-height: 450px">
+              <el-card id="myelement_" class="box-card" shadow="always" style="height: 551px; background-color: #ffffe6; min-height: 450px">
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
-                    <el-col :span="8">
-                      <span>Cupom</span>
+                    <el-col :span="9">
+                      <span>Cupom</span> <el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button>
                     </el-col>
-                    <el-col :span="16" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
+                    <el-col :span="15" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                       {{ today }}
                     </el-col>
                   </el-row>
                   <el-row>
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
-                        <el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button> | 
                         <span class="bold">Usuário:</span>{{ user }}<br>
                       </span>
                     </el-col>
@@ -393,7 +306,7 @@
           <el-row style="margin-top: 1px;">
             <el-col :span="24">
               <!-- Venda Check-out -->
-              <el-card class="box-card cardtitle" shadow="always" style="height: 95px; font-family: arial;">
+              <el-card class="box-card cardtitle" shadow="always" style="height: 90px; font-family: arial;">
                 <div style="height: 200px;">
                   <el-row type="flex" class="row-bg">
                     <el-col :span="24">
@@ -888,6 +801,7 @@ import 'vue-good-table/dist/vue-good-table.css'
 import { VueGoodTable } from 'vue-good-table'
 import { Printd } from 'printd'
 import Autocomplete from '@/components/Autocomplete'
+// import ProductsThumbGridItem from '@/components/ProductsThumbGridItem'
 import moment from 'moment'
 import swal from 'sweetalert'
 
@@ -900,10 +814,7 @@ export default {
       if (op=='opened') return 'Aberta'
       if (op=='closed') return 'Fechada'
     },
-    img_mini: function(value, produtos) {
-      var a = produtos.filter(item => item.descricao == value)[0]
-      if (a) return a.img_mini
-    },
+    
     money(value) {
       if (typeof value !== 'number') {
         return value
@@ -940,7 +851,15 @@ export default {
       vendaCloseEndFlg: false,
       date_ref: null,
       source: null,
-      atalhos: true,
+      atalhos:{
+        ativo: true,
+        itens: [
+          'tomate','cebola','alho','pimentao','limao','banana prata','banana nanica','banana terra','laranja','mamão papaia','abacaxi','maça'
+          ,'manga','pera','batatinha','chuchu','cenoura','beterraba', 'uva sem semente','repolho', 'pepino','melancia grande',
+          'melão','abacate','kiwi','coco verde', 'quiabo', 'inhame', 'ovos cartela', 'berinjela', 'limao siciliano',
+          'abobrinha', 'abobora japonesa', 'goiaba', 'alface crespa', 'rucula','salsa','coentro','couve', 'hortelan'
+        ]
+      },
       value: null,
       user: null,
       novoItem: true,
@@ -1066,7 +985,7 @@ export default {
       clientesListFlg: false,
       qnt: null,
       temp2: {
-        n: null,
+        n: 0,
         id: 0
       }
     }
@@ -1105,6 +1024,7 @@ export default {
     }
   },
   mounted() {
+    // const sound = (new Audio(require('@/assets/audio/button-2.mp3'))).play()
     this.vai()
   },
   created() {
@@ -1136,6 +1056,11 @@ export default {
     })
   },
   methods: {
+    img_mini(value) {
+      // console.log('img_mini > value:', value);
+      var a = this.produtos.filter(item => item.descricao == value)[0]
+      if (a) return a.img_mini
+    },
     caixa() {
       var self = this
       return {
@@ -1482,7 +1407,7 @@ export default {
             if (this.product_selected.id) {
               
               var auxObj = {
-                n: this.cupom.itens_n,
+                n: + new Date(),
                 id: this.product_selected.id,
                 ean: this.product_selected.ean,
                 descricao: this.product_selected.descricao,
@@ -1523,6 +1448,7 @@ export default {
     },
     productSet(params) {
       console.log(params)
+      const sound = (new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3'))).play()
       // Check if is called by datalist or by product button
       if (params === Object(params)) var params = this.source
       // var item = this.produtos.find(x => parseInt(x.id) === parseInt(params))
@@ -1693,6 +1619,7 @@ export default {
       console.log(row)
       this.cupom.subtotal -= row.total
       this.cupom.itens = this.cupom.itens.filter(item => item.n !== row.n)
+      this.cupom.itens_n--
       this.dialogFormCupomView = false
     }
   }
