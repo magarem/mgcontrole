@@ -165,7 +165,7 @@
 
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -17px;">
                   <el-col :span="3" v-for="(item, rindex) in atalhos.itens" :key="rindex">
-                      <button class="produto_button" @click="productSet(item)"><img :src="img_mini(item)"> </button>
+                      <button class="produto_button" @click="productSet(item)"><img style="max-width: 90%; max-height: 90%;" :src="img_mini(item)" :alt=item> </button>
                   </el-col>
                 </el-row>
                
@@ -186,7 +186,9 @@
                   </div>
                 </div> -->
                 <el-row>
-                  <el-col :span="5"><img style="width: 80%;" :src=product_selected.img_mini>
+                  <el-col :span="5">
+                    <img v-if="!product_selected.id" src="@/assets/img/arrow-24846_960_720.png" style='width: 80%'>
+                    <img style="padding-top: 3px; max-width: 80%; max-height: 110px;" :src=img_mini(product_selected.descricao) alt=''>
                   </el-col>
                   <el-col :span="19">
                 <div>
@@ -1056,10 +1058,23 @@ export default {
     })
   },
   methods: {
+    
     img_mini(value) {
-      // console.log('img_mini > value:', value);
-      var a = this.produtos.filter(item => item.descricao == value)[0]
-      if (a) return a.img_mini
+      if (value){
+        var img = '/assets/img/produtos/noimg.png'
+        value = value.trim().replace(/\s/g, '')
+        value = value.replace('ã', 'a')
+        value = value.replace('ç', 'c')
+        img = '/assets/img/produtos/' + value + '.png'
+        console.log('img:', img);
+        return img
+        // console.log('img_mini > value:', value);
+        // var a = this.produtos.filter(item => item.descricao == value)[0]
+        // if (a) {
+        //   console.log('a.img_mini:', a.img_mini);
+        //   return a.img_mini
+        // }
+      }
     },
     caixa() {
       var self = this
@@ -1485,6 +1500,7 @@ export default {
       this.vendaCloseOkFim()
     },
     vendaClose() {
+      const sound = (new Audio(require('@/assets/audio/zapsplat_bell_small_reception_desk_bell_single_ring_003_15125.mp3'))).play()
       this.desconto = 0
       this.pago_dinheiro = 0
       this.pago_debito = 0
