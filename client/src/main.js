@@ -31,6 +31,10 @@ import 'vue-select/dist/vue-select.css'
 import VueTheMask from 'vue-the-mask'
 Vue.use(VueTheMask)
 
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
+
+Vue.component('apexchart', VueApexCharts)
 // import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 // import Buefy from 'buefy'
 // import 'buefy/dist/buefy.css'

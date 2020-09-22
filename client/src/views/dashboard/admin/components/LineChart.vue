@@ -61,10 +61,10 @@ export default {
       this.chart = echarts.init(this.$el, 'macarons')
       this.setOptions(this.chartData)
     },
-    setOptions({ expectedData, actualData } = {}) {
+    setOptions({ faturado, avista, total } = {}) {
       this.chart.setOption({
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: [...Array(15).keys()],
           boundaryGap: false,
           axisTick: {
             show: false
@@ -74,7 +74,7 @@ export default {
           left: 10,
           right: 10,
           bottom: 20,
-          top: 30,
+          top: 0,
           containLabel: true
         },
         tooltip: {
@@ -90,26 +90,42 @@ export default {
           }
         },
         legend: {
-          data: ['expected', 'actual']
+          data: ['Faturado', 'A vista', 'Total']
         },
         series: [{
-          name: 'expected', itemStyle: {
+          name: 'faturado', itemStyle: {
             normal: {
               color: '#FF005A',
               lineStyle: {
                 color: '#FF005A',
-                width: 2
+                width: 4
               }
             }
           },
           smooth: true,
           type: 'line',
-          data: expectedData,
+          data: faturado,
           animationDuration: 2800,
           animationEasing: 'cubicInOut'
         },
         {
-          name: 'actual',
+          name: 'avista', itemStyle: {
+            normal: {
+              color: 'green',
+              lineStyle: {
+                color: 'green',
+                width: 4
+              }
+            }
+          },
+          smooth: true,
+          type: 'line',
+          data: avista,
+          animationDuration: 2800,
+          animationEasing: 'cubicInOut'
+        },
+        {
+          name: 'total',
           smooth: true,
           type: 'line',
           itemStyle: {
@@ -117,14 +133,14 @@ export default {
               color: '#3888fa',
               lineStyle: {
                 color: '#3888fa',
-                width: 2
+                width: 6
               },
               areaStyle: {
                 color: '#f3f8ff'
               }
             }
           },
-          data: actualData,
+          data: total,
           animationDuration: 2800,
           animationEasing: 'quadraticOut'
         }]

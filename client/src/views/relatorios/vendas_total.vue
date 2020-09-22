@@ -68,13 +68,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="% a vista" prop="total" sortable="custom" align="center" width="200">
+      <el-table-column label="% a vista" prop="dinheiro" sortable="custom" align="center" width="200">
         <template slot-scope="scope">
           <span>{{ ((scope.row.dinheiro + scope.row.cartao) / scope.row.total * 100) | decimal}} %</span>
         </template>
       
       </el-table-column>
-      <el-table-column label="% a prazo" prop="total" sortable="custom" align="center" width="200">
+      <el-table-column label="% a prazo" prop="faturado" sortable="custom" align="center" width="200">
         <template slot-scope="scope">
           <span>{{ ((scope.row.faturado) / scope.row.total * 100) | decimal}} %</span>
         </template>
