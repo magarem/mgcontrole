@@ -19,62 +19,57 @@
       :key="tableKey"
       v-loading="listLoading"
       :data="list"
-      border
       fit
       highlight-current-row
-      style="width: 100%; font-size: 18px;"
+      style="width: 100%; font-size: 20px;"
       @sort-change="sortChange"
-      @row-click="getVendas"
-      >
+      @row-click="getVendas">
 
-      <el-table-column label="Data" prop="data" sortable="custom" align="center" width="130">
+      <el-table-column label="Data" prop="data"  width="130">
         <template slot-scope="scope">
           <span>{{ scope.row.data }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Vendas" prop="n" sortable="custom" align="center" width="110">
+      <el-table-column label="Vendas" prop="n"  width="110">
         <template slot-scope="scope">
           <span>{{ scope.row.n }}</span>
         </template>
       </el-table-column>
-
      
-      <el-table-column label="Total (dinheiro)" prop="total" sortable="custom" align="center" width="180">
+      <el-table-column label="Total (dinheiro)" prop="total"  width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.dinheiro | money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Total (cartão)" prop="cartao" sortable="custom" align="center" width="180">
+      <el-table-column label="Total (cartão)" prop="cartao"  width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.cartao | money }}</span>
         </template>
       </el-table-column>
-       <el-table-column label="Total (a vista)" prop="avista" sortable="custom" align="center" width="180">
+       <el-table-column label="Total (a vista)" prop="avista"  width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.dinheiro + scope.row.cartao | money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Total (faturado)" prop="faturado" sortable="custom" align="center" width="200">
+      <el-table-column label="Total (faturado)" prop="faturado"  width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.faturado | money }}</span>
         </template>
       </el-table-column>
-     
-
-      <el-table-column label="Total geral" prop="total" sortable="custom" align="center" width="200">
+      <el-table-column label="Total geral" prop="total"  width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.total | money }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="% a vista" prop="dinheiro" sortable="custom" align="center" width="200">
+      <el-table-column label="% a vista" prop="dinheiro"  width="200">
         <template slot-scope="scope">
           <span>{{ ((scope.row.dinheiro + scope.row.cartao) / scope.row.total * 100) | decimal}} %</span>
         </template>
       
       </el-table-column>
-      <el-table-column label="% a prazo" prop="faturado" sortable="custom" align="center" width="200">
+      <el-table-column label="% a prazo" prop="faturado"  width="200">
         <template slot-scope="scope">
           <span>{{ ((scope.row.faturado) / scope.row.total * 100) | decimal}} %</span>
         </template>
@@ -94,60 +89,60 @@
         <el-table
             v-loading="listLoading"
             :data="vendas"
-            border
+            
             stripe
             fit
-            style="width: 100%; font-size: 16px;">
+            style="width: 100%; font-size: 18px;">
 
-            <el-table-column label="#" prop="#" sortable="custom" align="center" width="80">
+            <el-table-column label="#" prop="#"  width="80">
             <template slot-scope="scope">
                 <span>{{ scope.row.id }}</span>
             </template>
             </el-table-column>
 
-            <el-table-column label="Data" prop="data" sortable="custom" align="center" width="230">
+            <el-table-column label="Data" prop="data"  width="230">
             <template slot-scope="scope">
                 <span>{{ scope.row.data | data}}</span>
             </template>
             </el-table-column>
 
-            <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="250">
+            <el-table-column label="Cliente" prop="cliente"  width="250">
             <template slot-scope="scope">
                 <span>{{ scope.row.cliente }}</span>
             </template>
             </el-table-column>
-            <el-table-column label="Subtotal" prop="subtotal" sortable="custom" align="center" width="150">
+            <el-table-column label="Subtotal" prop="subtotal"  width="150">
             <template slot-scope="scope">
                 <span>{{ scope.row.subtotal | money }}</span>
             </template>
             </el-table-column>
 
-            <el-table-column label="Desconto" prop="desconto" sortable="custom" align="center" width="150">
+            <el-table-column label="Desconto" prop="desconto"  width="150">
             <template slot-scope="scope">
                 <span>{{ scope.row.desconto | money }}</span>
             </template>
             </el-table-column>
-            <el-table-column label="Total" prop="total" sortable="custom" align="center" width="150">
+            <el-table-column label="Total" prop="total"  width="150">
             <template slot-scope="scope">
                 <span>{{ scope.row.total | money }}</span>
             </template>
             </el-table-column>
-            <el-table-column label="Pg (dinheiro)" prop="pagamento" sortable="custom" align="center" width="200">
+            <el-table-column label="Pg (dinheiro)" prop="pagamento"  width="200">
             <template slot-scope="scope">
                 <span>{{ scope.row.pagamento.dinheiro | money  }}</span>
             </template>
             </el-table-column>
-            <el-table-column label="Pg (cart. Débito)" prop="pagamento" sortable="custom" align="center" width="200">
+            <el-table-column label="Pg (cart. Débito)" prop="pagamento"  width="200">
             <template slot-scope="scope">
                 <span>{{ scope.row.pagamento.debito | money  }}</span>
             </template>
             </el-table-column>
-            <el-table-column label="Pg (cart. Crédito)" prop="pagamento" sortable="custom" align="center" width="200">
+            <el-table-column label="Pg (cart. Crédito)" prop="pagamento"  width="200">
             <template slot-scope="scope">
                 <span>{{ scope.row.pagamento.credito | money  }}</span>
             </template>
             </el-table-column>
-            <el-table-column label="Pg (Faturado)" prop="pagamento" sortable="custom" align="center" width="200">
+            <el-table-column label="Pg (Faturado)" prop="pagamento"  width="200">
             <template slot-scope="scope">
                 <span>{{ scope.row.pagamento.faturado | money  }}</span>
             </template>

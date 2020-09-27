@@ -19,38 +19,35 @@
       :key="tableKey"
       v-loading="listLoading"
       :data="list"
-      border
       fit
       highlight-current-row
-      style="width: 100%;"
-      @sort-change="sortChange"
-    >
-
-      <el-table-column label="Código" prop="id" sortable="custom" align="center" width="100">
+      style="width: 100%; font-size: 20px;"
+      @sort-change="sortChange">
+      <el-table-column label="Código" prop="id"  align="center" width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Nome" prop="nome" sortable="custom" align="center" width="300">
+      <el-table-column label="Nome" prop="nome"  width="300">
         <template slot-scope="scope">
           <span>{{ scope.row.nome | capitalize }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Contato" prop="contato" sortable="custom" align="center" width="200">
+      <el-table-column label="Contato" prop="contato"  width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.contato }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Fone" prop="fone" sortable="custom" align="center" width="200">
+      <el-table-column label="Fone" prop="fone"   width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.fone }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Actions" align="center" width="150" class-name="small-padding fixed-width">
+      <el-table-column label="" align="center" width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit

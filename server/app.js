@@ -729,8 +729,6 @@ function updateSQL_string(table, id, obj){
 
     //Open database
     db_open('./' + domain + '.db').then(db => {
-
-     
       
       // Register op Venda
       register_op(null, 'vendas', null, 'clientes', cliente, total, date, db)
@@ -756,11 +754,27 @@ function updateSQL_string(table, id, obj){
             if (err) {
               return console.log(err.message);
             }
+
+             //Register in cash flow if exists
+             var pg_a_vista = value_dinheiro + value_debito + value_credito
+             if (pg_a_vista > 0){
+               sql = `INSERT INTO cash_flow 
+               (created, desc, desc2, type, value) 
+               VALUES (${date_ref}, 'Venda', ${this.lastID}, 1 , ${pg_a_vista})`
+               console.log(sql);
+               db.run(sql, function(err) {
+                   if (err) {
+                     return console.log(err.message);
+                   }
+               })
+             }
+
+
             //Register faturado_value if exists
             if (value_faturado > 0){
               sql = `INSERT INTO faturados 
               (venda_id, created, cliente, tipo, valor) 
-              VALUES (${this.lastID}, ${date_ref}, ${cliente}, 0, ${subtotal * -1})`
+              VALUES (${this.lastID}, ${date_ref}, ${cliente}, 0, ${value_faturado * -1})`
               console.log(sql);
               db.run(sql, function(err) {
                   if (err) {

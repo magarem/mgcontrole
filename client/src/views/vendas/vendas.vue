@@ -12,42 +12,39 @@
       <el-table
         v-loading="listLoading"
         :data="vendas"
-        border
         fit
         highlight-current-row
         style="_width: 100%; font-size: 18px;"
-        @row-click="getList_vendaItens"
-      >
-
-        <el-table-column label="#" prop="#" sortable="custom" align="center" width="80">
+        @row-click="getList_vendaItens">
+        <el-table-column label="#" prop="#"  width="80">
           <template slot-scope="scope">
             <span>{{ scope.row.id }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Data" prop="data" sortable="custom" align="center" width="220">
+        <el-table-column label="Data" prop="data"  width="220">
           <template slot-scope="scope">
             <span>{{ timeConverter(scope.row.data) }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="317">
+        <el-table-column label="Cliente" prop="cliente"  width="317">
           <template slot-scope="scope">
             <span>{{ scope.row.cliente }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Subtotal" prop="subtotal" sortable="custom" align="center" width="150">
+        <el-table-column label="Subtotal" prop="subtotal"  width="150">
           <template slot-scope="scope">
             <span>{{ scope.row.subtotal | money }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Desconto" prop="desconto" sortable="custom" align="center" width="150">
+        <el-table-column label="Desconto" prop="desconto"  width="150">
           <template slot-scope="scope">
             <span>{{ scope.row.desconto | money }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Total" prop="total" sortable="custom" align="center" width="150">
+        <el-table-column label="Total" prop="total"  width="150">
           <template slot-scope="scope">
             <span>{{ scope.row.total | money }}</span>
           </template>
@@ -72,8 +69,8 @@
     Modal Venda details
 
     -->
-    <el-dialog :visible.sync="dialogPvVisible" title="Venda" width="80%" top="5vh" center>
-      <span slot="title" style="font-size: 30px; margin-bottom: 100px;">Venda detalhada</span>
+    <el-dialog :visible.sync="dialogPvVisible" title="Venda" width="85%" top="5vh" center>
+      <span slot="title" style="font-size: 21px; margin-bottom: 0px;">Venda detalhada</span>
       <el-row :gutter="10" type="flex" class="row-bg">
         <el-col :span="2"><div class="grid-content bg-purple"><b>#:</b> {{ venda_selected.id }}</div></el-col>
         <el-col :span="7"><div class="grid-content bg-purple"><b>Data:</b> {{ timeConverter(venda_selected.data) }}</div></el-col>

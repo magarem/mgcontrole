@@ -122,67 +122,53 @@ table tbody tr:nth-child(2n) td {
 </style>
 <template>
   <div v-if="info" class="app-container">
-    <!-- <div v-if="selected" style="padding-top:10px; width: 100%;">
-      You have selected <code>{{selected.cliente_id}} - {{selected.cliente}}</code>
-      </div> -->
-
-    <!-- <h2>{{ info.name }}</h2> -->
-   
     <el-row style="width:95%;  margin:auto;">
-
       <el-col :span="24">
         <div>
-          <el-button type="success" @click="clientesTotais=true">Totais</el-button>
-          <el-button type="primary" icon="el-icon-search" @click="list_total=0; clientesListFlg=true" />
+          <el-button type="success" @click="clientesTotais=true" style="font-size: 20px;">Totais</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="list_total=0; clientesListFlg=true" style="font-size: 20px;"/>
           <el-divider direction="vertical" />
           <span v-if="selected.cliente" style="font-size:28px;"><span class="bold">Cliente:</span> ({{selected.cliente_id}}) {{ selected.cliente }}</span>
           <span v-if="!selected.cliente" style="font-size:25px;">Todos</span>
-
           <el-divider direction="vertical" />
-          <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true">Lançar crédito</el-button>
+          <el-button v-if="selected.cliente_id" type="success" @click="temp={}; dialogFormVisible=true" style="font-size: 20px;">Lançar crédito</el-button>
         </div>
       </el-col>
     </el-row><br>
     <el-row style="font-size:25px; width:95%; margin:auto;">
       <el-col :span="24" :offset="0">
         <div>
-          <!-- <span v-if="list_total.debito" style="color: red;"> Débitos: {{ (list_total.debito) | money }}</span>
-
-          <span v-if="list_total.credito" style="color: green; "> Créditos: {{ (list_total.credito) | money }}</span> -->
-
-          <!-- <span  style="color: red;"> Saldo total: {{ saldo | money }}</span> -->
           <span :style="[saldo>0?{color: 'green'}:{color: 'red'}]">Saldo total: {{ saldo | money }}</span>
-          <!-- <span v-if="(list_total) >= 0" style="color: green;"> Saldo total: {{ list_total | money }}</span> -->
         </div>
       </el-col>
     </el-row><br>
     <div style="width:95%; margin:auto;">
-      <el-table :data="list" border fit highlight-current-row style="width: 90%; font-size: 17px;">
-        <el-table-column label="Data" prop="created" sortable="custom" align="center" width="220">
+      <el-table :data="list" fit highlight-current-row style="width: 90%; font-size: 20px;">
+        <el-table-column label="Data" prop="created"  width="270">
           <template slot-scope="scope">
             <span>{{ scope.row.created | dateFormat}}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Cliente" prop="cliente" sortable="custom" align="center" width="290">
+        <el-table-column label="Cliente" prop="cliente"  width="300">
           <template slot-scope="scope">
             <span>{{ scope.row.cliente_id }} - {{ scope.row.cliente_nome }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="Venda" prop="venda" sortable="custom" align="center" width="100">
+        <el-table-column label="#" prop="venda"  width="50">
           <template slot-scope="scope">
             <span>{{ scope.row.venda_id }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="tipo" prop="tipo" sortable="custom" align="center" width="100">
+        <el-table-column label="Tipo" prop="tipo"  width="100">
           <template slot-scope="scope">
             <span>{{ scope.row.tipo | tipoFilter}}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="valor" prop="valor" sortable="custom" align="center" width="150">
+        <el-table-column label="Valor" prop="valor" align=right width="150">
           <template slot-scope="scope">
             <span>{{ scope.row.valor | money }}</span>
           </template>
@@ -243,32 +229,24 @@ table tbody tr:nth-child(2n) td {
 
       <!-- ClientesTotais -->
       <el-dialog :visible.sync="clientesTotais" title="Totais por cliente" width="70%" align="center">
-       
-       <el-table :data="lista2" border fit highlight-current-row style="width: 90%; font-size: 17px;">
-        <el-table-column label="Cliente_id" prop="cliente_id" sortable="custom" align="center" width="150">
+       <el-table :data="lista2" fit highlight-current-row style="width: 90%; font-size: 20px; margin-bottom: 50px;">
+        <el-table-column label="Cliente" prop="cliente_nome"  width="300">
           <template slot-scope="scope">
-            <span>{{ scope.row.cliente_id }}</span>
+            <span>{{ scope.row.cliente_nome }} ({{ scope.row.cliente_id }})</span>
           </template>
         </el-table-column>
-
-        <el-table-column label="Cliente_nome" prop="cliente_nome" sortable="custom" align="center" width="260">
-          <template slot-scope="scope">
-            <span>{{ scope.row.cliente_nome }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Faturas" prop="faturas" sortable="custom" align="center" width="110">
+        <el-table-column label="Faturas" prop="faturas"  width="100">
           <template slot-scope="scope">
             <span>{{ scope.row.faturas }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Total" prop="total" sortable="custom" align="center" width="200">
+        <el-table-column label="Total" prop="total" align=right width="200">
           <template slot-scope="scope">
             <span>{{ scope.row.total | money}}</span>
           </template>
         </el-table-column>
         </el-table>
       </el-dialog>
-
   </div>
 </template>
 
@@ -660,28 +638,38 @@ export default {
         valor: this.temp.credito
       }
       create('faturados', this.temp1).then((ret) => {
-            this.dialogFormVisible = false
-            swal({
-              title: 'Operação concluida!',
-              text: 'Crédito lançado com sucesso',
-              icon: 'success',
-              buttons: {
-                cancel: {
-                  text: 'ok',
-                  value: 'new'
-                },
-                new: {
-                  text: 'ok',
-                  value: 'new'
+           this.dialogFormVisible = false
+           //Register in cash flow
+           var objAux1 = {
+              created: +new Date(),
+              desc: 'Crédito cliente',
+              desc2: this.temp.cliente_id,
+              type: 1,
+              value: this.temp.credito
+            }
+           create('cash_flow', objAux1).then((ret) => {
+              swal({
+                title: 'Operação concluida!',
+                text: 'Crédito lançado com sucesso',
+                icon: 'success',
+                buttons: {
+                  cancel: {
+                    text: 'ok',
+                    value: 'new'
+                  },
+                  new: {
+                    text: 'ok',
+                    value: 'new'
+                  }
                 }
-              }
-              })
+                })
               .then((value) => {
-              switch (value) {
-                case 'ok':
-                  break
-              }
-            })
+                switch (value) {
+                  case 'ok':
+                    break
+                }
+              })
+           })
       })
       this.getList()
     }

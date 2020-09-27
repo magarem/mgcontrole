@@ -55,19 +55,13 @@
 </template>
 
 <script>
-Number.prototype.format = function(n, x, s, c) {
-    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',
-        num = this.toFixed(Math.max(0, ~~n));
-
-    return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
-};
 import { fetchList } from '@/api/generic'
 import Pagination from '@/components/Pagination'
 export default {
   name: 'DashboardAdmin',
   components: { Pagination },
   filters: {
-     data(value){
+    data(value){
       return moment(+value).format('DD-MM-YYYY, hh:mm:ss a')
     },
     decimal(value) {
@@ -154,11 +148,8 @@ export default {
             sums[index] = 'N/A';
           }
         });
-
         return sums;
       },
-  
-  
     vai(local){
       if (local == 'ultimas vendas') {
         this.$router.push('/relatorios/vendas_total');
@@ -169,10 +160,6 @@ export default {
       const self = this
       fetchList('rel_vendas_total', this.listQuery).then(response => {
         this.list = response.data.items.reverse()
-        
-        
-
-
         this.chartOptions = {
           chart: {
             id: 'vuechart-example',
@@ -250,13 +237,10 @@ export default {
         Order by total`, {tipo: 'sql'})
       .then(response => {
         this.lista2 = response.data.items
-        console.log('this.lista2>>:', this.lista2);
         var t1 = this.lista2.map(function(x){return +x.total.toFixed(2)*-1})
-        console.log('t1:>', t1);
-        console.log('!!!?>', this.lista2.map(function(x){return +x.total.toFixed(2)*-1}));
         this.ttt_ = 'R$ ' + response.data.items.map(function(x){return +x.total}).reduce((a, b) => {
           return a + b
-        }, 0).format(2, 3, '.', ',').toString();
+        }, 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }).toString();
         //Separa os 5 primeiros
         var lista_5_nomes = this.lista2.slice(0,7).map(function(x){return x.cliente_nome})
         var lista_5_valores = this.lista2.slice(0,7).map(function(x){return +x.total.toFixed(2)*-1})
@@ -265,41 +249,14 @@ export default {
           return a + b
         }, 0).toFixed(2)
 
-        var lista_completo_nomes = [...lista_5_nomes, 'outros']
+        var lista_completo_nomes = [...lista_5_nomes, 'Outros']
         var lista_completo_valores = [...lista_5_valores, +ttt0]
         
-        console.log('lista_completa:>', lista_completo_nomes, lista_completo_valores);
-
-        // var ttt0 = this.lista2.map(function(x){return +x.total*-1}).reduce((a, b) => {
-        //       return a + b
-        //     }, 0).toFixed(2)
-
-        // console.log('ttt0:', ttt0);
-
-        // var ttt_nomes = this.lista2.slice(0,5).map(function(x){return x.cliente_nome}).reduce((a, b) => {
-        //       return a + b
-        //     }, 0).toFixed(2)
-
-        // console.log('ttt_nomes:', ttt_nomes);
-
-        //  var ttt = this.lista2.slice(0,5).map(function(x){return +x.total*-1}).reduce((a, b) => {
-        //       return a + b
-        //     }, 0).toFixed(2)
-
-        // console.log('ttt:', ttt);
-
-
-        // var ttt2 = this.lista2.slice(5).map(function(x){return +x.total*-1}).reduce((a, b) => {
-        //       return a + b
-        //     }, 0).toFixed(2)
-
-        
-        // console.log('ttt2:', ttt2);
         this.series_2 = lista_completo_valores
         this.chartOptions_2 = {
           chart: {
             width: 550,
-            type: 'donut',
+            type: 'pie',
           },
           plotOptions: {
             pie: {
@@ -353,25 +310,6 @@ export default {
           labels: lista_completo_nomes,
           
         }
-        // this.series_2 = this.lista2.map(function(x){return +(x.total).toFixed(2)})
-        // this.chartOptions_2 = {
-        //     chart: {
-        //       width: 380,
-        //       type: 'pie',
-        //     },
-        //     labels: this.lista2.map(function(x){return x.cliente_nome}),
-        //     responsive: [{
-        //       breakpoint: 480,
-        //       options: {
-        //         chart: {
-        //           width: 200
-        //         },
-        //         legend: {
-        //           position: 'bottom'
-        //         }
-        //       }
-        //     }]
-        //   }
       
       })
 

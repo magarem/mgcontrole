@@ -12,50 +12,46 @@
     </div>
     <el-table
       :key="tableKey"
-      v-loading="listLoading"
+      
       :data="list"
-      border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%; font-size: 20px;"
       @sort-change="sortChange">
-      <el-table-column label="ID" prop="ean" sortable="custom" align="center" width="100">
+      <el-table-column label="ID" prop="ean"  align="center" width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="EAN" prop="ean" sortable="custom" align="center" width="130">
+      <!-- <el-table-column label="EAN" prop="ean"  align="center" width="70">
         <template slot-scope="scope">
           <span>{{ scope.row.ean }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
-      <el-table-column label="Descricao" prop="descricao" sortable="custom" align="center" width="390">
+      <el-table-column label="Descricao" prop="descricao"  _align="center" width="250">
         <template slot-scope="scope">
           <span>{{ scope.row.descricao | capitalize }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Preço" prop="pco_venda" sortable="custom" align="center" width="90">
-        <template slot-scope="scope">
-          <span>{{ scope.row.pco_venda | money }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Uni" prop="unidade" sortable="custom" align="center" width="70">
+      <el-table-column label="Uni" prop="unidade" _align="center" width="70">
         <template slot-scope="scope">
           <span>{{ scope.row.unidade }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Estoque" prop="estoque" sortable="custom" align="center" width="100">
+      <el-table-column label="Preço" prop="pco_venda"  align="right" width="170">
+        <template slot-scope="scope">
+          <span>{{ scope.row.pco_venda | money }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Estoque" prop="estoque"  align="center" width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.estoque }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Actions" align="center" width="150" class-name="small-padding fixed-width">
+      <el-table-column label="" align="center" width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit
@@ -163,10 +159,10 @@ export default {
       tableKey: 0,
       list: null,
       total: 0,
-      listLoading: true,
+      // listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
+        limit: 10,
         sort: 'id DESC',
         find: {
           ean: null,
@@ -199,16 +195,16 @@ export default {
   },
   methods: {
     getList() {
-      this.listLoading = true
+      // this.listLoading = true
       fetchList('produtos', this.listQuery).then(response => {
         console.log('response.data.items:', response.data.items)
         this.list = response.data.items
         this.total = response.data.total
 
         // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
+        // setTimeout(() => {
+        //   this.listLoading = false
+        // }, 1.5 * 1000)
       })
     },
     handleFilter() {
