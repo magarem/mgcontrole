@@ -36,7 +36,11 @@
           <span>{{ scope.row.n }}</span>
         </template>
       </el-table-column>
-     
+     <el-table-column label="Total geral" prop="total"  width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.total | money }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="Total (dinheiro)" prop="total"  width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.dinheiro | money }}</span>
@@ -57,11 +61,7 @@
           <span>{{ scope.row.faturado | money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Total geral" prop="total"  width="200">
-        <template slot-scope="scope">
-          <span>{{ scope.row.total | money }}</span>
-        </template>
-      </el-table-column>
+      
 
       <el-table-column label="% a vista" prop="dinheiro"  width="200">
         <template slot-scope="scope">
@@ -89,7 +89,6 @@
         <el-table
             v-loading="listLoading"
             :data="vendas"
-            
             stripe
             fit
             style="width: 100%; font-size: 18px;">

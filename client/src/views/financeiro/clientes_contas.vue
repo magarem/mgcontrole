@@ -156,7 +156,7 @@ table tbody tr:nth-child(2n) td {
           </template>
         </el-table-column>
 
-        <el-table-column label="#" prop="venda"  width="50">
+        <el-table-column label="#" prop="venda"  width="100">
           <template slot-scope="scope">
             <span>{{ scope.row.venda_id }}</span>
           </template>
@@ -306,7 +306,7 @@ export default {
       lista2: [],
       clientesTotais: false,
       clientesList: [],
-       columns_clientes: [
+      columns_clientes: [
         {
           label: 'Código',
           field: 'id',
@@ -489,7 +489,7 @@ export default {
       }).catch(function(error) {
         console.log(error)
       })
-      this.clientesListFlg = true
+      // this.clientesListFlg = true
       this.$nextTick(() => {
         this.searchTermClient = null
         // this.$refs.searchClient.focus()

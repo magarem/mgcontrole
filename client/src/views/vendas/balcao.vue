@@ -150,12 +150,18 @@
               <!-- Produtos -->
               <el-card class="box-card" shadow="always" style="height: 505px; background-color: #a3a3c2;">
                 <div slot="header" class="clearfix cardtitle">
-                  <el-row>
-                    <el-col :span="6">
+                  <el-row :gutter="20">
+                    <el-col :span="5">
                       <span>Produtos</span>
                     </el-col>
-                    <el-col :span="18">
-                      <input ref="searchTerm_" v-model="source" placeholder=" Selecione o produto" list="my-list-id" style="width: 99%; height: 35px;" @input="productSet">
+                    <el-col :span="9">
+                      <input ref="EAN" v-model="EAN" style="width: 99%; height: 35px;" placeholder=" Código de barra" @keyup.enter="productSet_EAN">
+                    </el-col>
+                    <!-- <el-col :span="1">
+                      &nbsp;
+                    </el-col> -->
+                    <el-col :span="10">
+                      <input ref="searchTerm_" v-model="source" placeholder=" Nome" list="my-list-id" style="width: 99%; height: 35px;" @input="productSet">
                       <datalist id="my-list-id">
                         <option v-for="(value, key) in produtos_" :key="key">{{ value.name }}</option>
                       </datalist>
@@ -260,9 +266,9 @@
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
-                      <span style="font-family: tahoma; font-size: 70%;">
+                      <span style="font-family: tahoma; font-size: 60%;">
                         <a @click="getCliente">
-                          <span class="bold">Cliente:</span> {{ cupom.cliente.nome }} ({{ cupom.cliente.id }})
+                          {{ cupom.cliente.nome }} ({{ cupom.cliente.id }})
                         </a>
                       </span>
                     </el-col>
@@ -830,6 +836,7 @@ export default {
   },
   data() {
     return {
+      EAN: null,
       caixa_open_value: 0,
       caixa_fechamento_value: 0,
       caixa_display: null,
@@ -1066,7 +1073,7 @@ export default {
         value = value.replace('ã', 'a')
         value = value.replace('ç', 'c')
         img = '/assets/img/produtos/' + value + '.png'
-        console.log('img:', img);
+        // console.log('img:', img);
         return img
         // console.log('img_mini > value:', value);
         // var a = this.produtos.filter(item => item.descricao == value)[0]
@@ -1315,7 +1322,8 @@ export default {
     },
     vai() {
       this.$nextTick(function() {
-        this.$refs.searchTerm_.focus()
+        // this.$refs.searchTerm_.focus()
+        this.$refs.EAN.focus()
         this.source = null
       })
     },
@@ -1443,6 +1451,7 @@ export default {
               this.product_selected = {}
               this.search = {}
               this.qnt = null
+              this.EAN = null
 
               // Reset products list
               this.novoItem = false
@@ -1460,6 +1469,23 @@ export default {
       console.log('row:',row);
       this.temp2 = this.cupom.itens.find(x => parseInt(x.n) === parseInt(row.n))
       this.dialogFormCupomView = true
+    },
+    productSet_EAN() {
+      const sound = (new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3'))).play()
+      console.log('this.EAN:', parseInt(this.EAN));
+      var item = this.produtos.find(x => parseInt(x.ean) === parseInt(this.EAN))
+      console.log(item)
+      if (item) {
+        this.qnt = 1
+        this.product_selected = item
+        this.product_selected.qnt = 0.0
+        this.product_selected.total = 0
+        console.log('this.product_selected:', this.product_selected)
+        this.$nextTick(() => {
+          // this.$refs.qnt.focus()
+          this.cupom_add()
+        })
+      }
     },
     productSet(params) {
       console.log(params)

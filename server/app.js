@@ -542,7 +542,7 @@ function updateSQL_string(table, id, obj){
         if (req.query.tipo==1) {sqlStr = sqlStrSimple2}
       }
       if (req.query.tipo) {
-        if (req.query.tipo=='sql') {sqlStr = key}
+        if (req.query.tipo=='sql') {sqlStr = unescape(key)}
       }
 
       console.log('>>>', sqlStr);

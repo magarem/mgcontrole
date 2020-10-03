@@ -49,6 +49,38 @@
      
     </el-row><br>
     <el-row :gutter="20">
+       <el-col :span="8">
+        <el-card class="box-card" style="width: 100%; _height: 490px;">
+          <div slot="header" class="clearfix">
+            <span @click="vai('ultimas vendas')">Livro caixa (últimos lançamentos)</span>
+          </div>
+          <el-table :data="list_caixa" height="360" highlight-current-row style="width: 100%; font-size: 16px;">
+            <el-table-column label="Data"  width="150">
+              <template slot-scope="scope">
+                <span>{{ scope.row.date }}</span>
+              </template>
+            </el-table-column>
+             <el-table-column label="N"  width="35">
+              <template slot-scope="scope">
+                <span>{{ scope.row.n }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Total" align="right" width="130">
+              <template slot-scope="scope">
+                <span>{{ scope.row.value | money}}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+      <el-col :span="16">
+        <el-card class="box-card" style="width: 100%; _height: 490px;">
+          <div slot="header" class="clearfix">
+            <span @click="vai('ultimas vendas')">Livro caixa (últimos lançamentos)</span>
+          </div>
+        <apexchart width="100%" :options="chartOptions_cash_flow" :series="series_cash_flow"></apexchart>
+      </el-card>
+      </el-col>
     </el-row>
     <br>
   </div>
@@ -88,6 +120,14 @@ export default {
         
       },
       series: [],
+      chartOptions_cash_flow: {
+       
+        chart: {
+          id: 'vuechart-example'
+        },
+        
+      },
+      series_cash_flow: [],
       series_2: [],
       chartOptions_2: {
           labels: []
@@ -211,7 +251,13 @@ export default {
             max: Math.max(...this.list.map(function(x){return x.total.toFixed(2)})),
           },
         }
-        this.series = [{
+        // var media = (this.list.slice(7).map(function(x){return x.total}).reduce((a, b) => {
+        //   return a + b
+        // }, 0))
+        var media = (this.list.slice(0,7).map(function(x){return x.total}).reduce((a, b) => a + b) / 7); 
+        console.log('media:', media.toFixed(2));
+        this.series = [
+        {
           name: 'Total',
           type: "line",
           data: this.list.map(function(x){return x.total.toFixed(2)})
@@ -313,8 +359,65 @@ export default {
       
       })
 
-      fetchList('view_fin_caixa', this.listQuery).then(response => {
+      fetchList('cash_flow_total_by_day', {page: 1, limit: 7, sort: '1 ASC'}).then(response => {
         this.list_caixa = response.data.items
+        console.log('this.list_caixa:', this.list_caixa);
+         this.chartOptions_cash_flow = {
+          chart: {
+            id: 'vuechart-example',
+            height: '350',
+            width: '100%',
+            type: 'bar',
+            stacked: 'true',
+            zoom: {
+              enabled: true,
+              type: 'x'
+            }, 
+            dropShadow: {
+              enabled: true,
+              color: '#000',
+              top: 18,
+              left: 7,
+              blur: 10,
+              opacity: 0.2
+            }
+          }, 
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '85%',
+            }
+          },
+          dataLabels: {
+            enabled: true
+          },
+          tooltip: {
+              followCursor: true,
+              shared: false
+            },
+          markers: {
+              size: 0,
+              fillOpacity: 0,
+              strokeOpacity: 0
+            },
+          stroke: {
+            width: 1,
+          },
+          xaxis: {
+            categories: this.list_caixa.map(function(x){return x.date})
+          },
+          yaxis: {
+            title: {
+              text: '$ (Valores)'
+            },
+            max: Math.max(...this.list_caixa.map(function(x){return x.value.toFixed(2)})),
+          },
+        }
+        this.series_cash_flow = [{
+          name: 'Total',
+          type: "bar",
+          data: this.list_caixa.map(function(x){return x.value.toFixed(2)})
+        }]
         this.listLoading = false
       })
     },
