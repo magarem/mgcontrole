@@ -17,7 +17,13 @@ const relatoriosRouter = {
       path: 'vendas_total',
       component: () => import('@/views/relatorios/vendas_total'),
       name: 'Clientes-',
-      meta: { roles: ['admin'], title: 'Relatorios' }
+      meta: { roles: ['admin'], title: 'Vendas' }
+    },
+    {
+      path: 'caixa',
+      component: () => import('@/views/relatorios/relatorio_caixa'),
+      name: 'Clientes-',
+      meta: { roles: ['admin'], title: 'Caixa' }
     }
   ]
 }

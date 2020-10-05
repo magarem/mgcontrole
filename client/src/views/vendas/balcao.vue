@@ -132,7 +132,6 @@
     background-color: #E6C793
   } */
 </style>
-
 <template>
   <div class="app-container body" >
     <div id="main">
@@ -147,14 +146,12 @@
                     <el-col :span="5">
                       <span>Produtos</span>
                     </el-col>
-                    <!-- <el-col :span="9">
+                    <el-col :span="9">
                       <input ref="EAN" v-model="EAN" style="width: 99%; height: 35px;" placeholder=" Código de barra" @keyup.enter="productSet_EAN">
-                    </el-col> -->
-                    <!-- <el-col :span="1">
-                      &nbsp;
-                    </el-col> -->
-                    <el-col :span="19">
-                      <input ref="searchTerm_" v-model="source" placeholder=" Código de barra ou busca pelo nome" list="my-list-id" style="width: 99%; height: 35px;" @input="productSet">
+                    </el-col>
+                    
+                    <el-col :span="10">
+                      <input ref="searchTerm_" v-model="source" placeholder=" Busca pelo nome" list="my-list-id" style="width: 99%; height: 35px;" @input="productSet">
                       <datalist id="my-list-id">
                         <option v-for="(value, key) in produtos_" :key="key">{{ value.name }}</option>
                       </datalist>
@@ -246,7 +243,7 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
                     <el-col :span="9">
-                      <span>Cupom</span> <el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button>
+                      <span>Cupom</span> <!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
                     </el-col>
                     <el-col :span="15" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                       {{ today }}
@@ -255,7 +252,7 @@
                   <el-row>
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
-                        <span class="bold">Usuário:</span>{{ user }}<br>
+                        <span class="bold">Usuário:</span> <a @click="caixa().open()">{{ user }}</a><br>
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -637,29 +634,28 @@
       </el-dialog>
 
       <!-- Caixa status -->
-      <modal name="modal_caixa_op" :clickToClose=false :width="700" :height="520" :adaptive="true">
+      <modal name="modal_caixa_op" :clickToClose=false :width="700" :height="570" :adaptive="true">
         <div style="padding:20px;">
           <div class="center" style="font-size: 25px; padding-bottom: 30px;">Operação de Caixa</div>
           <div style="font-size: 20px;">
-              <table style="width: 100%; margin: auto;">
+              <table style="width: 100%; margin: auto;" border="0">
                     <tr>
-                      <td class=bold style="text-align: right; important!">Data:</td>
-                      <td style="padding: 5px;">{{today}}</td>
+                      <td class=bold_ style="width: 33%; background-color: #f0f0f5; text-align: center; important!; padding: 10px;">Data:<br>{{today}}</td>
+                      <!-- <td style="padding: 5px;">{{today}}</td> -->
+                    
+                      <td class=bold_ style="width: 33%; background-color: #f0f0f5; text-align: center; important!; padding: 10px;">Usuário:<br>{{user}}</td>
+                      <!-- <td style="padding: 5px;">{{user}}</td> -->
+                    
+                      <td class=bold_ style="width: 33%; background-color: #f0f0f5; text-align: center; important!; padding: 10px;">Posição:<br>{{caixa_.status | caixa_op_filter}}</td>
+                      <!-- <td style="padding: 5px;">{{caixa_.status | caixa_op_filter}}</td> -->
                     </tr>
+                    <tr><td colspan=3>&nbsp;</td></tr>
                     <tr>
-                      <td class=bold style="text-align: right; important!">Usuário:</td>
-                      <td style="padding: 5px;">{{user}}</td>
-                    </tr>
-                    <tr>
-                      <td class=bold style="text-align: right; important!">Posição:</td>
-                      <td style="padding: 5px;">{{caixa_.status | caixa_op_filter}}</td>
-                    </tr>
-                    <tr>
-                      <td colspan=2 style="padding: 5px;">
+                      <td colspan=3 style="_padding: 5px;">
 
                         <el-tabs type="card" @tab-click="caixa_op">
                           <el-tab-pane :disabled="caixa_.status == 'opened'" label="Abertura">
-                            <table>
+                            <table v-if="caixa_.status !== 'opened'" style="width: 100%">
                               <tr>
                                 <td class=bold style="text-align: right; important!">Valor:</td>
                                 <td style="padding: 5px;">
@@ -673,16 +669,22 @@
                                     type="textarea"
                                     :rows="4"
                                     placeholder=""
-                                    style="font-size: 18px; width: 500px;"
+                                    style="font-size: 18px; width: 100%;"
                                     v-model="caixa_status_op_obs">
                                   </el-input>
                                 </td>
                               </tr>
+                              <tr>
+                                <td colspan=2 style="text-align: center; _height: 70px; padding-top: 15px;">
+                                  <el-button type=success v-if="aux_caixa_op" @click="caixa_op_ok" style="width: 100%; font-size: 30px; margin-bottom: 5px;">Confirma</el-button><br>
+                                  <el-button type=primary @click="caixa().close()" style="width: 100%; " :disabled="caixa_.status=='closed'">Cancela</el-button>
+                                </td>
+                              </tr>
+                              
                             </table>
                           </el-tab-pane>
-                         
                           <el-tab-pane :disabled="caixa_.status == 'closed'" label="Reforço">
-                            <table>
+                            <table style="width: 100%">
                               <tr>
                                 <td class=bold style="text-align: right; important!">Valor:</td>
                                 <td style="padding: 5px;">
@@ -696,15 +698,21 @@
                                     type="textarea"
                                     :rows="4"
                                     placeholder="Motivo"
-                                    style="font-size: 18px; width: 500px;"
+                                    style="font-size: 18px; width: 100%;"
                                     v-model="caixa_status_op_obs">
                                   </el-input>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td colspan=2 style="text-align: center; _height: 70px; padding-top: 15px;">
+                                  <el-button type=success v-if="aux_caixa_op" @click="caixa_op_ok" style="width: 100%; font-size: 30px; margin-bottom: 5px;">Confirma</el-button><br>
+                                  <el-button type=primary @click="caixa().close()" style="width: 100%; " :disabled="caixa_.status=='closed'">Cancela</el-button>
                                 </td>
                               </tr>
                             </table>
                           </el-tab-pane>
                           <el-tab-pane :disabled="caixa_.status == 'closed'" label="Sangria">
-                            <table>
+                            <table style="width: 100%">
                               <tr>
                                 <td class=bold style="text-align: right; important!">Valor:</td>
                                 <td style="padding: 5px;">
@@ -718,32 +726,66 @@
                                     type="textarea"
                                     :rows="4"
                                     placeholder="Motivo"
-                                    style="font-size: 18px; width: 500px;"
+                                    style="font-size: 18px; width: 100%;"
                                     v-model="caixa_status_op_obs">
                                   </el-input>
+                                </td>
+                              </tr>
+                               <tr>
+                                <td colspan=2 style="text-align: center; _height: 70px; padding-top: 15px;">
+                                  <el-button type=success v-if="aux_caixa_op" @click="caixa_op_ok" style="width: 100%; font-size: 30px; margin-bottom: 5px;">Confirma</el-button><br>
+                                  <el-button type=primary @click="caixa().close()" style="width: 100%; " :disabled="caixa_.status=='closed'">Cancela</el-button>
                                 </td>
                               </tr>
                             </table>
 
                           </el-tab-pane>
                           <el-tab-pane :disabled="caixa_.status == 'closed'" label="Fechamento">
-                            <table>
+                            <table style="width: 100%">
                               <tr>
-                                <td class=bold style="text-align: right; important!">Valor:</td>
+                                <td class=bold style="text-align: right; important!">Dinheiro:</td>
                                 <td style="padding: 5px;">
-                                  <money v-model="caixa_fechamento_value" v-bind="money" class="el-input__inner" readonly="true" />
+                                  {{ caixa_fechamento_value.dinheiro | money }}
+                                  <!-- <money v-model="caixa_fechamento_value.dinheiro" v-bind="money" class="el-input__inner" readonly="true" /> -->
+                                </td>
+                              </tr>
+                               <tr>
+                                <td class=bold style="text-align: right; important!">Cartão:</td>
+                                <td style="padding: 5px;">
+                                  {{ caixa_fechamento_value.cartao | money }}
+                                  <!-- <money v-model="caixa_fechamento_value.cartao" v-bind="money" class="el-input__inner" readonly="true" /> -->
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Faturado:</td>
+                                <td style="padding: 5px;">
+                                  {{ caixa_fechamento_value.faturado | money }}
+                                  <!-- <money v-model="caixa_fechamento_value.faturado" v-bind="money" class="el-input__inner" readonly="true" /> -->
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class=bold style="text-align: right; important!">Total:</td>
+                                <td style="padding: 5px;">
+                                  {{ caixa_fechamento_value.dinheiro + caixa_fechamento_value.cartao + caixa_fechamento_value.faturado | money }}
+                                  <!-- <money v-model="caixa_fechamento_value.faturado" v-bind="money" class="el-input__inner" readonly="true" /> -->
                                 </td>
                               </tr>
                               <tr>
                                 <td class=bold style="text-align: right; important!">Obs:</td>
-                                <td style="padding: 5px;">
+                                <td style="_padding: 5px;">
                                   <el-input
                                     type="textarea"
-                                    :rows="4"
+                                    :rows="2"
                                     placeholder="obs"
-                                    style="font-size: 18px; width: 500px;"
+                                    style="font-size: 18px; width: 100%;"
                                     v-model="caixa_status_op_obs">
                                   </el-input>
+                                </td>
+                              </tr>
+                               <tr>
+                                <td colspan=2 style="text-align: center; _height: 70px; padding-top: 15px;">
+                                  <el-button type=success v-if="aux_caixa_op" @click="caixa_op_ok" style="width: 100%; font-size: 30px; margin-bottom: 5px;">Confirma</el-button><br>
+                                  <el-button type=primary @click="caixa().close()" style="width: 100%; " :disabled="caixa_.status=='closed'">Cancela</el-button>
                                 </td>
                               </tr>
                             </table>
@@ -774,14 +816,7 @@
                         </el-input>
                       </td>
                     </tr> -->
-                    <tr>
-                      <td colspan=1 style="text-align: center; height: 70px; padding: 5px;">
-                        <el-button type=primary @click="caixa().close()" style="width: 100%;" :disabled="caixa_.status=='closed'">Cancela</el-button>
-                      </td>
-                      <td colspan=1 style="text-align: center; height: 70px; padding: 5px;">
-                        <el-button type=success v-if="aux_caixa_op" @click="caixa_op_ok" style="width: 100%;">Confirma</el-button>
-                      </td>
-                    </tr>
+                    
               </table>
           </div>
         </div>
@@ -831,7 +866,11 @@
       return {
         EAN: null,
         caixa_open_value: 0,
-        caixa_fechamento_value: 0,
+        caixa_fechamento_value: {
+          dinheiro: 0,
+          cartao: 0,
+          faturado: 0
+        },
         caixa_display: null,
         caixa_status_op_obs: null,
         caixa_op_selected: null,
@@ -1210,7 +1249,11 @@
                   faturado: response.data.items.map(amount.faturado).reduce(sum,0)
                 } 
 
-                self.caixa_fechamento_value = total.dinheiro + total.debito + total.credito + total.faturado
+                self.caixa_fechamento_value = {
+                  dinheiro: total.dinheiro,
+                  cartao: total.debito + total.credito,
+                  faturado: total.faturado
+                }
                 console.log('self.caixa_op_value:', self.caixa_op_value);
                 // var fechamento = {
                 //   // data: self.today,
@@ -1279,7 +1322,7 @@
           status = 'opened'
         }
         if (self.aux_caixa_op == 'Fechamento') {
-          self.caixa_.value = self.caixa_fechamento_value
+          self.caixa_.value = JSON.stringify(self.caixa_fechamento_value)
           self.aux_caixa_op = "close"
           status = 'closed'
         }
@@ -1323,8 +1366,8 @@
       },
       vai() {
         this.$nextTick(function() {
-          this.$refs.searchTerm_.focus()
-          // this.$refs.EAN.focus()
+          // this.$refs.searchTerm_.focus()
+          this.$refs.EAN.focus()
           this.source = null
           this.diversos_set()
         })
@@ -1362,8 +1405,10 @@
       },
       getUser() {
         var self = this
+        console.log('getToken:', getToken());
         getInfo().then(function(x) {
           self.user = x.data.name
+          console.log('x.data.name:', x.data.name)
           return self.user
         })
       },
@@ -1472,7 +1517,7 @@
         this.temp2 = this.cupom.itens.find(x => parseInt(x.n) === parseInt(row.n))
         this.dialogFormCupomView = true
       },
-      productSet_EAN_() {
+      productSet_EAN() {
         const sound = (new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3'))).play()
         console.log('this.EAN:', parseInt(this.EAN));
         console.log('this.produtos:', this.produtos);
@@ -1491,7 +1536,6 @@
         }
       },
       productSet(params) {
-        
         const sound = (new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3'))).play()
         // Check if is called by datalist or by product button
         if (params === Object(params)) var params = this.source
