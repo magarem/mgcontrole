@@ -1,17 +1,24 @@
 <style scoped>
   @page {
     margin-left: 0cm;
-    size: 58mm 100mm
+    size: 80mm 100mm
   } /* output size */
-  .receipt .sheet { width: 58mm; _height: 100mm } /* sheet size */
-  @media print { .receipt { width: 58mm } } /* fix for Chrome */
+  .receipt .sheet { width: 80mm; _height: 100mm } /* sheet size */
+  @media print { .receipt { width: 80mm } } /* fix for Chrome */
+
+  @media print {
+    body{
+      width: 80mm;
+      height: 100mm;
+      margin: 0mm 0mm 0mm 0mm; 
+      /* change the margins as you want them to be. */
+    } 
+  }
 
   .center {
     text-align: center;
   }
-  .left {
-    /* text-align: right; */
-  }
+  
   .right {
     text-align: right;
   }
@@ -67,8 +74,17 @@
     border-bottom: 1px solid #a6a6a6;
     margin-bottom: 3px;
   }
-  .cupom_total {
-    text-align: right; font-family: tahoma; font-size: 13px;
+  .cupom_header {
+    text-align: left; font-family: tahoma; font-size: 20px;
+  }
+  .cupom_table_header {
+    text-align: left; font-family: tahoma; font-size: 15px;
+  }
+  .cupom_table_rows {
+    height:40px; text-align: left; font-family: tahoma; font-size: 15px;
+  }
+  .cupom_footer {
+    text-align: left; font-family: tahoma; font-size: 15px;
   }
 
   #caixa_Status {
@@ -144,7 +160,7 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="20">
                     <el-col :span="5">
-                      <span>Produtos</span>
+                      Produtos
                     </el-col>
                     <el-col :span="9">
                       <input ref="EAN" v-model="EAN" style="width: 99%; height: 35px;" placeholder=" Código de barra" @keyup.enter="productSet_EAN">
@@ -217,16 +233,6 @@
                       </el-button>
                      </el-col>
                   </el-row>
-                  <!-- <el-row :gutter="5" style="margin-top: 20px">
-                    <el-col :span="8">
-                      <el-button v-waves round style="width: 100%; _height: 60px; font-size: 22px;" class="filter-item" type="warning" _icon="el-icon-search" @click="product_selected = {}">
-                        Cancela
-                      </el-button>
-                    </el-col>
-                    <el-col :span="24">
-                      
-                    </el-col>
-                  </el-row> -->
                 </div>
                   </el-col>
                 </el-row>
@@ -569,65 +575,27 @@
           <el-button type="primary" @click="vendaPrintClose">Fechar</el-button>
         </span><br><br>
         <div id="myelement" class="receipt">
-          <div class="cupom_total2">
-            <b>Hortifruti Nova Caraíva</b><br>CNPJ: 33.042.633/0001-11<br>
+          <div class="cupom_header">
+            <b>{{info.nome_fantasia}}</b><br>CNPJ: {{info.doc}}<br>
             Data: {{ today }}<br>Cliente: {{ cupom.cliente.nome }} - {{ cupom.cliente.id }}<br>
           </div><br>
-          <el-table
-            border
-            :data="cupom.itens"
-            row-class-name="cupom_total"
-            header-row-class-name="cupom_total"
-            style="width: 100%; font-size:13px;"
-          >
-            <el-table-column
-              prop="descricao"
-              label="Desc"
-              width="50px"
-            >
-              <template slot-scope="scope">
-                <span>{{ scope.row.id }}<br>{{ scope.row.descricao }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="pco_venda"
-              label="Pço"
-              width="50px"
-            >
-              <template slot-scope="scope">
-                <span>{{ scope.row.pco_venda | money }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="unidade"
-              label="Uni"
-              width="40px"
-            />
-            <el-table-column
-              prop="qnt"
-              label="Qnt"
-              width="40px"
-            />
-            <el-table-column
-              prop="total"
-              label="Total"
-            >
-              <template slot-scope="scope">
-                <span>{{ scope.row.total | money }}</span>
-              </template>
-            </el-table-column>
-          </el-table><br>
-          <div v-if="cupom.itens.length" class="cupom_total2" style="margin-top: 5px; text-align: left; font-family: tahoma;">
-            (Itens: {{ cupom.itens.length }})<br> Sub-total: {{ cupom.subtotal | money }}<br> Desconto:{{ desconto | money }}<br>Total: {{ cupom.subtotal - desconto | money }}
+          <table style="width: 100%;" >
+            <tr class=cupom_table_header style="font-weight: bold;"><td style="width: 20px;">#</td><td style="width: 170px;">Descrição</td><td style="width: 80px;">Preço</td><td style="width: 50px;">Uni</td><td style="width: 40px;">Qnt</td><td style="width: 110px;">Total</td></tr>
+            <tr class=cupom_table_rows v-for="(value, key) in cupom.itens" :key="key"><td>{{ key+1 }}</td><td>{{ value.ean }} {{ value.descricao }}</td><td>{{ value.pco_venda | money }}</td><td>{{ value.unidade }}</td><td>{{ value.qnt }}</td><td>{{ value.total | money}}</td></tr>
+          </table>
+          <div v-if="cupom.itens.length" class="cupom_footer" style="margin-top: 10px; text-align: left; font-family: tahoma;">
+            (Itens: {{ cupom.itens.length }})<br><span class=bold>Sub-total:</span> {{ cupom.subtotal | money }}<br><span class=bold>Desconto:</span> {{ desconto | money }}<br><span class=bold>Total:</span> {{ cupom.subtotal - desconto | money }}
           </div>
-          <div>
-            <h3>Forma de pagamento:</h3>
-            <div v-if="pago_dinheiro">Dinheiro: {{ pago_dinheiro | money }}</div>
-            <div v-if="pago_debito">Cartão de débito: {{ pago_debito | money }}</div>
-            <div v-if="pago_credito">Cartão de crédito: {{ pago_credito | money }}</div>
-            <div v-if="pago_faturado">Faturado :{{ pago_faturado | money }}</div>
+          <div class="cupom_footer" style="margin-top: 10px;">
+            <span class=bold>Forma de pagamento:</span><br>
+            <div style="margin-top: 5px;">
+              <div v-if="pago_dinheiro"><span class=bold>Dinheiro:</span> {{ pago_dinheiro | money }}</div>
+              <div v-if="pago_debito"><span class=bold>Cartão de débito:</span> {{ pago_debito | money }}</div>
+              <div v-if="pago_credito"><span class=bold>Cartão de crédito:</span> {{ pago_credito | money }}</div>
+              <div v-if="pago_faturado"><span class=bold>Faturado:</span> {{ pago_faturado | money }}</div>
+            </div>
           </div>
-          <div>
+          <div class="cupom_footer">
             <p>Obrigado pela preferência! Volte sempre.</p>
           </div>
         </div>
@@ -789,34 +757,10 @@
                                 </td>
                               </tr>
                             </table>
-
                           </el-tab-pane>
                         </el-tabs>
-
-                        <!-- <el-radio-group v-model="aux_caixa_op" @input="caixa_op">
-                          <el-radio-button label="abertura" :disabled="caixa_.status == 'opened'">Abertura</el-radio-button>
-                          <el-radio-button label="reforco" :disabled="caixa_.status == 'closed'">Reforço</el-radio-button>
-                          <el-radio-button label="sangria" :disabled="caixa_.status == 'closed'">Sangria</el-radio-button>
-                          <el-radio-button label="fechamento" :disabled="caixa_.status == 'closed'" >Fechamento</el-radio-button>
-                        </el-radio-group> -->
                       </td>
                     </tr>
-                    
-                    
-                   
-                    <!-- <tr >
-                      <td class=bold style="text-align: right; important!">Posição:</td>
-                      <td>
-                        <el-input
-                          type="textarea"
-                          :rows="10"
-                          placeholder="Motivo"
-                          style="font-size: 18px;"
-                          v-model="caixa_display">
-                        </el-input>
-                      </td>
-                    </tr> -->
-                    
               </table>
           </div>
         </div>
@@ -837,13 +781,14 @@
   import { VueGoodTable } from 'vue-good-table'
   import { Printd } from 'printd'
   import Autocomplete from '@/components/Autocomplete'
+  import magaform from '@/components/Magaform'
   // import ProductsThumbGridItem from '@/components/ProductsThumbGridItem'
   import moment from 'moment'
   import swal from 'sweetalert'
 
   export default {
     name: 'Balcao',
-    components: { Money, VueGoodTable, Autocomplete, swal, moment },
+    components: { magaform, Money, VueGoodTable, Autocomplete, swal, moment },
     directives: { waves, money: Money },
     filters: {
       caixa_op_filter(op){
@@ -864,6 +809,44 @@
     },
     data() {
       return {
+        printer:{
+          initCursor: {
+            type: 'select',
+            label: 'Iniciar cursor em',
+            options: ['Código de barras,ean', 'Busca por nome,product_name'],
+            value: 'ean'
+          },
+          width: {
+            type: 'input',
+            label: 'Largura',
+            value: '80mm'
+          },
+          height: {
+            type: 'input',
+            label: 'Altura',
+            value: '100mm'
+          },
+          status: {
+            type: 'radio',
+            label: 'Válido',
+            options: ['verdadeiro,true', 'falso,false', 'vazio,nenhum'],
+            value: 'false'
+          },
+          doc: {
+            type: 'select',
+            label: 'Tipo de doc',
+            options: ['Jurídico,juri', 'Físico,fisi', 'Estrangeiro,estran'],
+            value: 'fisi'
+          },
+          ops: {
+            type: 'textarea',
+            label: 'Opções',
+            value: `tomate, cebola, alho, pimentao, limao, banana prata, banana nanica, banana terra, laranja, mamão papaia, abacaxi, maça, manga, pera, batatinha, chuchu, cenoura, beterraba, uva sem semente, repolho, pepino, melancia grande, melão, abacate, kiwi, coco verde, quiabo, inhame, ovos cartela, berinjela, limao siciliano, abobrinha, abobora japonesa, goiaba, alface crespa, rucula, salsa, coentro, couve, hortelan`.trim()}
+        },
+        info: {
+          nome_fantasia: null,
+          doc: null
+        },
         EAN: null,
         caixa_open_value: 0,
         caixa_fechamento_value: {
@@ -1078,6 +1061,12 @@
           e.preventDefault()
           this.vendaClose()
         }
+      })
+
+      //Load enterprise info
+      fetchList('info', '').then(response => {
+        this.info = response.data.items[0]
+        console.log('this.info:', this.info);
       })
 
       //Load products list
@@ -1561,11 +1550,17 @@
         // Check if is needed to print
         const d = new Printd()
         const cssText = `
-            .cupom_total {
-              text-align: left; font-family: tahoma; font-size: 15px;
+            .cupom_header {
+              text-align: left; font-family: tahoma; font-size: ${this.info.definitions.split(',')[0]}px;
             }
-            .cupom_total2 {
-              text-align: left; font-family: tahoma; font-size: 18px;
+            .cupom_table_header {
+              width: 100%; font-family: tahoma; font-size: ${this.info.definitions.split(',')[1]}px;
+            }
+            .cupom_table_rows {
+              height:40px; width: 100%; text-align: left; font-family: tahoma; font-size: ${this.info.definitions.split(',')[1]}px;
+            }
+            .cupom_footer {
+              text-align: left; font-family: tahoma; font-size: ${this.info.definitions.split(',')[1]}px;
             }
           `
         d.print(document.getElementById('myelement'), [cssText])

@@ -15,9 +15,21 @@ const cadastrosRouter = {
   },
   children: [
     {
+      path: 'info',
+      component: () => import('@/views/cadastros/info'),
+      name: 'info',
+      meta: { roles: ['admin'], title: 'Info' }
+    },
+    {
+      path: 'usuarios',
+      component: () => import('@/views/cadastros/usuarios'),
+      name: 'usuarios',
+      meta: { roles: ['admin'], title: 'Usuários' }
+    },
+    {
       path: 'clientes',
       component: () => import('@/views/cadastros/clientes'),
-      name: 'Clientes-',
+      name: 'Clientes',
       meta: { roles: ['admin'], title: 'Clientes' }
     },
     {
