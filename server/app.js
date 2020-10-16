@@ -572,10 +572,14 @@ function updateSQL_string(table, id, obj){
       console.log('sql:', sql);
       db.run(sql,
         function(err) {
-          if (err) return console.log(err.message);
-          // get the last insert id
-          console.log(`A row has been inserted with rowid ${this.lastID}`);
-          jsonStr = {code: 20000, data: {id: this.lastID}}
+          if (err) {
+            jsonStr = {code: -1, message: "Código já cadastrado"}
+            // return console.log(err.message);
+          }else{
+            // get the last insert id
+            console.log(`A row has been inserted with rowid ${this.lastID}`);
+            jsonStr = {code: 20000, data: {id: this.lastID}}
+          }
           res.send(jsonStr);
         }
       );

@@ -22,27 +22,28 @@
       fit
       highlight-current-row
       style="width: 100%; font-size: 20px;"
-      @sort-change="sortChange">
+      @sort-change="sortChange"
+    >
 
-      <el-table-column label="Código" prop="id"  align="center" width="100">
+      <el-table-column label="Código" prop="id" align="center" width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Usuário"  width="200">
+      <el-table-column label="Usuário" width="200">
         <template slot-scope="scope">
           <span>{{ scope.row.username | capitalize }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Senha" prop="contato"  width="150">
+      <el-table-column label="Senha" prop="contato" width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.password }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Token" prop="fone"   width="330">
+      <el-table-column label="Token" prop="fone" width="330">
         <template slot-scope="scope">
           <span>{{ scope.row.token }}</span>
         </template>
@@ -69,32 +70,32 @@
     <el-dialog :title="textMap[dialogStatus]" align="left" :visible.sync="dialogFormVisible" top="2vh" :width="tela">
       <div slot="title" style="font-size: 30px;">{{ textMap[dialogStatus] }}</div>
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="top">
-        <el-form-item label="Usuário" >
+        <el-form-item label="Usuário">
           <el-input v-model="temp.username" autofocus />
         </el-form-item>
-        <el-form-item label="Senha" >
+        <el-form-item label="Senha">
           <el-input v-model="temp.password" autofocus />
         </el-form-item>
-        <el-form-item label="Perfil" >
+        <el-form-item label="Perfil">
           <el-select v-model="temp.roles" placeholder="Select">
             <el-option label="Admin" value="admin" />
             <el-option label="Gerente" value="gerente" />
             <el-option label="Caixa" value="caixa" />
           </el-select>
         </el-form-item>
-        <el-form-item label="token" >
+        <el-form-item label="token">
           <el-input v-model="temp.token" />
         </el-form-item>
-        <el-form-item label="Nome" >
+        <el-form-item label="Nome">
           <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="Apresentação" >
+        <el-form-item label="Apresentação">
           <el-input v-model="temp.introduction" />
         </el-form-item>
-        <el-form-item label="Avatar" >
+        <el-form-item label="Avatar">
           <el-input v-model="temp.avatar" />
         </el-form-item>
-        <el-form-item label="Status" >
+        <el-form-item label="Status">
           <el-select v-model="temp.disabled" placeholder="Select">
             <el-option label="Ativo" value="0" />
             <el-option label="Desabilitado" value="1" />
@@ -229,7 +230,7 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
+        id: undefined
         // importance: 1,
         // remark: '',
         // timestamp: new Date()
@@ -267,7 +268,7 @@ export default {
       })
     },
     deleteData() {
-        console.log('Delete:>', this.temp);
+      console.log('Delete:>', this.temp)
       delete ('user', this.temp).then(() => {
         this.list.unshift(this.temp)
         this.dialogFormVisible = false
@@ -281,7 +282,7 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      //this.temp.timestamp = new Date(this.temp.timestamp)
+      // this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'editar'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -292,7 +293,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          //tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          // tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           update('user', tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
