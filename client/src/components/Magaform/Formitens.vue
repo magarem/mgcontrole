@@ -40,9 +40,12 @@
         </el-checkbox-group> -->
       </div>
       <div v-if="obj.type=='radio'" class="radio">
-        <div v-for="(value_radio, key_radio) in obj.options" :key="key_radio" >
-          <input type="radio" :value="value_radio.split('|')[0]" v-model="obj.value"/>
-          <span for="">{{value_radio.split('|')[1]}}</span><br>
+        <div v-for="(value_radio, key_radio) in obj.options" :key="key_radio" style="padding-bottom: 5px;">
+          <label style="padding-left: 5px;" :for="value_radio.split('|')[0]">
+            <input type="radio" :id="value_radio.split('|')[0]" :value="value_radio.split('|')[0]" v-model="obj.value"/>
+            {{value_radio.split('|')[1]}}
+          </label>
+          <br>
         </div>
       </div>
       <div v-if="obj.type == 'textarea'" class="textarea">
@@ -54,8 +57,8 @@
           style="width:400px"
         /> -->
       </div>
-      <div v-if="obj.type == 'input'">
-        <input v-model="obj.value" class="input"  />
+      <div v-if="obj.type == 'input'" class=input>
+        <input v-model="obj.value"   />
       </div>
     </div>
   <!-- </div> -->
@@ -73,10 +76,10 @@ export default {
 </script>
 
 <style scoped>
-  .label {
+  label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 15px;
-    font-weight: bold;
+    font-weight: normal;
     padding-bottom: 5px;
     width: 100%;
   }
@@ -84,10 +87,10 @@ export default {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     /* font-size: 17px; */
     /* padding-bottom: 15px; */
-    margin-left: 0px;
+    margin-left: 10px;
     margin-bottom: 15px;
+    padding-top: 6px;
   }
-
   .input {
     width: 200px;
   }

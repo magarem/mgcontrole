@@ -569,34 +569,40 @@
       </el-dialog>
 
       <!-- Print venda -->
-      <el-dialog :visible.sync="vendaPrintFlg" title="Impressão de ticket" width="45%" align="left">
+      <el-dialog v-if=info.preferences :visible.sync="vendaPrintFlg" title="Impressão de ticket" width="45%" align="left">
         <span align="center">
           <el-button type="primary" @click="print">Imprimir</el-button>
           <el-button type="primary" @click="vendaPrintClose">Fechar</el-button>
         </span><br><br>
         <div id="myelement" class="receipt">
-          <div class="cupom_header">
+          <div style="margin-bottom: 10px;" v-bind:style="{fontSize: balcao_pref.cupom_printer.children.header.children.font_size.value}">
+            {{balcao_pref.cupom_printer.children.header.children.text.value}}
+          </div>
+          <div class="cupom_header" v-bind:style="{fontSize: balcao_pref.cupom_printer.children.table_header.value}">
             <b>{{ info.nome_fantasia }}</b><br>CNPJ: {{ info.doc }}<br>
             Data: {{ today }}<br>Cliente: {{ cupom.cliente.nome }} - {{ cupom.cliente.id }}<br>
           </div><br>
           <table style="width: 100%;">
-            <tr class="cupom_table_header" style="font-weight: bold;"><td style="width: 20px;">#</td><td style="width: 170px;">Descrição</td><td style="width: 80px;">Preço</td><td style="width: 50px;">Uni</td><td style="width: 40px;">Qnt</td><td style="width: 110px;">Total</td></tr>
-            <tr v-for="(value, key) in cupom.itens" :key="key" class="cupom_table_rows"><td>{{ key+1 }}</td><td>{{ value.ean }} {{ value.descricao }}</td><td>{{ value.pco_venda | money }}</td><td>{{ value.unidade }}</td><td>{{ value.qnt }}</td><td>{{ value.total | money }}</td></tr>
+            <tr class="cupom_table_header" style="font-weight: bold;" v-bind:style="{fontSize: balcao_pref.cupom_printer.children.table_rows.value}">
+              <td style="width: 20px;">#</td><td style="width: 170px;">Descrição</td><td style="width: 80px;">Preço</td><td style="width: 50px;">Uni</td><td style="width: 40px;">Qnt</td><td style="width: 110px;">Total</td></tr>
+            <tr v-for="(value, key) in cupom.itens" :key="key" class="cupom_table_rows" v-bind:style="{fontSize: balcao_pref.cupom_printer.children.table_rows.value}"><td>{{ key+1 }}</td><td>{{ value.ean }} {{ value.descricao }}</td><td>{{ value.pco_venda | money }}</td><td>{{ value.unidade }}</td><td>{{ value.qnt }}</td><td>{{ value.total | money }}</td></tr>
           </table>
-          <div v-if="cupom.itens.length" class="cupom_footer" style="margin-top: 10px; text-align: left; font-family: tahoma;">
-            (Itens: {{ cupom.itens.length }})<br><span class="bold">Sub-total:</span> {{ cupom.subtotal | money }}<br><span class="bold">Desconto:</span> {{ desconto | money }}<br><span class="bold">Total:</span> {{ cupom.subtotal - desconto | money }}
-          </div>
-          <div class="cupom_footer" style="margin-top: 10px;">
-            <span class="bold">Forma de pagamento:</span><br>
-            <div style="margin-top: 5px;">
-              <div v-if="pago_dinheiro"><span class="bold">Dinheiro:</span> {{ pago_dinheiro | money }}</div>
-              <div v-if="pago_debito"><span class="bold">Cartão de débito:</span> {{ pago_debito | money }}</div>
-              <div v-if="pago_credito"><span class="bold">Cartão de crédito:</span> {{ pago_credito | money }}</div>
-              <div v-if="pago_faturado"><span class="bold">Faturado:</span> {{ pago_faturado | money }}</div>
+          <div v-bind:style="{fontSize: balcao_pref.cupom_printer.children.footer.value}">
+            <div v-if="cupom.itens.length" class="cupom_footer" style="margin-top: 10px; text-align: left; font-family: tahoma;" v-bind:style="{fontSize: balcao_pref.cupom_printer.children.footer.value}">
+              (Itens: {{ cupom.itens.length }})<br><span class="bold">Sub-total:</span> {{ cupom.subtotal | money }}<br><span class="bold">Desconto:</span> {{ desconto | money }}<br><span class="bold">Total:</span> {{ cupom.subtotal - desconto | money }}
             </div>
-          </div>
-          <div class="cupom_footer">
-            <p>Obrigado pela preferência! Volte sempre.</p>
+            <div class="cupom_footer" style="margin-top: 10px;" v-bind:style="{fontSize: balcao_pref.cupom_printer.children.footer.value}">
+              <span class="bold">Forma de pagamento:</span><br>
+              <div style="margin-top: 5px;">
+                <div v-if="pago_dinheiro"><span class="bold">Dinheiro:</span> {{ pago_dinheiro | money }}</div>
+                <div v-if="pago_debito"><span class="bold">Cartão de débito:</span> {{ pago_debito | money }}</div>
+                <div v-if="pago_credito"><span class="bold">Cartão de crédito:</span> {{ pago_credito | money }}</div>
+                <div v-if="pago_faturado"><span class="bold">Faturado:</span> {{ pago_faturado | money }}</div>
+              </div>
+            </div>
+            <div class="cupom_footer" v-bind:style="{fontSize: balcao_pref.cupom_printer.children.footer.value}">
+              <p>{{balcao_pref.cupom_printer.children.goodby_message.value}}</p>
+            </div>
           </div>
         </div>
       </el-dialog>
@@ -809,46 +815,8 @@ export default {
   },
   data() {
     return {
-      printer: {
-        initCursor: {
-          type: 'select',
-          label: 'Iniciar cursor em',
-          options: ['Código de barras,ean', 'Busca por nome,product_name'],
-          value: 'ean'
-        },
-        width: {
-          type: 'input',
-          label: 'Largura',
-          value: '80mm'
-        },
-        height: {
-          type: 'input',
-          label: 'Altura',
-          value: '100mm'
-        },
-        status: {
-          type: 'radio',
-          label: 'Válido',
-          options: ['verdadeiro,true', 'falso,false', 'vazio,nenhum'],
-          value: 'false'
-        },
-        doc: {
-          type: 'select',
-          label: 'Tipo de doc',
-          options: ['Jurídico,juri', 'Físico,fisi', 'Estrangeiro,estran'],
-          value: 'fisi'
-        },
-        doc: {
-          type: 'checkbox',
-          label: 'Tipo de doc2',
-          options: ['Jurídico,juri', 'Físico,fisi', 'Estrangeiro,estran'],
-          value: 'fisi'
-        },
-        ops: {
-          type: 'textarea',
-          label: 'Opções',
-          value: `tomate, cebola, alho, pimentao, limao, banana prata, banana nanica, banana terra, laranja, mamão papaia, abacaxi, maça, manga, pera, batatinha, chuchu, cenoura, beterraba, uva sem semente, repolho, pepino, melancia grande, melão, abacate, kiwi, coco verde, quiabo, inhame, ovos cartela, berinjela, limao siciliano, abobrinha, abobora japonesa, goiaba, alface crespa, rucula, salsa, coentro, couve, hortelan`.trim() }
-      },
+      preferences: {},
+      balcao_pref: null,
       info: {
         nome_fantasia: null,
         doc: null
@@ -1055,8 +1023,9 @@ export default {
     }
   },
   mounted() {
-    // const sound = (new Audio(require('@/assets/audio/button-2.mp3'))).play()
-    this.vai()
+    // var audio = new Audio(require('@/assets/audio/button-2.mp3'))// path to file
+    // audio.muted = true;
+    // audio.play();
   },
   created() {
     this.updateDateTime()
@@ -1072,7 +1041,10 @@ export default {
     // Load enterprise info
     fetchList('info', '').then(response => {
       this.info = response.data.items[0]
-      console.log('this.info:', this.info)
+      this.info.preferences = JSON.parse(this.info.preferences)
+      this.balcao_pref = this.info.preferences.children.balcao.children
+      console.log('this.info.preferences:', this.info.preferences);
+      this.vai()
     })
 
     // Load products list
@@ -1088,6 +1060,7 @@ export default {
         return { id: item.id, name: item.descricao ? item.descricao.replace(/\s+/g, ' ').trim() : '' }
       })
     })
+
   },
   methods: {
     diversos_set() {
@@ -1359,8 +1332,15 @@ export default {
     },
     vai() {
       this.$nextTick(function() {
+       //Start cursor fild by user info preferences
+        if (this.balcao_pref.init_field_focus.value == "ean"){
+          this.$refs.EAN.focus()
+        }
+        if (this.balcao_pref.init_field_focus.value == "product_name"){
+          this.$refs.searchTerm_.focus()
+        }
         // this.$refs.searchTerm_.focus()
-        this.$refs.EAN.focus()
+        // this.$refs.EAN.focus()
         this.source = null
         this.diversos_set()
       })
@@ -1582,20 +1562,21 @@ export default {
     print() {
       // Check if is needed to print
       const d = new Printd()
+      var cupom_printer = this.balcao_pref.cupom_printer.children
       const cssText = `
-            .cupom_header {
-              text-align: left; font-family: tahoma; font-size: ${this.info.definitions.split(',')[0]}px;
-            }
-            .cupom_table_header {
-              width: 100%; font-family: tahoma; font-size: ${this.info.definitions.split(',')[1]}px;
-            }
-            .cupom_table_rows {
-              height:40px; width: 100%; text-align: left; font-family: tahoma; font-size: ${this.info.definitions.split(',')[1]}px;
-            }
-            .cupom_footer {
-              text-align: left; font-family: tahoma; font-size: ${this.info.definitions.split(',')[1]}px;
-            }
-          `
+        .cupom_header {
+          text-align: left; font-family: tahoma; font-size: ${cupom_printer.header.children.font_size}px;
+        }
+        .cupom_table_header {
+          width: 100%; font-family: tahoma; font-size: ${cupom_printer.table_header}px;
+        }
+        .cupom_table_rows {
+          height:40px; width: 100%; text-align: left; font-family: tahoma; font-size: ${cupom_printer.table_rows}px;
+        }
+        .cupom_footer {
+          text-align: left; font-family: tahoma; font-size: ${cupom_printer.footer}px;
+        }
+      `
       d.print(document.getElementById('myelement'), [cssText])
       this.check_out_print_option = false
       this.vendaCloseOkFim()
