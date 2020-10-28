@@ -470,7 +470,7 @@ function insertSQL_string(table, obj){
   if (obj.total_rows) delete obj.total_rows
   if (obj.tot) delete obj.tot
 
-  var sql = `INSERT INTO ${table} ('${Object.keys(obj).join("','")}') values ('${Object.values(obj).join("','")}')`
+  var sql = `INSERT OR IGNORE INTO ${table} ('${Object.keys(obj).join("','")}') values ('${Object.values(obj).join("','")}')`
   return sql
 }
 function updateSQL_string(table, id, obj){
@@ -547,16 +547,21 @@ function updateSQL_string(table, id, obj){
 
       console.log('>>>', sqlStr);
       db.all(sqlStr, function(err, rows, fields) {
-        var total = rows[0]?rows[0].total_rows:0
+        var total = (rows.length>0)?rows[0].total_rows:0
         var jsonStr = {code: 20000, data: {total: total, items: rows||[]}} 
         res.send(jsonStr);
       });
     })
   })
   app.post(environment + '/generic', function (req, res, next) {
-    
+   
+    // Aux var
+    var sqlArray = []
+    var lastId = 0
+
     // Get user token
     let token = req.headers['x-token']
+
     // Get domain
     let domain = token.split('.')[0]
 
@@ -564,27 +569,45 @@ function updateSQL_string(table, id, obj){
     let key = req.query.key
     console.log('key:', key);
 
-    console.log('req.body:', req.body);
-    
-    sql = insertSQL_string(key, req.body)
+    body_parsed = JSON.parse(JSON.stringify(req.body))
 
+    //Check if is only one sql line
+    if (Array.isArray(body_parsed)) { 
+       sqlArray = body_parsed
+    }else{
+       sqlArray.push(body_parsed) 
+    }
+
+    console.log('sqlArray:', sqlArray);
+
+    //Insert in data bank
     db_open(`./${domain}.db`).then(db => {
-      console.log('sql:', sql);
-      db.run(sql,
-        function(err) {
-          if (err) {
-            jsonStr = {code: -1, message: "Código já cadastrado"}
-            // return console.log(err.message);
-          }else{
-            // get the last insert id
-            console.log(`A row has been inserted with rowid ${this.lastID}`);
-            jsonStr = {code: 20000, data: {id: this.lastID}}
-          }
-          res.send(jsonStr);
-        }
-      );
+      db.serialize(function() {
+        db.run("begin transaction");
+        sqlArray.forEach(function(item, x){
+          console.log('x', x);
+          sql = insertSQL_string(key, item)
+          db.run(sql, function (err) {  // FUNCTION INSTEAD OF ARROW LAMBDA
+            if (err) throw err;
+            console.log(this);
+            console.log(this.lastID);
+            console.log('lastID', this.lastID);
+            lastId = this.lastID
+            console.log(`>1--[ ${lastId} ]----------------------------------------------`);
+            //Test if is the last inset
+            console.log('sqlArray.length:', sqlArray.length);
+            if (sqlArray.length == x+1){
+              db.run("commit");
+              console.log(`>2--[ ${lastId} ]----------------------------------------------`);
+              jsonStr = {code: 20000, data:{id: this.lastID}}
+              res.send(jsonStr);
+            }
+          });
+        })
+      });
     })
   })
+
   app.patch(environment + '/generic', function (req, res, next) {
     
     // Get user token
@@ -701,7 +724,7 @@ function updateSQL_string(table, id, obj){
   })
 
   //Balcao
-  app.post(`${environment}/vendaClose`, function (req, res) {
+  app.post(`${environment}/vendaClose__`, function (req, res) {
 
     // Get domain
     let token = req.headers['x-token']
@@ -824,6 +847,64 @@ function updateSQL_string(table, id, obj){
   });
 
 
+  app.post(`${environment}/vendaClose`, function (req, res) {
+
+    // Get domain
+    let token = req.headers['x-token']
+    let domain = token.split('.')[0]
+
+    //Get form data
+    var data = JSON.parse(JSON.stringify(req.body.data))
+    console.log('data parse:', data)
+
+    //Def aux vars
+    var sql = []
+   
+    //Begin vendas SQL build
+    // sql.push('BEGIN TRANSACTION;')
+    data.forEach(function(item){
+      if (!item.date_ref){item.date_ref = item.date} //Adjust ref_date by date
+      // Insert Venda
+      var aux_pagamento = JSON.stringify({dinheiro: item.dinheiro, debito: item.debito, credito: item.credito,faturado: item.faturado})
+      sql.push(`INSERT INTO vendas 
+      (id, session, cliente, itens, subtotal, desconto, acrescimo, total, pagamento, created) 
+      VALUES ('${item.id}', '${item.session}', ${item.cliente}, '${JSON.stringify(item.itens)}', ${item.subtotal}, ${item.desconto}, null, ${item.total}, '${aux_pagamento}', '${item.date_ref}');`)
+    
+      //Register in cash flow if exists
+      // var pg_a_vista = item.dinheiro + item.debito + item.credito
+      // if (pg_a_vista > 0){
+      //   sql.push(`INSERT INTO cash_flow 
+      //   (created, desc, desc2, type, value) 
+      //   VALUES (${item.date_ref}, 'Venda', '${item.id}', 1 , ${pg_a_vista});`)
+      // } 
+
+      //Register faturado_value if exists
+      // if (item.faturado > 0){
+      //   sql.push(`INSERT INTO faturados 
+      //   (venda_id, created, cliente, tipo, valor) 
+      //   VALUES ('${item.id}', ${item.date_ref}, ${item.cliente}, 0, ${item.faturado * -1});`)
+      // }
+    });
+
+    // sql.push('COMMIT;')
+    
+    console.log('sql.join(""):', sql.join(""))
+    console.log('./' + domain + '.db');
+    db_open('./' + domain + '.db').then(db => {
+
+      sql.forEach(function(item){
+        db.run(item, function(err) {
+          console.log('>>item:', item);
+          if (err) {
+            return console.log(err.message);
+          }
+        })     
+      })
+    })
+    jsonStr = {
+      "code": 20000}
+    res.send(jsonStr);
+  })
 ///////////////////////////////
 
 

@@ -160,7 +160,12 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="20">
                     <el-col :span="5">
-                      Produtos
+                      
+                      Produtos<button @click="local_data_load">DB Local</button>
+                     <button @click="dataUpload">Vendas data upload</button>
+                      <button @click="server_data_load">DB Server</button>
+                      <button @click="caixastatus_plus">caixastatus +</button>
+                      
                     </el-col>
                     <el-col :span="9">
                       <input ref="EAN" v-model="EAN" style="width: 99%; height: 35px;" placeholder=" Código de barra" @keyup.enter="productSet_EAN">
@@ -176,6 +181,12 @@
                 </div>
 
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -17px;">
+                  <div style="overflow-y: scroll; height:300px; width: 100%">
+                        {{corrent_uset_info}}<br>
+                        <pre>
+                         {{vendas}}
+                        </pre>
+                      </div> 
                   <el-col v-for="(item, rindex) in atalhos.itens" :key="rindex" :span="3">
                     <button class="produto_button" @click="productSet(item)"><img style="max-width: 90%; max-height: 90%;" :src="img_mini(item)" :alt="item"> </button>
                   </el-col>
@@ -248,7 +259,7 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
                     <el-col :span="9">
-                      <span>Cupom</span> <!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
+                      <span>Cupom</span>: <span v-if="cupom">{{cupom.id}}</span><!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
                     </el-col>
                     <el-col :span="15" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                       {{ today }}
@@ -561,9 +572,9 @@
           @on-row-click="clienteSet"
         />
         <span slot="footer" class="dialog-footer" align="center">
-          <el-button v-if="searchTermClient" type="primary" @click="handleCliente_insert">
+          <!-- <el-button v-if="searchTermClient" type="primary" @click="handleCliente_insert">
             Incluir novo cliente
-          </el-button>
+          </el-button> -->
           <el-button type="primary" @click="clientesListFlg = false">Fechar</el-button>
         </span>
       </el-dialog>
@@ -719,7 +730,7 @@
                         <tr>
                           <td class="bold" style="text-align: right; important!">Dinheiro:</td>
                           <td style="padding: 5px;">
-                            {{ caixa_fechamento_value.dinheiro | money }}
+                            {{ caixa_fechamento_value.dinheiro }}
                             <!-- <money v-model="caixa_fechamento_value.dinheiro" v-bind="money" class="el-input__inner" readonly="true" /> -->
                           </td>
                         </tr>
@@ -740,7 +751,7 @@
                         <tr>
                           <td class="bold" style="text-align: right; important!">Total:</td>
                           <td style="padding: 5px;">
-                            {{ caixa_fechamento_value.dinheiro + caixa_fechamento_value.cartao + caixa_fechamento_value.faturado | money }}
+                            {{ caixa_fechamento_value.dinheiro + caixa_fechamento_value.cartao + caixa_fechamento_value.faturado }}
                             <!-- <money v-model="caixa_fechamento_value.faturado" v-bind="money" class="el-input__inner" readonly="true" /> -->
                           </td>
                         </tr>
@@ -815,6 +826,10 @@ export default {
   },
   data() {
     return {
+      corrent_uset_info: {},
+      som1: new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3')),
+      caixastatus: [],
+      vendas: [],
       preferences: {},
       balcao_pref: null,
       info: {
@@ -950,7 +965,7 @@ export default {
           type: 'string'
         }
       ],
-      caixaStatus: {
+      caixaStatus_: {
         data: new Date().toLocaleString('pt-BR'),
         usuario: this.$store.getters.name,
         operacao: 'abertura',
@@ -1022,10 +1037,67 @@ export default {
       this.pago_falta = this.cupom.subtotal - this.desconto - this.valor_pago
     }
   },
-  mounted() {
-    // var audio = new Audio(require('@/assets/audio/button-2.mp3'))// path to file
-    // audio.muted = true;
-    // audio.play();
+  mounted(){
+    this.server_data_load()
+  },
+  mounted_() {
+    //If online get the server databank values
+    if (navigator.onLine){
+       this.databank_load()
+      //  this.vai()
+      }else{  
+        //Get info (if already exists)
+        if (localStorage.getItem(getToken()+'.info')) {
+          try {
+            this.info = JSON.parse(localStorage.getItem(getToken()+'.info'));
+            this.info_data_adjustes()
+            console.log('localStorage, this.info:', this.info);
+          } catch(e) {
+            localStorage.removeItem(getToken()+'.info');
+          }
+        }
+        
+        //Get clientesList (if already exists)
+        if (localStorage.getItem(getToken()+'.clientesList')) {
+          try {
+            this.clientesList = JSON.parse(localStorage.getItem(getToken()+'.clientesList'));
+            this.produtos_data_adjustes()
+            console.log('localStorage, this.clientesList:', this.clientesList);
+         } catch(e) {
+            localStorage.removeItem(getToken()+'.clientesList');
+          }
+        }
+
+        //Check produtos (if already exists)
+        if (localStorage.getItem(getToken()+'.produtos')) {
+          try {
+            this.produtos = JSON.parse(localStorage.getItem(getToken()+'.produtos'));
+            console.log('localStorage, this.produtos:', this.produtos);
+          } catch(e) {
+            localStorage.removeItem(getToken()+'.produtos');
+          }
+        }
+
+         //Check vendas (if already exists)
+        if (localStorage.getItem(getToken()+'.vendas')) {
+          try {
+            this.vendas = JSON.parse(localStorage.getItem(getToken()+'.vendas'));
+            console.log('localStorage, this.vendas:', this.vendas);
+          } catch(e) {
+            localStorage.removeItem(getToken()+'.vendas');
+          }
+        }
+
+         //Check caixa status (if already exists)
+        if (localStorage.getItem(getToken()+'.caixastatus')) {
+          try {
+            this.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
+            console.log('localStorage, this.caixastatus:', this.caixastatus);
+          } catch(e) {
+            localStorage.removeItem(getToken()+'.caixastatus');
+          }
+        }
+    }
   },
   created() {
     this.updateDateTime()
@@ -1037,41 +1109,191 @@ export default {
         this.vendaClose()
       }
     })
-
-    // Load enterprise info
-    fetchList('info', '').then(response => {
-      this.info = response.data.items[0]
-      this.info.preferences = JSON.parse(this.info.preferences)
-      this.balcao_pref = this.info.preferences.children.balcao.children
-      console.log('this.info.preferences:', this.info.preferences);
-      this.vai()
-    })
-
-    // Load products list
-    fetchList('produtos', '').then(response => {
-      this.produtos = response.data.items
-      for (var t = 0; t < this.produtos.length; t++) {
-        if (this.produtos[t].descricao) {
-          this.produtos[t].descricao = this.produtos[t].descricao.replace(/\s+/g, ' ').trim()
-        }
-      }
-      this.diversos_set()
-      this.produtos_ = response.data.items.map(function(item) {
-        return { id: item.id, name: item.descricao ? item.descricao.replace(/\s+/g, ' ').trim() : '' }
-      })
-    })
-
   },
   methods: {
+    caixastatus_plus(val){
+      this.caixastatus.push(JSON.parse(JSON.stringify(val)))
+    },
+    local_data_load(){
+        //Get info (if already exists)
+        if (localStorage.getItem(getToken()+'.info')) {
+          try {
+            this.info = JSON.parse(localStorage.getItem(getToken()+'.info'));
+            this.info_data_adjustes()
+            console.log('localStorage, this.info:', this.info);
+          } catch(e) {
+            localStorage.removeItem(getToken()+'.info');
+          }
+        }
+        
+        //Get clientesList (if already exists)
+        if (localStorage.getItem(getToken()+'.clientesList')) {
+          try {
+            this.clientesList = JSON.parse(localStorage.getItem(getToken()+'.clientesList'));
+            console.log('localStorage, this.clientesList:', this.clientesList);
+         } catch(e) {
+            localStorage.removeItem(getToken()+'.clientesList');
+          }
+        }
+
+        //Check produtos (if already exists)
+        if (localStorage.getItem(getToken()+'.produtos')) {
+          try {
+            this.produtos = JSON.parse(localStorage.getItem(getToken()+'.produtos'));
+            console.log('localStorage, this.produtos:', this.produtos);
+            this.produtos_data_adjustes()
+          } catch(e) {
+            localStorage.removeItem(getToken()+'.produtos');
+          }
+        }
+
+         //Check vendas (if already exists)
+        if (localStorage.getItem(getToken()+'.vendas')) {
+          try {
+            this.vendas = JSON.parse(localStorage.getItem(getToken()+'.vendas'));
+            console.log('localStorage, this.vendas:', this.vendas);
+          } catch(e) {
+            alert()
+            localStorage.removeItem(getToken()+'.vendas');
+          }
+        }
+
+         //Check caixa status (if already exists)
+        if (localStorage.getItem(getToken()+'.caixastatus')) {
+          try {
+            this.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
+            console.log('localStorage, this.caixastatus:', this.caixastatus);
+          } catch(e) {
+            localStorage.removeItem(getToken()+'.caixastatus');
+          }
+        }
+   },
+    server_data_load(){
+      var self = this
+      // Load enterprise info
+      fetchList('info', '').then(response => {
+        this.info = response.data.items[0]
+        console.log('this.info:', this.info);
+        //Save in local storage
+        const parsed = JSON.stringify(this.info);
+        localStorage.setItem(getToken()+'.info', parsed);
+        this.info_data_adjustes()
+        // this.vai()
+      })
+      // Load clients list
+      fetchList('clientes', '').then(response => {
+        console.log('clientesList:', response.data)
+        this.clientesList = response.data.items
+        //Save in local storage
+        const parsed = JSON.stringify(this.clientesList);
+        localStorage.setItem(getToken()+'.clientesList', parsed);
+      })
+      // Load products list
+      fetchList('produtos', '').then(response => {
+        this.produtos = response.data.items
+        console.log('this.produtos:', this.produtos)
+        for (var t = 0; t < this.produtos.length; t++) {
+          if (this.produtos[t].descricao) {
+            this.produtos[t].descricao = this.produtos[t].descricao.replace(/\s+/g, ' ').trim()
+          }
+        }   
+        this.produtos_data_adjustes()
+        //Save in local storage
+        const parsed = JSON.stringify(this.produtos);
+        localStorage.setItem(getToken()+'.produtos', parsed);
+        this.produtos_data_adjustes()
+        //Define 'diversos' item
+        this.diversos_set()
+      })
+      
+      //Get current usuario data
+      getInfo().then(function(x) {
+        self.corrent_uset_info = x.data
+        console.log('self.corrent_uset_info:', self.corrent_uset_info);
+      })
+      
+      // fetchList(
+      //   'caixa_status',
+      //   { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
+      // ).then(response => {
+      //   if (response.data.items[0]) {
+      //     console.log('caixa_status:', response.data.items[0])
+      //     self.caixa_ = response.data.items[0]
+      //   }
+      //   if (self.caixa_) {
+      //     if (self.caixa_.status == 'opened') {
+      //       self.caixaSession = self.caixa_.session
+      //       console.log('self.caixaSession:', self.caixaSession);
+      //       //Load vendas data
+      //       fetchList('vendas', { find: { session: self.caixaSession }}).then(response => {
+      //         this.vendas = response.data.items
+      //         console.log('this.vendas:', this.vendas)
+      //         //Save in local storage
+      //         const parsed = JSON.stringify(this.vendas);
+      //         localStorage.setItem(getToken()+'.vendas', parsed);
+      //       })
+      //    }
+      //     delete self.caixa_.id
+      //     if (self.caixa_.status == 'closed') {
+      //       console.log('self.caixa_.status:', self.caixa_.status)
+      //       // self.caixa_op = null
+      //       self.caixa_op({ label: 'Abertura' })
+      //       self.$modal.show('modal_caixa_op')
+      //     }
+      //   } else {
+      //     console.log('pp')
+      //     self.caixa_op({ label: 'Abertura' })
+      //   }
+      // }).catch(function(error) {
+      //   console.log(error)
+      // })
+   
+      //Cash status
+      // fetchList('caixa_status',
+      //     { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
+      // ).then(response => {
+      //   if (response.data.items[0]) {
+      //     console.log('caixa_status:', response.data.items[0])
+      //     this.caixa_ = response.data.items[0]
+      //   }
+      //   if (this.caixa_) {
+      //     if (this.caixa_.status == 'opened') {
+      //       this.caixaSession = this.caixa_.session
+      //     }
+      //     delete this.caixa_.id
+      //     if (this.caixa_.status == 'closed') {
+      //       console.log('this.caixa_.status:', this.caixa_.status)
+      //       this.caixa_op({ label: 'Abertura' })
+      //       this.$modal.show('modal_caixa_op')
+      //     }
+      //   } else {
+      //     this.caixa_op({ label: 'Abertura' })
+      //   }
+      // }).catch(function(error) {
+      //   console.log(error)
+      // })
+      //Adjusts
+      
+      
+    },
+    info_data_adjustes(){
+      //info
+      this.info.preferences = JSON.parse(this.info.preferences)
+      console.log('..>', this.info.preferences);
+      this.balcao_pref = this.info.preferences.children.balcao.children
+    },
+    produtos_data_adjustes(){
+      //produtos
+      this.produtos_ = this.produtos.map(function(item) {
+        return { id: item.id, name: item.descricao ? item.descricao.replace(/\s+/g, ' ').trim() : '' }
+      })
+    },
     diversos_set() {
-      // var item = this.produtos.find(x => x.descricao === 'diversos')
-      // console.log('item::>', this.item);
       this.qnt = 1
       this.product_selected.id = 5429
       this.product_selected.descricao = 'diversos'
       this.product_selected.pco_venda = 0
       this.product_selected.unidade = 'Uni'
-      // this.product_selected.qnt = 0.0
       this.product_selected.total = 0
     },
     img_mini(value) {
@@ -1096,57 +1318,93 @@ export default {
       return {
         open() {
           // self.caixa_op = null
+          // console.log('1>self.caixastatus:', self.caixastatus);
           self.caixa_open_value = 0
           self.caixa_op({ label: 'Abertura' })
           self.$modal.show('modal_caixa_op')
         },
         close() {
           console.log(self.caixa_op)
-          // self.caixa_op(null)
-          // self.caixa_op_value = 0
           self.$modal.hide('modal_caixa_op')
         },
         get(f) {
-          fetchList(
-            'caixa_status',
-            { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
-          ).then(response => {
-            if (response.data.items[0]) {
-              console.log('caixa_status:', response.data.items[0])
-              self.caixa_ = response.data.items[0]
-            }
-            if (self.caixa_) {
-              if (self.caixa_.status == 'opened') {
-                self.caixaSession = self.caixa_.session
+          //Off-line
+          //check local storage
+          if (self.caixastatus.length == 0){
+            if (localStorage.getItem(getToken()+'.caixastatus')) {
+              try {
+                self.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
+                self.caixa_ = self.caixastatus[self.caixastatus.length-1]
+              } catch(e) {
+                localStorage.removeItem(getToken()+'.caixastatus');
               }
-              delete self.caixa_.id
-              if (self.caixa_.status == 'closed') {
-                console.log('self.caixa_.status:', self.caixa_.status)
-                // self.caixa_op = null
-                self.caixa_op({ label: 'Abertura' })
-                self.$modal.show('modal_caixa_op')
-              }
-            } else {
-              console.log('pp')
-              self.caixa_op({ label: 'Abertura' })
             }
-          }).catch(function(error) {
-            console.log(error)
-          })
+          }
 
-          // if (Cookies.get('caixa_')) {
-          //   self.caixa_ = JSON.parse(Cookies.get('caixa_'))
-          //   console.log('get: (self.caixa_)', self.caixa_)
-          // }
+          console.log('self.caixa_:',self.caixa_);
+
+          if (self.caixa_) {
+            if (self.caixa_.status == 'opened') {
+              self.caixaSession = self.caixa_.session
+            }
+            delete self.caixa_.id
+            if (self.caixa_.status == 'closed') {
+              console.log('self.caixa_.status:', self.caixa_.status)
+              self.caixa_op({ label: 'Abertura' })
+              self.$modal.show('modal_caixa_op')
+            }
+          } else {
+            self.caixa_op({ label: 'Abertura' })
+          }
+
+
+          //On-line
+          // fetchList(
+          //   'caixa_status',
+          //   { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
+          // ).then(response => {
+          //   if (response.data.items[0]) {
+          //     console.log('caixa_status:', response.data.items[0])
+          //     self.caixa_ = response.data.items[0]
+          //   }
+          //   if (self.caixa_) {
+          //     if (self.caixa_.status == 'opened') {
+          //       self.caixaSession = self.caixa_.session
+          //     }
+          //     delete self.caixa_.id
+          //     if (self.caixa_.status == 'closed') {
+          //       console.log('self.caixa_.status:', self.caixa_.status)
+          //       // self.caixa_op = null
+          //       self.caixa_op({ label: 'Abertura' })
+          //       self.$modal.show('modal_caixa_op')
+          //     }
+          //   } else {
+          //     console.log('pp')
+          //     self.caixa_op({ label: 'Abertura' })
+          //   }
+          // }).catch(function(error) {
+          //   console.log(error)
+          // })
         },
         set(obj) {
           console.log('set: (obj)', obj)
           self.caixa_ = obj
-          // Cookies.set('caixa_', obj)
-          // Save operation in databank
-          create('caixa_status', obj).then((ret) => {
-            console.log('ret:', ret)
-          })
+
+          //Off-line local storage
+          console.log('1>self.caixastatus:', self.caixastatus);
+              
+          // self.caixastatus.push(obj)       
+          self.caixastatus_plus(obj)
+         
+          // self.caixastatus.push(obj)
+          const parsed = JSON.stringify(self.caixastatus);
+          localStorage.setItem(getToken()+'.caixastatus', parsed);
+
+          console.log('2>self.caixastatus:', self.caixastatus);
+          //Save operation in databank
+          // create('caixa_status', obj).then((ret) => {
+          //   console.log('ret:', ret)
+          // })
         }
       }
     },
@@ -1154,116 +1412,165 @@ export default {
       var self = this
       var op = x.label
       console.log('op:', op)
-      getInfo().then(function(x) {
+   
+        
         self.caixa_op_value = 0
         self.caixa_status_op_obs = ''
         self.caixa_op_selected = op
         if (op == 'Fechamento') {
-          // Get open value
-          fetchList('caixa_status', { tipo: 0, fields: ['op', 'created', 'sum(value) tot'], find: { session: self.caixaSession }, groupby: 'op' }).then(response => {
-            console.log('response.data>:', response.data)
+          //off-line
+          console.log('self.caixastatus:', self.caixastatus);
+          /// Calcula totais
+         
+          var open_ = self.caixastatus.find(function(item) {
+            return item.op == 'open'
+          }).value
+          console.log('open_:', open_);
+          
+          // Get reforco total
+          var reforco_ = self.caixastatus.filter(function(item) {
+            return item.op == 'reforco'
+          }).map(a => a.value).reduce(function(t, c) {return t + c}, 0)
+          console.log('reforco_:', reforco_);
+          
+          // Get sangria total
+          var sangria_array = self.caixastatus.filter(function(item) {
+            return item.op == 'sangria'
+          }).map(a => a.value)
+          console.log('sangria_array:', sangria_array);
 
-            var open_ = response.data.items.filter(function(item) {
-              return item.op == 'open'
-            })
-            var reforco_ = response.data.items.filter(function(item) {
-              return item.op == 'reforco'
-            })
-            var sangria_ = response.data.items.filter(function(item) {
-              return item.op == 'sangria'
-            })
-            var t1 = {
-              open: (open_[0] ? open_[0].tot : 0),
-              reforco: (reforco_[0] ? reforco_[0].tot : 0),
-              sangria: (sangria_[0] ? sangria_[0].tot : 0)
+          var sangria_ = self.caixastatus.filter(function(item) {
+            return item.op == 'sangria'
+          }).map(a => a.value).reduce((a, b) => a + b, 0)
+          console.log('sangria_:', sangria_);
+          
+          // Calcula o total parcial
+          var total_parcial = (open_||0) + (reforco_||0) - (sangria_||0)
+          console.log('total_parcial:', total_parcial);
+
+          ///Calcula o total de vendas da sessão do caixa
+          console.log('self.vendas:', self.vendas);
+          console.log('self.caixaSession:', self.caixaSession);
+          // self.vendas = JSON.parse(self.vendas)
+          console.log('self.vendas(parsed):', self.vendas);
+          var vendas_da_sessao = self.vendas.filter(x => x.session === self.caixaSession)
+          console.log('vendas_da_sessao:', vendas_da_sessao);
+          var amountByPaymentType = {
+            dinheiro(item) {
+              console.log(+item.dinheiro)
+              // return JSON.parse(item.pagamento).dinheiro
+              return +item.dinheiro
+            },
+            debito(item) {
+              console.log(+item.debito)
+              // return JSON.parse(item.pagamento).debito
+              return +item.debito
+            },
+            credito(item) {
+              console.log(+item.credito)
+              // return JSON.parse(item.pagamento).credito
+              return +item.credito
+            },
+            faturado(item) {
+              console.log(+item.faturado)
+              // return JSON.parse(item.pagamento).faturado
+              return +item.faturado
             }
-            var tt = t1.open + t1.reforco - t1.sangria
-            console.log('open_>:', tt)
-            // ret = response.data.items
-            // console.log('valor de abertura:', ret.value);
+          }
+          var total_vendido = {
+            dinheiro: vendas_da_sessao.map(amountByPaymentType.dinheiro).reduce((a, b) => a + b, 0),
+            debito: vendas_da_sessao.map(amountByPaymentType.debito).reduce((a, b) => a + b, 0),
+            credito: vendas_da_sessao.map(amountByPaymentType.credito).reduce((a, b) => a + b, 0),
+            faturado: vendas_da_sessao.map(amountByPaymentType.faturado).reduce((a, b) => a + b, 0)
+          }
+          self.caixa_fechamento_value = {
+            dinheiro: total_vendido.dinheiro + total_parcial,
+            cartao: total_vendido.debito + total_vendido.credito,
+            faturado: total_vendido.faturado
+          }
+          self.caixa_op_value =  self.caixa_fechamento_value.dinheiro
 
-            fetchList('vendas', { find: { session: self.caixaSession }}).then(response => {
-              console.log('response.data:', response.data)
-              self.clientesList = response.data.items
+          console.log('total_vendido:', total_vendido);
+          console.log('local:self.caixa_op_value:', self.caixa_op_value)
 
-              // Calc de total
-              var amount = {
-                dinheiro(item) {
-                  console.log(JSON.parse(item.pagamento).dinheiro)
-                  return JSON.parse(item.pagamento).dinheiro
-                },
-                debito(item) {
-                  console.log(JSON.parse(item.pagamento).debito)
-                  return JSON.parse(item.pagamento).debito
-                },
-                credito(item) {
-                  console.log(JSON.parse(item.pagamento).credito)
-                  return JSON.parse(item.pagamento).credito
-                },
-                faturado(item) {
-                  console.log(JSON.parse(item.pagamento).faturado)
-                  return JSON.parse(item.pagamento).faturado
-                }
-              }
-              function sum(prev, next) { return prev + next }
-              function varExistTest(val) {
-                if (val) { return val } else { return [] }
-              }
 
-              var total = {
-                dinheiro: response.data.items.map(amount.dinheiro).reduce(sum, 0) + tt,
-                debito: response.data.items.map(amount.debito).reduce(sum, 0),
-                credito: response.data.items.map(amount.credito).reduce(sum, 0),
-                faturado: response.data.items.map(amount.faturado).reduce(sum, 0)
-              }
+          // Get open value
+          // fetchList('caixa_status', { tipo: 0, fields: ['op', 'created', 'sum(value) tot'], find: { session: self.caixaSession }, groupby: 'op' }).then(response => {
+          //   console.log('response.data>:', response.data)
 
-              self.caixa_fechamento_value = {
-                dinheiro: total.dinheiro,
-                cartao: total.debito + total.credito,
-                faturado: total.faturado
-              }
-              console.log('self.caixa_op_value:', self.caixa_op_value)
-              // var fechamento = {
-              //   // data: self.today,
-              //   total: total.dinheiro + total.debito + total.credito + total.faturado,
-              //   // detalhes:{
-              //   //   total_dinheiro: total.dinheiro,
-              //   //   total_debito: total.debito,
-              //   //   total_credito: total.credito,
-              //   //   total_faturado: total.credito
-              //   // }
-              // }
+          //   var open_ = response.data.items.filter(function(item) {
+          //     return item.op == 'open'
+          //   })
+          //   var reforco_ = response.data.items.filter(function(item) {
+          //     return item.op == 'reforco'
+          //   })
+          //   var sangria_ = response.data.items.filter(function(item) {
+          //     return item.op == 'sangria'
+          //   })
+          //   var t1 = {
+          //     open: (open_[0] ? open_[0].tot : 0),
+          //     reforco: (reforco_[0] ? reforco_[0].tot : 0),
+          //     sangria: (sangria_[0] ? sangria_[0].tot : 0)
+          //   }
+          //   var tt = t1.open + t1.reforco - t1.sangria
+          //   console.log('open_>:', tt)
+          //   // ret = response.data.items
+          //   // console.log('valor de abertura:', ret.value);
 
-              // var relatorio = {
-              //   fechamento,
-              //   sangria: {
-              //     total: t1.sangria
-              //   },
-              //   reforco: {
-              //     total: t1.reforco
-              //   },
-              //   abertura: {
-              //     data: moment(new Date(open_[0].created)).format('DD/MM/YYYY, h:mm:ss a'),
-              //     total: t1.open
-              //   }
-              // }
+          //   fetchList('vendas', { find: { session: self.caixaSession }}).then(response => {
+          //     console.log('response.data:', response.data)
 
-              // var dinheiro = response.data.items.map(amount.dinheiro).reduce(sum) + tt
-              // self.caixa_op_value = JSON.stringify(self.caixa_op_value)
-              // self.caixa_display = JSON.stringify(fechamento, null, ' ')
-            }).catch(function(error) {
-              console.log(error)
-            })
-          }).catch(function(error) {
-            console.log(error)
-          })
+          //     // Calc de total
+          //     var amount = {
+          //       dinheiro(item) {
+          //         console.log(JSON.parse(item.pagamento).dinheiro)
+          //         return JSON.parse(item.pagamento).dinheiro
+          //       },
+          //       debito(item) {
+          //         console.log(JSON.parse(item.pagamento).debito)
+          //         return JSON.parse(item.pagamento).debito
+          //       },
+          //       credito(item) {
+          //         console.log(JSON.parse(item.pagamento).credito)
+          //         return JSON.parse(item.pagamento).credito
+          //       },
+          //       faturado(item) {
+          //         console.log(JSON.parse(item.pagamento).faturado)
+          //         return JSON.parse(item.pagamento).faturado
+          //       }
+          //     }
+          //     function sum(prev, next) { return prev + next }
+          //     function varExistTest(val) {
+          //       if (val) { return val } else { return [] }
+          //     }
+
+          //     var total = {
+          //       dinheiro: response.data.items.map(amount.dinheiro).reduce(sum, 0) + tt,
+          //       debito: response.data.items.map(amount.debito).reduce(sum, 0),
+          //       credito: response.data.items.map(amount.credito).reduce(sum, 0),
+          //       faturado: response.data.items.map(amount.faturado).reduce(sum, 0)
+          //     }
+
+          //     self.caixa_fechamento_value = {
+          //       dinheiro: total.dinheiro,
+          //       cartao: total.debito + total.credito,
+          //       faturado: total.faturado
+          //     }
+          //     console.log('self.caixa_op_value:', self.caixa_op_value)
+      
+          //   }).catch(function(error) {
+          //     console.log(error)
+          //   })
+          // }).catch(function(error) {
+          //   console.log(error)
+          // })
           console.log('!!!!-!!!')
         }
 
-        self.user = x.data.name
+        self.user = self.corrent_uset_info.name
         self.aux_caixa_op = op
         self.$modal.show('modal_caixa_op')
-      })
+     
     },
     caixa_op_ok(op) {
       var self = this
@@ -1272,8 +1579,15 @@ export default {
       var status = self.caixa_.status
 
       if (self.aux_caixa_op == 'Abertura') {
+        //Zera caixastatus e vendas
+        self.vendas = []
+        localStorage.removeItem(getToken()+'.vendas');
+
+        self.caixastatus = []
+        localStorage.removeItem(getToken()+'.caixastatus');
+        
         self.caixa_.value = self.caixa_open_value
-        self.caixaSession = getToken() + '-' + this.today_timestamp
+        self.caixaSession = getToken() + '-' + self.today_timestamp
         self.aux_caixa_op = 'open'
         status = 'opened'
       }
@@ -1288,11 +1602,16 @@ export default {
         status = 'opened'
       }
       if (self.aux_caixa_op == 'Fechamento') {
+        //Zera caixastatus e vendas
         self.caixa_.value = JSON.stringify(self.caixa_fechamento_value)
         self.aux_caixa_op = 'close'
         status = 'closed'
+
+        console.log('vendas to upload:', this.vendas);
+        self.dataUpload()
       }
 
+      self.caixa_.id = getToken() + '|' + (+new Date())
       self.caixa_.created = self.today_timestamp
       self.caixa_.token = getToken()
       self.caixa_.status = status
@@ -1303,27 +1622,16 @@ export default {
       console.log(self.caixa_)
 
       self.caixa().set(self.caixa_)
-      // var status = this.caixa_.status
 
-      // if (this.aux_caixa_op == 'open') {
-      //   this.caixaSession = getToken() + '-' + this.today_timestamp
-      //   status = 'opened'
-      // }
+      
+      //Evia pro servidor
+      //Caixa status
 
-      // if (this.aux_caixa_op == 'close') {
-      //   status = 'closed'
-      // }
-
-      // this.caixa_.created = this.today_timestamp
-      // this.caixa_.token = getToken()
-      // this.caixa_.status = status
-      // this.caixa_.op = this.aux_caixa_op
-      // this.caixa_.session = this.caixaSession
-      // this.caixa_.value = this.caixa_op_value
-
-      // console.log(this.caixa_)
-      // this.caixa().set(this.caixa_)
-
+      //uplod Vendas
+     
+      
+      //zera caixastatus
+        
       if (this.aux_caixa_op == 'close') {
         this.$router.push('/')
       }
@@ -1409,14 +1717,6 @@ export default {
       }
     },
     getCliente() {
-      const self = this
-      self.clientesList = []
-      fetchList('clientes', '').then(response => {
-        console.log('response.data:', response.data)
-        self.clientesList = response.data.items
-      }).catch(function(error) {
-        console.log(error)
-      })
       this.clientesListFlg = true
       this.$nextTick(() => {
         this.searchTermClient = null
@@ -1436,50 +1736,45 @@ export default {
     },
     cupom_add() {
       // Check if is a register of a credit
-      if (this.product_selected.ean == '1001' && this.cupom.cliente.id == 1) {
-        // Try if client not is defined
-        // swal("Defina o cliente que vai receber esse crédito")
-        this.getCliente()
-      } else {
-        if (this.product_selected.pco_venda > 0) {
-          if (this.product_selected.qnt == 0) this.product_selected.qnt = 1
-          if (this.product_selected.qnt > 0) {
-            const sound = (new Audio(require('@/assets/audio/timer_beep.mp3'))).play()
-            this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
-            // Procura produto pelo ID
-            if (this.product_selected.id) {
-              var auxObj = {
-                n: +new Date(),
-                id: this.product_selected.id,
-                ean: this.product_selected.ean,
-                descricao: this.product_selected.descricao,
-                pco_venda: this.product_selected.pco_venda,
-                qnt: this.product_selected.qnt,
-                unidade: this.product_selected.unidade,
-                total: this.product_selected.qnt * this.product_selected.pco_venda
-              }
-              // this.cupom.itens.unshift(auxObj)
-              this.cupom.itens.push(auxObj)
-              this.cupom.itens_n++
-              this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
-
-              // Total Calc
-              this.cupom.total = this.cupom.subtotal // += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
-
-              // Reset qnt
-              this.product_selected = {}
-              this.search = {}
-              this.qnt = null
-              this.EAN = null
-
-              // Reset products list
-              this.novoItem = false
-              this.$nextTick(function() {
-                this.novoItem = true
-                this.scrollToEnd()
-              })
-              this.vai()
+      if (this.product_selected.pco_venda > 0) {
+        if (this.product_selected.qnt == 0) this.product_selected.qnt = 1
+        if (this.product_selected.qnt > 0) {
+          const sound = (new Audio(require('@/assets/audio/timer_beep.mp3'))).play()
+          this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
+          // Procura produto pelo ID
+          if (this.product_selected.id) {
+            var auxObj = {
+              n: +new Date(),
+              id: this.product_selected.id,
+              ean: this.product_selected.ean,
+              descricao: this.product_selected.descricao,
+              pco_venda: this.product_selected.pco_venda,
+              qnt: this.product_selected.qnt,
+              unidade: this.product_selected.unidade,
+              total: this.product_selected.qnt * this.product_selected.pco_venda
             }
+            // this.cupom.itens.unshift(auxObj)
+            if (!this.cupom.id) {this.cupom.id = +new Date()}
+            this.cupom.itens.push(auxObj)
+            this.cupom.itens_n++
+            this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
+
+            // Total Calc
+            this.cupom.total = this.cupom.subtotal // += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
+
+            // Reset qnt
+            this.product_selected = {}
+            this.search = {}
+            this.qnt = null
+            this.EAN = null
+
+            // Reset products list
+            this.novoItem = false
+            this.$nextTick(function() {
+              this.novoItem = true
+              this.scrollToEnd()
+            })
+            this.vai()
           }
         }
       }
@@ -1490,7 +1785,7 @@ export default {
       this.dialogFormCupomView = true
     },
     productSet_EAN() {
-      const sound = (new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3'))).play()
+      this.som1.play()
       console.log('this.EAN:', parseInt(this.EAN))
       var item = this.produtos.find(x => parseInt(x.ean) === parseInt(this.EAN))
       console.log(item)
@@ -1538,7 +1833,7 @@ export default {
       }
     },
     productSet(params) {
-      const sound = (new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3'))).play()
+      this.som1.play()
       // Check if is called by datalist or by product button
       if (params === Object(params)) var params = this.source
       // var item = this.produtos.find(x => parseInt(x.id) === parseInt(params))
@@ -1602,8 +1897,7 @@ export default {
       this.cupom.total = this.cupom.subtotal - this.desconto
       this.totalpago = this.pago_dinheiro + this.pago_debito + this.pago_credito + this.pago_faturado
       console.log('this.cupom.date:', this.cupom.date)
-      // this.falta_pagar = this.cupom.total - this.totalpago
-
+     
       // data_ref to timestamp
       if (this.date_ref) {
         var myDate = this.date_ref.split('/')
@@ -1613,6 +1907,7 @@ export default {
       }
 
       const auxObj = {
+        id: getToken()+'|'+this.cupom.id,
         date: +new Date(),
         date_ref: this.date_ref,
         session: this.caixaSession,
@@ -1629,10 +1924,19 @@ export default {
       console.log('auxObj>>', auxObj)
       const auxJson = JSON.stringify(auxObj)
 
-      // Try save operation in server
-      vendaClose({ json_data: auxJson }).then((ret) => {
-        console.log('response:', ret)
-      })
+      // Try save operation
+      if (navigator.onLine){
+        // // in server
+        // vendaClose({ json_data: auxJson }).then((ret) => {
+        //   console.log('response:', ret)
+        // })
+      }
+
+      //in local storage
+      console.log('>this.vendas:', this.vendas);
+      this.vendas.push(auxObj)
+      localStorage.setItem(getToken()+'.vendas', JSON.stringify(this.vendas));
+      
       // Close modal
       this.vendaCloseFlg = false
       // this.vendaCloseEndFlg = true
@@ -1668,6 +1972,7 @@ export default {
     vendaCloseOkFim() {
       // Clean up form
       this.cupom = {
+        id: null,
         date: this.today_timestamp,
         cliente: {
           id: 1,
@@ -1696,6 +2001,21 @@ export default {
       this.$nextTick(() => {
         this.parametros_flg = true
       })
+    },
+    dataUpload(){
+      // Try save operation
+      if (navigator.onLine){
+
+        //Save operation in databank
+        console.log('this.caixastatus:', this.caixastatus);
+        create('caixa_status', this.caixastatus).then((ret) => {
+          console.log('caixa_status.ret:', ret)
+        })
+
+        vendaClose({ data: this.vendas }).then((ret) => {
+          console.log('response:', ret)
+        })
+      }
     },
     vendaCancel() {
       this.cupom = {
