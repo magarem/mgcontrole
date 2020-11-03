@@ -11,6 +11,7 @@
       width: 80mm;
       height: 100mm;
       margin: 0mm 0mm 0mm 0mm;
+      
       /* change the margins as you want them to be. */
     }
   }
@@ -114,9 +115,10 @@
   .cardtitle {
     font-size: 25px;
   }
-  /* .body {
+  .body {
     background-color: #44475D;
-  } */
+    height: 1000px;
+  }
   .box_product_selected {
     font-size: 18px;
   }
@@ -152,22 +154,62 @@
   <div class="app-container body">
     <div id="main">
       <el-row :gutter="10">
-      Operações de caixa:<br>
-      caixa_.session: {{caixa_.session}}<br> 
-      caixa_: {{caixa_}}
-      caixastatus:
-      <div style="overflow-y: auto; height: 200px; width:50%;">
-      <pre>
-      {{caixastatus}}
-      </pre>
-      </div>
-        <el-button v-if="!caixa_.session" @click="caixa_open">Abrir</el-button> 
-        <el-button v-if="caixa_.session && caixa_.status != 'close'" @click="caixa_reforco">Reforçar</el-button> 
-        <el-button v-if="caixa_.session && caixa_.status != 'close'" @click="caixa_sangria">Sangrar</el-button>
-        <el-button v-if="caixa_.session && caixa_.status != 'close'" @click="caixa_close">Fechar</el-button>
-        <el-button v-if="caixa_.session && caixa_.status == 'close'" @click="caixa_upload">Enviar</el-button>
+         <el-card v-if=card_caixa_status class="box-card" shadow="always" style="">
+            <h1 style="margin-top: 0px; margin-bottom: 0px;">Caixa: {{caixa_.status | caixa_op_filter}} | Usuário: {{user}} | Opções: 
+        <el-button-group style="margin-top: -5px;">
+          <el-button v-if="!caixa_.session" @click="caixa_open"  type="primary">Abrir caixa</el-button> 
+          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_reforco" type="primary">Reforçar</el-button> 
+          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_sangria" type="primary">Sangrar</el-button>
+          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_close" type="primary">Fechar</el-button>
+          <el-button v-if="caixa_.session && caixa_.status == 'closed'" @click="caixa_close_upload" type="info">Enviar dados para o servidor</el-button>
+          <el-button v-if="caixa_.session" @click="flg_caixa_operations_table=!flg_caixa_operations_table" type="warning" icon="el-icon-more" circle style="padding-top: -115px;"></el-button>
+        
+        </el-button-group>
+       </h1>
+       
+            <el-table
+            v-if="caixa_.session && flg_caixa_operations_table"
+            :data="caixastatus"
+            style="width: 100%">
+            <el-table-column
+              prop="id"
+              label="id"
+              width="250">
+            </el-table-column>
+            <el-table-column
+              prop="created"
+              label="created"
+              width="130">
+            </el-table-column>
+            <el-table-column
+              prop="session"
+              label="session"
+              width="250">
+              </el-table-column>
+            <el-table-column
+              prop="status"
+              label="status"
+              width="100">
+              </el-table-column>
+            <el-table-column
+              prop="op"
+              label="Operação"
+              width="100">
+              </el-table-column>
+            <el-table-column
+              prop="value"
+              label="value">
+            </el-table-column>
+          </el-table>
+        
+      <!-- <div style="overflow-y: auto; height: 200px; width:50%;">
+        <pre>
+        {{caixastatus}}
+        </pre>
+      </div> -->
+         </el-card><br>
       </el-row>
-      <el-row :gutter="10">
+      <el-row v-if="caixa_.status == 'opened'" :gutter="10">
         <el-col :span="13">
           <el-row :gutter="20">
             <el-col :span="24">
@@ -284,7 +326,7 @@
                   <el-row>
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
-                        <span class="bold">Usuário:</span> <a @click="caixa().open_panel()">{{ user }}</a><br>
+                        <span class="bold">Usuário:</span> <a @click="card_caixa_status=!card_caixa_status">{{ user }}</a><br>
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -847,6 +889,8 @@ export default {
   },
   data() {
     return {
+      flg_caixa_operations_table: false,
+      card_caixa_status: true,
       modal_data_upload: false,
       dataUpload_is_ok: false,
       dataUpload_status: false,
@@ -1373,7 +1417,6 @@ export default {
         // }
       }
     },
-   
     caixa_open(){
       var self = this
       swal("Abertura de caixa:", {
@@ -1403,6 +1446,9 @@ export default {
         //Insert in local storage
         const parsed = JSON.stringify(self.caixastatus);
         localStorage.setItem(getToken()+'.caixastatus', parsed);
+
+        //Close top panel
+        self.card_caixa_status = false
       });
     },
     caixa_reforco(){
@@ -1506,7 +1552,7 @@ export default {
         self.caixa_.id = getToken() + '|' + (+new Date())
         self.caixa_.created = self.today_timestamp
         self.caixa_.token = getToken()
-        self.caixa_.status = 'close'
+        self.caixa_.status = 'closed'
         self.caixa_.op = 'fechamento'
         self.caixa_.session = self.caixa_.session
         self.caixa_.value = JSON.stringify(self.caixa_fechamento_value)
@@ -1520,7 +1566,7 @@ export default {
         localStorage.setItem(getToken()+'.caixastatus', parsed);
         
         //reset caixa_
-        // self.caixa_ = {}
+        //self.caixa_ = {}
 
         //self.$modal.show('modal_data_upload')
       });
