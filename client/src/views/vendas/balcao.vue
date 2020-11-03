@@ -152,6 +152,22 @@
   <div class="app-container body">
     <div id="main">
       <el-row :gutter="10">
+      Operações de caixa:<br>
+      caixa_.session: {{caixa_.session}}<br> 
+      caixa_: {{caixa_}}
+      caixastatus:
+      <div style="overflow-y: auto; height: 200px; width:50%;">
+      <pre>
+      {{caixastatus}}
+      </pre>
+      </div>
+        <el-button v-if="!caixa_.session" @click="caixa_open">Abrir</el-button> 
+        <el-button v-if="caixa_.session && caixa_.status != 'close'" @click="caixa_reforco">Reforçar</el-button> 
+        <el-button v-if="caixa_.session && caixa_.status != 'close'" @click="caixa_sangria">Sangrar</el-button>
+        <el-button v-if="caixa_.session && caixa_.status != 'close'" @click="caixa_close">Fechar</el-button>
+        <el-button v-if="caixa_.session && caixa_.status == 'close'" @click="caixa_upload">Enviar</el-button>
+      </el-row>
+      <el-row :gutter="10">
         <el-col :span="13">
           <el-row :gutter="20">
             <el-col :span="24">
@@ -160,9 +176,9 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="20">
                     <el-col :span="5">
-                      
+                     
                       Produtos<button @click="local_data_load">DB Local</button>
-                     <button @click="dataUpload">Vendas data upload</button>
+                      <button @click="dataUpload">Vendas data upload</button>
                       <button @click="server_data_load">DB Server</button>
                       <button @click="caixastatus_plus">caixastatus +</button>
                       
@@ -182,7 +198,7 @@
 
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -17px;">
                   <div style="overflow-y: scroll; height:300px; width: 100%">
-                        {{corrent_uset_info}}<br>
+                        {{corrent_user_info}}<br>
                         <pre>
                          {{vendas}}
                         </pre>
@@ -259,7 +275,7 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
                     <el-col :span="9">
-                      <span>Cupom</span>: <span v-if="cupom">{{cupom.id}}</span><!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
+                      <span>Cupom</span>: <span v-if="cupom" style="font-size:10px;">{{cupom.id}}</span> | <span>{{dataUpload_is_ok}}</span> <!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
                     </el-col>
                     <el-col :span="15" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                       {{ today }}
@@ -268,7 +284,7 @@
                   <el-row>
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
-                        <span class="bold">Usuário:</span> <a @click="caixa().open()">{{ user }}</a><br>
+                        <span class="bold">Usuário:</span> <a @click="caixa().open_panel()">{{ user }}</a><br>
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -331,8 +347,7 @@
                             round
                             style="_height:60px; font-size:22px; width: 100%;"
                             type="danger"
-                            @click="vendaCancel()"
-                          >
+                            @click="vendaCancel()">
                             Cancelar
                           </el-button>
                         </el-col>
@@ -661,7 +676,7 @@
                         </tr>
                         <tr>
                           <td colspan="2" style="text-align: center; _height: 70px; padding-top: 15px;">
-                            <el-button v-if="aux_caixa_op" type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_op_ok">Confirma</el-button><br>
+                            <el-button  type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_op_ok">Confirma</el-button><br>
                             <el-button type="primary" style="width: 100%; " :disabled="caixa_.status=='closed'" @click="caixa().close()">Cancela</el-button>
                           </td>
                         </tr>
@@ -782,6 +797,12 @@
           </div>
         </div>
       </modal>
+
+      <!-- Data upload -->
+      <modal name="modal_data_upload" :click-to-close="false" :width="400" :height="250" :adaptive="true">
+        <p style="text-align: center;">Enviar dados para o servidor</p>
+        <el-button type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_close_upload">Enviar</el-button>
+      </modal> 
     </div>
   </div>
 </template>
@@ -826,7 +847,10 @@ export default {
   },
   data() {
     return {
-      corrent_uset_info: {},
+      modal_data_upload: false,
+      dataUpload_is_ok: false,
+      dataUpload_status: false,
+      corrent_user_info: {},
       som1: new Audio(require('@/assets/audio/zapsplat_multimedia_button_click_006_53867.mp3')),
       caixastatus: [],
       vendas: [],
@@ -1039,6 +1063,8 @@ export default {
   },
   mounted(){
     this.server_data_load()
+    this.local_data_load('caixastatus')
+    this.local_data_load('vendas')
   },
   mounted_() {
     //If online get the server databank values
@@ -1101,8 +1127,8 @@ export default {
   },
   created() {
     this.updateDateTime()
-    this.getUser()
-    this.caixa().get()
+    // this.getUser()
+    // this.caixa().get()
     window.addEventListener('keydown', (e) => {
       if (e.key == 'F2') {
         e.preventDefault()
@@ -1114,167 +1140,201 @@ export default {
     caixastatus_plus(val){
       this.caixastatus.push(JSON.parse(JSON.stringify(val)))
     },
-    local_data_load(){
-        //Get info (if already exists)
-        if (localStorage.getItem(getToken()+'.info')) {
-          try {
-            this.info = JSON.parse(localStorage.getItem(getToken()+'.info'));
-            this.info_data_adjustes()
-            console.log('localStorage, this.info:', this.info);
-          } catch(e) {
-            localStorage.removeItem(getToken()+'.info');
-          }
-        }
-        
-        //Get clientesList (if already exists)
-        if (localStorage.getItem(getToken()+'.clientesList')) {
-          try {
-            this.clientesList = JSON.parse(localStorage.getItem(getToken()+'.clientesList'));
-            console.log('localStorage, this.clientesList:', this.clientesList);
-         } catch(e) {
-            localStorage.removeItem(getToken()+'.clientesList');
-          }
-        }
-
-        //Check produtos (if already exists)
-        if (localStorage.getItem(getToken()+'.produtos')) {
-          try {
-            this.produtos = JSON.parse(localStorage.getItem(getToken()+'.produtos'));
-            console.log('localStorage, this.produtos:', this.produtos);
-            this.produtos_data_adjustes()
-          } catch(e) {
-            localStorage.removeItem(getToken()+'.produtos');
-          }
-        }
-
-         //Check vendas (if already exists)
-        if (localStorage.getItem(getToken()+'.vendas')) {
-          try {
-            this.vendas = JSON.parse(localStorage.getItem(getToken()+'.vendas'));
-            console.log('localStorage, this.vendas:', this.vendas);
-          } catch(e) {
-            alert()
-            localStorage.removeItem(getToken()+'.vendas');
-          }
-        }
-
-         //Check caixa status (if already exists)
-        if (localStorage.getItem(getToken()+'.caixastatus')) {
-          try {
-            this.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
-            console.log('localStorage, this.caixastatus:', this.caixastatus);
-          } catch(e) {
-            localStorage.removeItem(getToken()+'.caixastatus');
-          }
-        }
-   },
-    server_data_load(){
+    local_data_load(table){ 
       var self = this
-      // Load enterprise info
-      fetchList('info', '').then(response => {
-        this.info = response.data.items[0]
-        console.log('this.info:', this.info);
-        //Save in local storage
-        const parsed = JSON.stringify(this.info);
-        localStorage.setItem(getToken()+'.info', parsed);
-        this.info_data_adjustes()
-        // this.vai()
-      })
-      // Load clients list
-      fetchList('clientes', '').then(response => {
-        console.log('clientesList:', response.data)
-        this.clientesList = response.data.items
-        //Save in local storage
-        const parsed = JSON.stringify(this.clientesList);
-        localStorage.setItem(getToken()+'.clientesList', parsed);
-      })
-      // Load products list
-      fetchList('produtos', '').then(response => {
-        this.produtos = response.data.items
-        console.log('this.produtos:', this.produtos)
-        for (var t = 0; t < this.produtos.length; t++) {
-          if (this.produtos[t].descricao) {
-            this.produtos[t].descricao = this.produtos[t].descricao.replace(/\s+/g, ' ').trim()
+      switch (table) {
+        case 'corrent_user_info':
+          console.log('>', table)
+          //Get info (if already exists)
+          if (localStorage.getItem(getToken()+'.corrent_user_info')) {
+            try {
+              this.corrent_user_info = localStorage.getItem(getToken()+'.corrent_user_info');
+              console.log('this.corrent_user_info:', this.corrent_user_info);
+            } catch(e) {
+              localStorage.removeItem(getToken()+'.corrent_user_info');
+            }
           }
-        }   
-        this.produtos_data_adjustes()
-        //Save in local storage
-        const parsed = JSON.stringify(this.produtos);
-        localStorage.setItem(getToken()+'.produtos', parsed);
-        this.produtos_data_adjustes()
-        //Define 'diversos' item
-        this.diversos_set()
-      })
-      
-      //Get current usuario data
-      getInfo().then(function(x) {
-        self.corrent_uset_info = x.data
-        console.log('self.corrent_uset_info:', self.corrent_uset_info);
-      })
-      
-      // fetchList(
-      //   'caixa_status',
-      //   { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
-      // ).then(response => {
-      //   if (response.data.items[0]) {
-      //     console.log('caixa_status:', response.data.items[0])
-      //     self.caixa_ = response.data.items[0]
-      //   }
-      //   if (self.caixa_) {
-      //     if (self.caixa_.status == 'opened') {
-      //       self.caixaSession = self.caixa_.session
-      //       console.log('self.caixaSession:', self.caixaSession);
-      //       //Load vendas data
-      //       fetchList('vendas', { find: { session: self.caixaSession }}).then(response => {
-      //         this.vendas = response.data.items
-      //         console.log('this.vendas:', this.vendas)
-      //         //Save in local storage
-      //         const parsed = JSON.stringify(this.vendas);
-      //         localStorage.setItem(getToken()+'.vendas', parsed);
-      //       })
-      //    }
-      //     delete self.caixa_.id
-      //     if (self.caixa_.status == 'closed') {
-      //       console.log('self.caixa_.status:', self.caixa_.status)
-      //       // self.caixa_op = null
-      //       self.caixa_op({ label: 'Abertura' })
-      //       self.$modal.show('modal_caixa_op')
-      //     }
-      //   } else {
-      //     console.log('pp')
-      //     self.caixa_op({ label: 'Abertura' })
-      //   }
-      // }).catch(function(error) {
-      //   console.log(error)
-      // })
-   
-      //Cash status
-      // fetchList('caixa_status',
-      //     { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
-      // ).then(response => {
-      //   if (response.data.items[0]) {
-      //     console.log('caixa_status:', response.data.items[0])
-      //     this.caixa_ = response.data.items[0]
-      //   }
-      //   if (this.caixa_) {
-      //     if (this.caixa_.status == 'opened') {
-      //       this.caixaSession = this.caixa_.session
-      //     }
-      //     delete this.caixa_.id
-      //     if (this.caixa_.status == 'closed') {
-      //       console.log('this.caixa_.status:', this.caixa_.status)
-      //       this.caixa_op({ label: 'Abertura' })
-      //       this.$modal.show('modal_caixa_op')
-      //     }
-      //   } else {
-      //     this.caixa_op({ label: 'Abertura' })
-      //   }
-      // }).catch(function(error) {
-      //   console.log(error)
-      // })
-      //Adjusts
-      
-      
+          break;
+        case 'info':
+          console.log('>', table)
+          //Get info (if already exists)
+          if (localStorage.getItem(getToken()+'.info')) {
+            try {
+              this.info = JSON.parse(localStorage.getItem(getToken()+'.info'));
+              this.info_data_adjustes()
+              console.log('localStorage, this.info:', this.info);
+            } catch(e) {
+              localStorage.removeItem(getToken()+'.info');
+            }
+          }
+          break;
+        case 'clientes':
+          console.log('>', table)
+          //Get clientesList (if already exists)
+          if (localStorage.getItem(getToken()+'.clientesList')) {
+        try {
+          this.clientesList = JSON.parse(localStorage.getItem(getToken()+'.clientesList'));
+          console.log('localStorage, this.clientesList:', this.clientesList);
+        } catch(e) {
+          localStorage.removeItem(getToken()+'.clientesList');
+        }
+      }
+          break;
+        case 'produtos':  
+          console.log('>', table)
+          //Check produtos (if already exists)
+          if (localStorage.getItem(getToken()+'.produtos')) {
+            try {
+              this.produtos = JSON.parse(localStorage.getItem(getToken()+'.produtos'));
+              console.log('localStorage, this.produtos:', this.produtos);
+              this.produtos_data_adjustes()
+            } catch(e) {
+              localStorage.removeItem(getToken()+'.produtos');
+            }
+          }
+          break;
+        case 'vendas':
+          console.log('>', table) 
+          //Check vendas (if already exists)
+          if (localStorage.getItem(getToken()+'.vendas')) {
+            try {
+              this.vendas = JSON.parse(localStorage.getItem(getToken()+'.vendas'));
+              console.log('localStorage, this.vendas:', this.vendas);
+            } catch(e) {
+              alert()
+              localStorage.removeItem(getToken()+'.vendas');
+            }
+          }
+          break;
+        case 'caixastatus':
+            console.log('>', table)
+            //Check caixa status (if already exists)
+            if (localStorage.getItem(getToken()+'.caixastatus')) {
+            try {
+              self.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
+              console.log('localStorage, self.caixastatus:', self.caixastatus);
+              self.caixa_ = self.caixastatus[self.caixastatus.length-1]
+            } catch(e) {
+              localStorage.removeItem(getToken()+'.caixastatus');
+            }
+          }
+          break;
+        default:
+          console.log('default>', table)
+          this.local_data_load('corrent_user_info')
+          this.local_data_load('info')
+          this.local_data_load('clientes')
+          this.local_data_load('produtos')
+          this.local_data_load('vendas')
+          this.local_data_load('caixastatus')
+      }
+    },
+    server_data_load(table){
+      var self = this
+      console.log(table);
+      switch (table){
+        case 'corrent_user_info':
+          //Get current usuario data
+          getInfo().then(function(x) {
+            self.corrent_user_info = x.data
+            self.user = x.data.name
+            console.log('self.corrent_user_info:', self.corrent_user_info);
+            // Clean up register
+            if (localStorage.getItem(getToken()+'.corrent_user_info')) {
+              localStorage.removeItem(getToken()+'.corrent_user_info');
+            }
+            // Set local item 
+            localStorage.setItem(getToken()+'.corrent_user_info', self.corrent_user_info);
+          })
+          break;
+        case 'info':
+          // Load enterprise info
+          fetchList('info', '').then(response => {
+            self.info = response.data.items[0]
+            console.log('self.info:', self.info);
+            //Save in local storage
+            const parsed = JSON.stringify(self.info);
+            localStorage.setItem(getToken()+'.info', parsed);
+            self.info_data_adjustes()
+            // this.vai()
+          })
+          break;
+        case 'caixa_status':
+          fetchList('caixa_status',
+              { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
+          ).then(response => {
+            if (response.data.items[0]) {
+              console.log('caixa_status:', response.data.items[0])
+              self.caixastatus = response.data.items
+              self.caixa_ = response.data.items[0]
+              if (self.caixa_.status == 'opened') {
+                self.caixaSession = self.caixa_.session
+                // Load vendas
+                fetchList('vendas',
+                  { find: { 'session': self.caixaSession } }
+                ).then(response => {
+                  fetchList('vendas', { find: { session: self.caixaSession }}).then(response => {
+                    self.vendas = response.data.items
+                    console.log('self.vendas:', self.vendas)
+                    //Save in local storage
+                    const parsed = JSON.stringify(self.vendas);
+                    localStorage.setItem(getToken()+'.vendas', parsed);
+                  })
+                })
+              }
+              delete self.caixa_.id
+              // if (self.caixa_.status == 'closed') {
+              //   self.caixa_op({ label: 'Abertura' })
+              //   self.$modal.show('modal_caixa_op')
+              // }
+            }else{
+              //Since caixa_status doesn't exist in server most open to begin day work
+              if (localStorage.getItem(getToken()+'.caixa_status')) {
+                localStorage.removeItem(getToken()+'.caixa_status');
+              }
+              self.caixa_op({ label: 'Abertura' })
+              self.$modal.show('modal_caixa_op')
+            }
+          }).catch(function(error) {
+           console.log(error)
+          })
+          break;
+        case 'clientes':
+          // Load clients list
+          fetchList('clientes', '').then(response => {
+            console.log('clientesList:', response.data)
+            this.clientesList = response.data.items
+            //Save in local storage
+            const parsed = JSON.stringify(this.clientesList);
+            localStorage.setItem(getToken()+'.clientesList', parsed);
+          })
+          break;
+        case 'produtos':
+          // Load products list
+          fetchList('produtos', '').then(response => {
+            this.produtos = response.data.items
+            console.log('this.produtos:', this.produtos)
+            for (var t = 0; t < this.produtos.length; t++) {
+              if (this.produtos[t].descricao) {
+                this.produtos[t].descricao = this.produtos[t].descricao.replace(/\s+/g, ' ').trim()
+              }
+            }   
+            this.produtos_data_adjustes()
+            //Save in local storage
+            const parsed = JSON.stringify(this.produtos);
+            localStorage.setItem(getToken()+'.produtos', parsed);
+            this.produtos_data_adjustes()
+            //Define 'diversos' item
+            this.diversos_set()
+          })
+          break;
+        default:
+          self.server_data_load('corrent_user_info')
+          self.server_data_load('info')
+          //self.server_data_load('caixa_status')
+          self.server_data_load('clientes')
+          self.server_data_load('produtos')
+      } 
     },
     info_data_adjustes(){
       //info
@@ -1313,9 +1373,167 @@ export default {
         // }
       }
     },
+   
+    caixa_open(){
+      var self = this
+      swal("Abertura de caixa:", {
+        content: "input",
+      })
+      .then((value) => {
+        //swal(`You typed: ${value}`);
+         //Zera caixastatus e vendas
+        self.vendas = []
+        localStorage.removeItem(getToken()+'.vendas');
+
+        self.caixastatus = []
+        localStorage.removeItem(getToken()+'.caixastatus');
+        
+        // process data
+        self.caixa_.id = getToken() + '|' + (+new Date())
+        self.caixa_.created = self.today_timestamp
+        self.caixa_.token = getToken()
+        self.caixa_.status = 'opened'
+        self.caixa_.op = 'open'
+        self.caixa_.session = getToken() + '-' + self.today_timestamp
+        self.caixa_.value = value
+        // self.caixa_.obs = self.caixa_status_op_obs
+        console.log(self.caixa_)
+        //Insert in memory
+        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+        //Insert in local storage
+        const parsed = JSON.stringify(self.caixastatus);
+        localStorage.setItem(getToken()+'.caixastatus', parsed);
+      });
+    },
+    caixa_reforco(){
+      var self = this
+      swal("Reforço de caixa:", {
+        content: "input",
+      })
+      .then((value) => {
+        // process data
+        self.caixa_.id = getToken() + '|' + (+new Date())
+        self.caixa_.created = self.today_timestamp
+        self.caixa_.token = getToken()
+        self.caixa_.status = 'opened'
+        self.caixa_.op = 'reforco'
+        self.caixa_.session = self.caixa_.session
+        self.caixa_.value = value
+        // self.caixa_.obs = self.caixa_status_op_obs
+        console.log(self.caixa_)
+        //Insert in memory
+        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+        //Insert in local storage
+        localStorage.removeItem(getToken()+'.caixastatus');
+        const parsed = JSON.stringify(self.caixastatus);
+        localStorage.setItem(getToken()+'.caixastatus', parsed);
+      });
+    },
+    caixa_sangria(){
+      var self = this
+      swal("Sangria de caixa:", {
+        content: "input",
+      })
+      .then((value) => {
+        // process data
+        self.caixa_.id = getToken() + '|' + (+new Date())
+        self.caixa_.created = self.today_timestamp
+        self.caixa_.token = getToken()
+        self.caixa_.status = 'opened'
+        self.caixa_.op = 'sangria'
+        self.caixa_.session = self.caixa_.session
+        self.caixa_.value = value * -1
+        // self.caixa_.obs = self.caixa_status_op_obs
+        console.log(self.caixa_)
+        //Insert in memory
+        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+        //Insert in local storage
+        localStorage.removeItem(getToken()+'.caixastatus');
+        const parsed = JSON.stringify(self.caixastatus);
+        localStorage.setItem(getToken()+'.caixastatus', parsed);
+      });
+    },
+    caixa_close(){
+      var self = this
+      swal("Fechamento de caixa:", {
+        content: "input",
+      })
+      .then((value) => {
+
+        var total_parcial = self.caixastatus.map(a => +a.value).reduce(function(t, c) {return t + c}, 0)
+        console.log('total_parcial:', total_parcial);
+
+        var vendas_da_sessao = self.vendas.filter(x => x.session === self.caixa_.session)
+        console.log('vendas_da_sessao:', vendas_da_sessao);
+
+        var amountByPaymentType = {
+          dinheiro(item) {
+            console.log(+item.dinheiro)
+            // return JSON.parse(item.pagamento).dinheiro
+            return +item.dinheiro
+          },
+          debito(item) {
+            console.log(+item.debito)
+            // return JSON.parse(item.pagamento).debito
+            return +item.debito
+          },
+          credito(item) {
+            console.log(+item.credito)
+            // return JSON.parse(item.pagamento).credito
+            return +item.credito
+          },
+          faturado(item) {
+            console.log(+item.faturado)
+            // return JSON.parse(item.pagamento).faturado
+            return +item.faturado
+          }
+        }
+
+        var total_vendido = {
+          dinheiro: vendas_da_sessao.map(amountByPaymentType.dinheiro).reduce((a, b) => a + b, 0),
+          debito: vendas_da_sessao.map(amountByPaymentType.debito).reduce((a, b) => a + b, 0),
+          credito: vendas_da_sessao.map(amountByPaymentType.credito).reduce((a, b) => a + b, 0),
+          faturado: vendas_da_sessao.map(amountByPaymentType.faturado).reduce((a, b) => a + b, 0)
+        }
+
+        self.caixa_fechamento_value = {
+          dinheiro: total_vendido.dinheiro + total_parcial,
+          cartao: total_vendido.debito + total_vendido.credito,
+          faturado: total_vendido.faturado
+        }
+
+        // process data
+        self.caixa_.id = getToken() + '|' + (+new Date())
+        self.caixa_.created = self.today_timestamp
+        self.caixa_.token = getToken()
+        self.caixa_.status = 'close'
+        self.caixa_.op = 'fechamento'
+        self.caixa_.session = self.caixa_.session
+        self.caixa_.value = JSON.stringify(self.caixa_fechamento_value)
+        // self.caixa_.obs = self.caixa_status_op_obs
+        console.log(self.caixa_)
+        //Insert in memory
+        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+        //Insert in local storage
+        localStorage.removeItem(getToken()+'.caixastatus');
+        const parsed = JSON.stringify(self.caixastatus);
+        localStorage.setItem(getToken()+'.caixastatus', parsed);
+        
+        //reset caixa_
+        // self.caixa_ = {}
+
+        //self.$modal.show('modal_data_upload')
+      });
+    },
+    caixa_upload(){
+      this.$modal.show('modal_data_upload')
+    },
     caixa() {
       var self = this
       return {
+        open_panel() {
+          self.$modal.show('modal_caixa_op')
+        },
         open() {
           // self.caixa_op = null
           // console.log('1>self.caixastatus:', self.caixastatus);
@@ -1428,32 +1646,34 @@ export default {
           console.log('open_:', open_);
           
           // Get reforco total
-          var reforco_ = self.caixastatus.filter(function(item) {
-            return item.op == 'reforco'
-          }).map(a => a.value).reduce(function(t, c) {return t + c}, 0)
-          console.log('reforco_:', reforco_);
-          
-          // Get sangria total
-          var sangria_array = self.caixastatus.filter(function(item) {
-            return item.op == 'sangria'
-          }).map(a => a.value)
-          console.log('sangria_array:', sangria_array);
-
-          var sangria_ = self.caixastatus.filter(function(item) {
-            return item.op == 'sangria'
-          }).map(a => a.value).reduce((a, b) => a + b, 0)
-          console.log('sangria_:', sangria_);
-          
-          // Calcula o total parcial
-          var total_parcial = (open_||0) + (reforco_||0) - (sangria_||0)
+          var total_parcial = self.caixastatus.map(a => a.value).reduce(function(t, c) {return t + c}, 0)
           console.log('total_parcial:', total_parcial);
 
+          // var reforco_ = self.caixastatus.filter(function(item) {
+          //   return item.op == 'reforco'
+          // }).map(a => a.value).reduce(function(t, c) {return t + c}, 0)
+          // console.log('reforco_:', reforco_);
+          
+          // // Get sangria total
+          // var sangria_array = self.caixastatus.filter(function(item) {
+          //   return item.op == 'sangria'
+          // }).map(a => a.value)
+          // console.log('sangria_array:', sangria_array);
+
+          // var sangria_ = self.caixastatus.filter(function(item) {
+          //   return item.op == 'sangria'
+          // }).map(a => a.value).reduce((a, b) => a + b, 0)
+          // console.log('sangria_:', sangria_);
+          
+          // // Calcula o total parcial
+          // var total_parcial = (open_||0) + (reforco_||0) - (sangria_||0)
+          // console.log('total_parcial:', total_parcial);
+
           ///Calcula o total de vendas da sessão do caixa
-          console.log('self.vendas:', self.vendas);
-          console.log('self.caixaSession:', self.caixaSession);
+        
           // self.vendas = JSON.parse(self.vendas)
-          console.log('self.vendas(parsed):', self.vendas);
-          var vendas_da_sessao = self.vendas.filter(x => x.session === self.caixaSession)
+         
+          var vendas_da_sessao = self.vendas.filter(x => x.session === self.caixa_.session)
           console.log('vendas_da_sessao:', vendas_da_sessao);
           var amountByPaymentType = {
             dinheiro(item) {
@@ -1488,7 +1708,7 @@ export default {
             cartao: total_vendido.debito + total_vendido.credito,
             faturado: total_vendido.faturado
           }
-          self.caixa_op_value =  self.caixa_fechamento_value.dinheiro
+          self.caixa_op_value = self.caixa_fechamento_value.dinheiro
 
           console.log('total_vendido:', total_vendido);
           console.log('local:self.caixa_op_value:', self.caixa_op_value)
@@ -1567,13 +1787,14 @@ export default {
           console.log('!!!!-!!!')
         }
 
-        self.user = self.corrent_uset_info.name
+        self.user = self.corrent_user_info.name
         self.aux_caixa_op = op
         self.$modal.show('modal_caixa_op')
      
     },
     caixa_op_ok(op) {
       var self = this
+      // var dataUpload_is_ok = true
       console.log('!!!!-!!!>', self.aux_caixa_op)
 
       var status = self.caixa_.status
@@ -1608,35 +1829,55 @@ export default {
         status = 'closed'
 
         console.log('vendas to upload:', this.vendas);
-        self.dataUpload()
+        
       }
 
+      // process data
       self.caixa_.id = getToken() + '|' + (+new Date())
       self.caixa_.created = self.today_timestamp
       self.caixa_.token = getToken()
       self.caixa_.status = status
       self.caixa_.op = self.aux_caixa_op
       self.caixa_.session = self.caixaSession
-
       self.caixa_.obs = self.caixa_status_op_obs
       console.log(self.caixa_)
-
       self.caixa().set(self.caixa_)
 
-      
-      //Evia pro servidor
-      //Caixa status
 
-      //uplod Vendas
-     
-      
-      //zera caixastatus
-        
       if (this.aux_caixa_op == 'close') {
-        this.$router.push('/')
+        self.$modal.show('modal_data_upload')
+        // if (self.dataUpload()) {
+        //   this.$router.push('/')
+        // }else{
+        //   swal("Erro: Sem internet ou o servidor fora do ar, não é possível fechar o caixa, por favor aguarde.")
+        // }
+      }else{
+        self.$modal.hide('modal_caixa_op')
       }
 
-      this.$modal.hide('modal_caixa_op')
+      // if (dataUpload_is_ok) {
+      //   this.$modal.hide('modal_caixa_op')
+      // }else{
+      //   swal("Erro: Sem internet ou o servidor fora do ar, não é possível fechar o caixa, por favor aguarde.")
+      // }
+    },
+    caixa_close_upload() {
+      var self = this
+      this.dataUpload().then(function(x){
+        console.log('self.dataUpload_is_ok:::>', self.dataUpload_is_ok);
+        if (self.dataUpload_is_ok) {
+         
+          //Reset caixa
+          self.caixa_ = {}
+          localStorage.removeItem(getToken()+'.caixastatus');
+          localStorage.removeItem(getToken()+'.vendas');
+         
+         //Redirect do home site (dashboard)
+          self.$router.push('/')
+        }else{
+          swal("Erro: Sem internet ou o servidor fora do ar, não é possível fechar o caixa, por favor aguarde.")
+        }
+      })
     },
     vai() {
       this.$nextTick(function() {
@@ -1910,7 +2151,7 @@ export default {
         id: getToken()+'|'+this.cupom.id,
         date: +new Date(),
         date_ref: this.date_ref,
-        session: this.caixaSession,
+        session: this.caixa_.session,
         cliente: this.cupom.cliente.id,
         subtotal: this.cupom.subtotal,
         desconto: this.desconto,
@@ -2002,19 +2243,30 @@ export default {
         this.parametros_flg = true
       })
     },
-    dataUpload(){
+    async dataUpload(){
+      var self = this
       // Try save operation
       if (navigator.onLine){
-
         //Save operation in databank
         console.log('this.caixastatus:', this.caixastatus);
-        create('caixa_status', this.caixastatus).then((ret) => {
+        await create('caixa_status', this.caixastatus).then((ret) => {
           console.log('caixa_status.ret:', ret)
+            vendaClose({ data: this.vendas }).then((ret) => {
+            console.log('response:', ret)
+           
+            return true
+          }).catch((error) => {
+            console.warn('Not good man2 :(');
+            return false
+          })
+          self.dataUpload_is_ok = true
+        }).catch((error) => {
+          self.dataUpload_status = "up load error"     
         })
 
-        vendaClose({ data: this.vendas }).then((ret) => {
-          console.log('response:', ret)
-        })
+        
+
+        
       }
     },
     vendaCancel() {
