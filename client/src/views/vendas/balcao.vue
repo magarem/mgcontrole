@@ -117,7 +117,7 @@
   }
   .body {
     background-color: #44475D;
-    height: 1000px;
+    height: 110vh;
   }
   .box_product_selected {
     font-size: 18px;
@@ -154,14 +154,18 @@
   <div class="app-container body">
     <div id="main">
       <el-row :gutter="10">
+         <!-- <el-card class="box-card" shadow="always" style="">
+          {{caixa_}}
+         </el-card> -->
          <el-card v-if=card_caixa_status class="box-card" shadow="always" style="">
             <h1 style="margin-top: 0px; margin-bottom: 0px;">Caixa: {{caixa_.status | caixa_op_filter}} | Usuário: {{user}} | Opções: 
         <el-button-group style="margin-top: -5px;">
-          <el-button v-if="!caixa_.session" @click="caixa_open"  type="primary">Abrir caixa</el-button> 
-          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_reforco" type="primary">Reforçar</el-button> 
-          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_sangria" type="primary">Sangrar</el-button>
+          <el-button v-if="!caixa_.session" @click="modal_open('modal_caixastatus_open')"  type="primary">Abrir caixa</el-button> 
+          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="modal_open('modal_caixastatus_reforco')" type="primary">Reforçar</el-button> 
+          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="modal_open('modal_caixastatus_sangria')" type="primary">Sangrar</el-button>
           <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_close" type="primary">Fechar</el-button>
           <el-button v-if="caixa_.session && caixa_.status == 'closed'" @click="caixa_close_upload" type="info">Enviar dados para o servidor</el-button>
+          <!-- <el-button @click="teste" type="info">Teste</el-button> -->
           <el-button v-if="caixa_.session" @click="flg_caixa_operations_table=!flg_caixa_operations_table" type="warning" icon="el-icon-more" circle style="padding-top: -115px;"></el-button>
         
         </el-button-group>
@@ -675,175 +679,60 @@
         </div>
       </el-dialog>
 
-      <!-- Caixa status -->
-      <modal name="modal_caixa_op" :click-to-close="false" :width="700" :height="570" :adaptive="true">
-        <div style="padding:20px;">
-          <div class="center" style="font-size: 25px; padding-bottom: 30px;">Operação de Caixa</div>
-          <div style="font-size: 20px;">
-            <table style="width: 100%; margin: auto;" border="0">
-              <tr>
-                <td class="bold_" style="width: 33%; background-color: #f0f0f5; text-align: center; important!; padding: 10px;">Data:<br>{{ today }}</td>
-                <!-- <td style="padding: 5px;">{{today}}</td> -->
-
-                <td class="bold_" style="width: 33%; background-color: #f0f0f5; text-align: center; important!; padding: 10px;">Usuário:<br>{{ user }}</td>
-                <!-- <td style="padding: 5px;">{{user}}</td> -->
-
-                <td class="bold_" style="width: 33%; background-color: #f0f0f5; text-align: center; important!; padding: 10px;">Posição:<br>{{ caixa_.status | caixa_op_filter }}</td>
-                <!-- <td style="padding: 5px;">{{caixa_.status | caixa_op_filter}}</td> -->
-              </tr>
-              <tr><td colspan="3">&nbsp;</td></tr>
-              <tr>
-                <td colspan="3" style="_padding: 5px;">
-
-                  <el-tabs type="card" @tab-click="caixa_op">
-                    <el-tab-pane :disabled="caixa_.status == 'opened'" label="Abertura">
-                      <table v-if="caixa_.status !== 'opened'" style="width: 100%">
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Valor:</td>
-                          <td style="padding: 5px;">
-                            <money v-model="caixa_open_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Obs:</td>
-                          <td style="padding: 5px;">
-                            <el-input
-                              v-model="caixa_status_op_obs"
-                              type="textarea"
-                              :rows="4"
-                              placeholder=""
-                              style="font-size: 18px; width: 100%;"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="2" style="text-align: center; _height: 70px; padding-top: 15px;">
-                            <el-button  type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_op_ok">Confirma</el-button><br>
-                            <el-button type="primary" style="width: 100%; " :disabled="caixa_.status=='closed'" @click="caixa().close()">Cancela</el-button>
-                          </td>
-                        </tr>
-
-                      </table>
-                    </el-tab-pane>
-                    <el-tab-pane :disabled="caixa_.status == 'closed'" label="Reforço">
-                      <table style="width: 100%">
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Valor:</td>
-                          <td style="padding: 5px;">
-                            <money v-model="caixa_op_value" v-bind="money" class="el-input__inner" :readonly="caixa_op_selected=='fechamento'" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Obs:</td>
-                          <td style="padding: 5px;">
-                            <el-input
-                              v-model="caixa_status_op_obs"
-                              type="textarea"
-                              :rows="4"
-                              placeholder="Motivo"
-                              style="font-size: 18px; width: 100%;"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="2" style="text-align: center; _height: 70px; padding-top: 15px;">
-                            <el-button v-if="aux_caixa_op" type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_op_ok">Confirma</el-button><br>
-                            <el-button type="primary" style="width: 100%; " :disabled="caixa_.status=='closed'" @click="caixa().close()">Cancela</el-button>
-                          </td>
-                        </tr>
-                      </table>
-                    </el-tab-pane>
-                    <el-tab-pane :disabled="caixa_.status == 'closed'" label="Sangria">
-                      <table style="width: 100%">
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Valor:</td>
-                          <td style="padding: 5px;">
-                            <money v-model="caixa_op_value" v-bind="money" class="el-input__inner" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Obs:</td>
-                          <td style="padding: 5px;">
-                            <el-input
-                              v-model="caixa_status_op_obs"
-                              type="textarea"
-                              :rows="4"
-                              placeholder="Motivo"
-                              style="font-size: 18px; width: 100%;"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="2" style="text-align: center; _height: 70px; padding-top: 15px;">
-                            <el-button v-if="aux_caixa_op" type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_op_ok">Confirma</el-button><br>
-                            <el-button type="primary" style="width: 100%; " :disabled="caixa_.status=='closed'" @click="caixa().close()">Cancela</el-button>
-                          </td>
-                        </tr>
-                      </table>
-
-                    </el-tab-pane>
-                    <el-tab-pane :disabled="caixa_.status == 'closed'" label="Fechamento">
-                      <table style="width: 100%">
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Dinheiro:</td>
-                          <td style="padding: 5px;">
-                            {{ caixa_fechamento_value.dinheiro }}
-                            <!-- <money v-model="caixa_fechamento_value.dinheiro" v-bind="money" class="el-input__inner" readonly="true" /> -->
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Cartão:</td>
-                          <td style="padding: 5px;">
-                            {{ caixa_fechamento_value.cartao | money }}
-                            <!-- <money v-model="caixa_fechamento_value.cartao" v-bind="money" class="el-input__inner" readonly="true" /> -->
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Faturado:</td>
-                          <td style="padding: 5px;">
-                            {{ caixa_fechamento_value.faturado | money }}
-                            <!-- <money v-model="caixa_fechamento_value.faturado" v-bind="money" class="el-input__inner" readonly="true" /> -->
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Total:</td>
-                          <td style="padding: 5px;">
-                            {{ caixa_fechamento_value.dinheiro + caixa_fechamento_value.cartao + caixa_fechamento_value.faturado }}
-                            <!-- <money v-model="caixa_fechamento_value.faturado" v-bind="money" class="el-input__inner" readonly="true" /> -->
-                          </td>
-                        </tr>
-                        <tr>
-                          <td class="bold" style="text-align: right; important!">Obs:</td>
-                          <td style="_padding: 5px;">
-                            <el-input
-                              v-model="caixa_status_op_obs"
-                              type="textarea"
-                              :rows="2"
-                              placeholder="obs"
-                              style="font-size: 18px; width: 100%;"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="2" style="text-align: center; _height: 70px; padding-top: 15px;">
-                            <el-button v-if="aux_caixa_op" type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_op_ok">Confirma</el-button><br>
-                            <el-button type="primary" style="width: 100%; " :disabled="caixa_.status=='closed'" @click="caixa().close()">Cancela</el-button>
-                          </td>
-                        </tr>
-                      </table>
-                    </el-tab-pane>
-                  </el-tabs>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </modal>
-
       <!-- Data upload -->
       <modal name="modal_data_upload" :click-to-close="false" :width="400" :height="250" :adaptive="true">
         <p style="text-align: center;">Enviar dados para o servidor</p>
         <el-button type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_close_upload">Enviar</el-button>
+      </modal> 
+
+      <!-- caixa status > open  -->
+      <modal name="modal_caixastatus_open" :click-to-close="true" :width="700" :height="350" :adaptive="true">
+       <el-card class="box-card">
+        <p style="text-align: center;">Abertura de caixa</p>
+         Valor inicial: <money v-model="modal_caixastatus.open.value" v-bind="money" class="el-input__inner"  />
+         <br><br>Obs:
+         <el-input
+            v-model="modal_caixastatus.open.obs"
+            type="textarea"
+            :rows="2"
+            placeholder="obs"
+            style="font-size: 18px; width: 100%;"
+          /><br><br>
+        <el-button type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_open">Ok</el-button>
+       </el-card>
+      </modal> 
+     
+      <!-- caixa status > reforco  -->
+      <modal name="modal_caixastatus_reforco" :click-to-close="true" :width="700" :height="350" :adaptive="true">
+       <el-card class="box-card">
+        <p style="text-align: center;">Reforço de caixa</p>
+         Valor inicial: <money v-model="modal_caixastatus.reforco.value" v-bind="money" class="el-input__inner"  />
+         <br><br>Obs:
+         <el-input
+            v-model="modal_caixastatus.reforco.obs"
+            type="textarea"
+            :rows="2"
+            placeholder="obs"
+            style="font-size: 18px; width: 100%;"
+          /><br><br>
+        <el-button type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_reforco">Ok</el-button>
+       </el-card>
+      </modal> 
+      <!-- caixa status > sangria  -->
+      <modal name="modal_caixastatus_sangria" :click-to-close="true" :width="700" :height="350" :adaptive="true">
+       <el-card class="box-card">
+        <p style="text-align: center;">Sangria de caixa</p>
+         Valor inicial: <money v-model="modal_caixastatus.sangria.value" v-bind="money" class="el-input__inner"  />
+         <br><br>Obs:
+         <el-input
+            v-model="modal_caixastatus.sangria.obs"
+            type="textarea"
+            :rows="2"
+            placeholder="obs"
+            style="font-size: 18px; width: 100%;"
+          /><br><br>
+        <el-button type="success" style="width: 100%; font-size: 30px; margin-bottom: 5px;" @click="caixa_sangria">Ok</el-button>
+       </el-card>
       </modal> 
     </div>
   </div>
@@ -865,17 +754,17 @@ import magaform from '@/components/Magaform'
 // import ProductsThumbGridItem from '@/components/ProductsThumbGridItem'
 import moment from 'moment'
 import swal from 'sweetalert'
+import swal2 from 'sweetalert2'
 
 export default {
   name: 'Balcao',
-  components: { magaform, Money, VueGoodTable, Autocomplete, swal, moment },
+  components: { magaform, Money, VueGoodTable, Autocomplete, swal, swal2, moment },
   directives: { waves, money: Money },
   filters: {
     caixa_op_filter(op) {
       if (op == 'opened') return 'Aberta'
       if (op == 'closed') return 'Fechada'
     },
-
     money(value) {
       if (typeof value !== 'number') {
         return value
@@ -889,6 +778,24 @@ export default {
   },
   data() {
     return {
+      modal_caixastatus: {
+        open:{
+          value: 0,
+          obs: null
+        },
+        reforco:{
+          value: 0,
+          obs: null
+        },
+        sangria:{
+          value: 0,
+          obs: null
+        },
+        close:{
+          value: 0,
+          obs: null
+        },
+      },
       flg_caixa_operations_table: false,
       card_caixa_status: true,
       modal_data_upload: false,
@@ -1417,495 +1324,254 @@ export default {
         // }
       }
     },
+    async teste(){
+      // this.$swal('Hello Vue world!!!');
+      const { value: formValues } = await swal2.fire({
+      title: 'Multiple inputs',
+      html:
+        '<input id="swal-input1" class="swal2-input">' +
+        '<input id="swal-input2" class="swal2-input">',
+      focusConfirm: false,
+      preConfirm: () => {
+        return [
+          document.getElementById('swal-input1').value,
+          document.getElementById('swal-input2').value
+        ]
+      }
+    })
+
+    if (formValues) {
+      swal2.fire(JSON.stringify(formValues))
+    }
+      // swal2.mixin({
+      //   input: 'text',
+      //   confirmButtonText: 'Próximo &rarr;',
+      //   showCancelButton: true,
+      //   progressSteps: ['1', '2']
+      // }).queue(['Valor inicial',
+      //   'Observação'
+      // ]).then((result) => {
+      //   if (result.value) {
+      //     const answers = JSON.stringify(result.value)
+      //     swal2.fire({
+      //       title: 'Caixa aberta!',
+      //       html: `
+      //         Dados digitados:
+      //         <pre><code>${answers}</code></pre>
+      //       `,
+      //       confirmButtonText: 'Iniciar'
+      //     })
+      //   }
+      // })
+    },
+    modal_open(modal){
+      this.$modal.show(modal)
+    },
     caixa_open(){
       var self = this
-      swal("Abertura de caixa:", {
-        content: "input",
-      })
-      .then((value) => {
-        //swal(`You typed: ${value}`);
-         //Zera caixastatus e vendas
-        self.vendas = []
-        localStorage.removeItem(getToken()+'.vendas');
 
-        self.caixastatus = []
-        localStorage.removeItem(getToken()+'.caixastatus');
-        
-        // process data
-        self.caixa_.id = getToken() + '|' + (+new Date())
-        self.caixa_.created = self.today_timestamp
-        self.caixa_.token = getToken()
-        self.caixa_.status = 'opened'
-        self.caixa_.op = 'open'
-        self.caixa_.session = getToken() + '-' + self.today_timestamp
-        self.caixa_.value = value
-        // self.caixa_.obs = self.caixa_status_op_obs
-        console.log(self.caixa_)
-        //Insert in memory
-        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
-        //Insert in local storage
-        const parsed = JSON.stringify(self.caixastatus);
-        localStorage.setItem(getToken()+'.caixastatus', parsed);
+      // Zera caixastatus e vendas
+      self.vendas = []
+      localStorage.removeItem(getToken()+'.vendas');
 
-        //Close top panel
-        self.card_caixa_status = false
-      });
+      self.caixastatus = []
+      localStorage.removeItem(getToken()+'.caixastatus');
+      
+      // self.caixa_operation('open')
+      
+      //Close modal
+      
+      // // process data
+      self.caixa_.id = getToken() + '|' + (+new Date())
+      self.caixa_.created = self.today_timestamp
+      self.caixa_.token = getToken()
+      self.caixa_.status = 'opened'
+      self.caixa_.op = 'open'
+      self.caixa_.session = getToken() + '-' + self.today_timestamp
+      self.caixa_.value = self.modal_caixastatus.open.value
+      self.caixa_.obs = self.modal_caixastatus.open.obs
+      console.log(self.caixa_)
+      //Insert in memory
+      self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+      //Insert in local storage
+      const parsed = JSON.stringify(self.caixastatus);
+      localStorage.setItem(getToken()+'.caixastatus', parsed);
+
+      //Cleanup form
+      self.modal_caixastatus.open = {}
+
+      this.$modal.hide('modal_caixastatus_open')
+      //Close top panel
+      self.card_caixa_status = false
     },
     caixa_reforco(){
       var self = this
-      swal("Reforço de caixa:", {
-        content: "input",
-      })
-      .then((value) => {
-        // process data
-        self.caixa_.id = getToken() + '|' + (+new Date())
-        self.caixa_.created = self.today_timestamp
-        self.caixa_.token = getToken()
-        self.caixa_.status = 'opened'
-        self.caixa_.op = 'reforco'
-        self.caixa_.session = self.caixa_.session
-        self.caixa_.value = value
-        // self.caixa_.obs = self.caixa_status_op_obs
-        console.log(self.caixa_)
-        //Insert in memory
-        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
-        //Insert in local storage
-        localStorage.removeItem(getToken()+'.caixastatus');
-        const parsed = JSON.stringify(self.caixastatus);
-        localStorage.setItem(getToken()+'.caixastatus', parsed);
-      });
+      // process data
+      // self.caixa_operation('reforco')
+      //Close modal
+      
+      self.caixa_.id = getToken() + '|' + (+new Date())
+      self.caixa_.created = self.today_timestamp
+      self.caixa_.token = getToken()
+      self.caixa_.status = 'opened'
+      self.caixa_.op = 'reforco'
+      self.caixa_.session = self.caixa_.session
+      self.caixa_.value = self.modal_caixastatus.reforco.value
+      self.caixa_.obs = self.modal_caixastatus.reforco.obs
+      console.log(self.caixa_)
+      //Insert in memory
+      self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+      //Insert in local storage
+      localStorage.removeItem(getToken()+'.caixastatus');
+      const parsed = JSON.stringify(self.caixastatus);
+      localStorage.setItem(getToken()+'.caixastatus', parsed);
+      //Cleanup form
+      self.modal_caixastatus.reforco = {}
+      this.$modal.hide('modal_caixastatus_reforco')
     },
     caixa_sangria(){
       var self = this
-      swal("Sangria de caixa:", {
-        content: "input",
-      })
-      .then((value) => {
-        // process data
-        self.caixa_.id = getToken() + '|' + (+new Date())
-        self.caixa_.created = self.today_timestamp
-        self.caixa_.token = getToken()
-        self.caixa_.status = 'opened'
-        self.caixa_.op = 'sangria'
-        self.caixa_.session = self.caixa_.session
-        self.caixa_.value = value * -1
-        // self.caixa_.obs = self.caixa_status_op_obs
-        console.log(self.caixa_)
-        //Insert in memory
-        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
-        //Insert in local storage
-        localStorage.removeItem(getToken()+'.caixastatus');
-        const parsed = JSON.stringify(self.caixastatus);
-        localStorage.setItem(getToken()+'.caixastatus', parsed);
-      });
-    },
-    caixa_close(){
-      var self = this
-      swal("Fechamento de caixa:", {
-        content: "input",
-      })
-      .then((value) => {
-
-        var total_parcial = self.caixastatus.map(a => +a.value).reduce(function(t, c) {return t + c}, 0)
-        console.log('total_parcial:', total_parcial);
-
-        var vendas_da_sessao = self.vendas.filter(x => x.session === self.caixa_.session)
-        console.log('vendas_da_sessao:', vendas_da_sessao);
-
-        var amountByPaymentType = {
-          dinheiro(item) {
-            console.log(+item.dinheiro)
-            // return JSON.parse(item.pagamento).dinheiro
-            return +item.dinheiro
-          },
-          debito(item) {
-            console.log(+item.debito)
-            // return JSON.parse(item.pagamento).debito
-            return +item.debito
-          },
-          credito(item) {
-            console.log(+item.credito)
-            // return JSON.parse(item.pagamento).credito
-            return +item.credito
-          },
-          faturado(item) {
-            console.log(+item.faturado)
-            // return JSON.parse(item.pagamento).faturado
-            return +item.faturado
-          }
-        }
-
-        var total_vendido = {
-          dinheiro: vendas_da_sessao.map(amountByPaymentType.dinheiro).reduce((a, b) => a + b, 0),
-          debito: vendas_da_sessao.map(amountByPaymentType.debito).reduce((a, b) => a + b, 0),
-          credito: vendas_da_sessao.map(amountByPaymentType.credito).reduce((a, b) => a + b, 0),
-          faturado: vendas_da_sessao.map(amountByPaymentType.faturado).reduce((a, b) => a + b, 0)
-        }
-
-        self.caixa_fechamento_value = {
-          dinheiro: total_vendido.dinheiro + total_parcial,
-          cartao: total_vendido.debito + total_vendido.credito,
-          faturado: total_vendido.faturado
-        }
-
-        // process data
-        self.caixa_.id = getToken() + '|' + (+new Date())
-        self.caixa_.created = self.today_timestamp
-        self.caixa_.token = getToken()
-        self.caixa_.status = 'closed'
-        self.caixa_.op = 'fechamento'
-        self.caixa_.session = self.caixa_.session
-        self.caixa_.value = JSON.stringify(self.caixa_fechamento_value)
-        // self.caixa_.obs = self.caixa_status_op_obs
-        console.log(self.caixa_)
-        //Insert in memory
-        self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
-        //Insert in local storage
-        localStorage.removeItem(getToken()+'.caixastatus');
-        const parsed = JSON.stringify(self.caixastatus);
-        localStorage.setItem(getToken()+'.caixastatus', parsed);
-        
-        //reset caixa_
-        //self.caixa_ = {}
-
-        //self.$modal.show('modal_data_upload')
-      });
-    },
-    caixa_upload(){
-      this.$modal.show('modal_data_upload')
-    },
-    caixa() {
-      var self = this
-      return {
-        open_panel() {
-          self.$modal.show('modal_caixa_op')
-        },
-        open() {
-          // self.caixa_op = null
-          // console.log('1>self.caixastatus:', self.caixastatus);
-          self.caixa_open_value = 0
-          self.caixa_op({ label: 'Abertura' })
-          self.$modal.show('modal_caixa_op')
-        },
-        close() {
-          console.log(self.caixa_op)
-          self.$modal.hide('modal_caixa_op')
-        },
-        get(f) {
-          //Off-line
-          //check local storage
-          if (self.caixastatus.length == 0){
-            if (localStorage.getItem(getToken()+'.caixastatus')) {
-              try {
-                self.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
-                self.caixa_ = self.caixastatus[self.caixastatus.length-1]
-              } catch(e) {
-                localStorage.removeItem(getToken()+'.caixastatus');
-              }
-            }
-          }
-
-          console.log('self.caixa_:',self.caixa_);
-
-          if (self.caixa_) {
-            if (self.caixa_.status == 'opened') {
-              self.caixaSession = self.caixa_.session
-            }
-            delete self.caixa_.id
-            if (self.caixa_.status == 'closed') {
-              console.log('self.caixa_.status:', self.caixa_.status)
-              self.caixa_op({ label: 'Abertura' })
-              self.$modal.show('modal_caixa_op')
-            }
-          } else {
-            self.caixa_op({ label: 'Abertura' })
-          }
-
-
-          //On-line
-          // fetchList(
-          //   'caixa_status',
-          //   { find: { 'token': getToken() }, page: 1, limit: 1, sort: 'id DESC' }
-          // ).then(response => {
-          //   if (response.data.items[0]) {
-          //     console.log('caixa_status:', response.data.items[0])
-          //     self.caixa_ = response.data.items[0]
-          //   }
-          //   if (self.caixa_) {
-          //     if (self.caixa_.status == 'opened') {
-          //       self.caixaSession = self.caixa_.session
-          //     }
-          //     delete self.caixa_.id
-          //     if (self.caixa_.status == 'closed') {
-          //       console.log('self.caixa_.status:', self.caixa_.status)
-          //       // self.caixa_op = null
-          //       self.caixa_op({ label: 'Abertura' })
-          //       self.$modal.show('modal_caixa_op')
-          //     }
-          //   } else {
-          //     console.log('pp')
-          //     self.caixa_op({ label: 'Abertura' })
-          //   }
-          // }).catch(function(error) {
-          //   console.log(error)
-          // })
-        },
-        set(obj) {
-          console.log('set: (obj)', obj)
-          self.caixa_ = obj
-
-          //Off-line local storage
-          console.log('1>self.caixastatus:', self.caixastatus);
-              
-          // self.caixastatus.push(obj)       
-          self.caixastatus_plus(obj)
-         
-          // self.caixastatus.push(obj)
-          const parsed = JSON.stringify(self.caixastatus);
-          localStorage.setItem(getToken()+'.caixastatus', parsed);
-
-          console.log('2>self.caixastatus:', self.caixastatus);
-          //Save operation in databank
-          // create('caixa_status', obj).then((ret) => {
-          //   console.log('ret:', ret)
-          // })
-        }
-      }
-    },
-    caixa_op(x) {
-      var self = this
-      var op = x.label
-      console.log('op:', op)
-   
-        
-        self.caixa_op_value = 0
-        self.caixa_status_op_obs = ''
-        self.caixa_op_selected = op
-        if (op == 'Fechamento') {
-          //off-line
-          console.log('self.caixastatus:', self.caixastatus);
-          /// Calcula totais
-         
-          var open_ = self.caixastatus.find(function(item) {
-            return item.op == 'open'
-          }).value
-          console.log('open_:', open_);
-          
-          // Get reforco total
-          var total_parcial = self.caixastatus.map(a => a.value).reduce(function(t, c) {return t + c}, 0)
-          console.log('total_parcial:', total_parcial);
-
-          // var reforco_ = self.caixastatus.filter(function(item) {
-          //   return item.op == 'reforco'
-          // }).map(a => a.value).reduce(function(t, c) {return t + c}, 0)
-          // console.log('reforco_:', reforco_);
-          
-          // // Get sangria total
-          // var sangria_array = self.caixastatus.filter(function(item) {
-          //   return item.op == 'sangria'
-          // }).map(a => a.value)
-          // console.log('sangria_array:', sangria_array);
-
-          // var sangria_ = self.caixastatus.filter(function(item) {
-          //   return item.op == 'sangria'
-          // }).map(a => a.value).reduce((a, b) => a + b, 0)
-          // console.log('sangria_:', sangria_);
-          
-          // // Calcula o total parcial
-          // var total_parcial = (open_||0) + (reforco_||0) - (sangria_||0)
-          // console.log('total_parcial:', total_parcial);
-
-          ///Calcula o total de vendas da sessão do caixa
-        
-          // self.vendas = JSON.parse(self.vendas)
-         
-          var vendas_da_sessao = self.vendas.filter(x => x.session === self.caixa_.session)
-          console.log('vendas_da_sessao:', vendas_da_sessao);
-          var amountByPaymentType = {
-            dinheiro(item) {
-              console.log(+item.dinheiro)
-              // return JSON.parse(item.pagamento).dinheiro
-              return +item.dinheiro
-            },
-            debito(item) {
-              console.log(+item.debito)
-              // return JSON.parse(item.pagamento).debito
-              return +item.debito
-            },
-            credito(item) {
-              console.log(+item.credito)
-              // return JSON.parse(item.pagamento).credito
-              return +item.credito
-            },
-            faturado(item) {
-              console.log(+item.faturado)
-              // return JSON.parse(item.pagamento).faturado
-              return +item.faturado
-            }
-          }
-          var total_vendido = {
-            dinheiro: vendas_da_sessao.map(amountByPaymentType.dinheiro).reduce((a, b) => a + b, 0),
-            debito: vendas_da_sessao.map(amountByPaymentType.debito).reduce((a, b) => a + b, 0),
-            credito: vendas_da_sessao.map(amountByPaymentType.credito).reduce((a, b) => a + b, 0),
-            faturado: vendas_da_sessao.map(amountByPaymentType.faturado).reduce((a, b) => a + b, 0)
-          }
-          self.caixa_fechamento_value = {
-            dinheiro: total_vendido.dinheiro + total_parcial,
-            cartao: total_vendido.debito + total_vendido.credito,
-            faturado: total_vendido.faturado
-          }
-          self.caixa_op_value = self.caixa_fechamento_value.dinheiro
-
-          console.log('total_vendido:', total_vendido);
-          console.log('local:self.caixa_op_value:', self.caixa_op_value)
-
-
-          // Get open value
-          // fetchList('caixa_status', { tipo: 0, fields: ['op', 'created', 'sum(value) tot'], find: { session: self.caixaSession }, groupby: 'op' }).then(response => {
-          //   console.log('response.data>:', response.data)
-
-          //   var open_ = response.data.items.filter(function(item) {
-          //     return item.op == 'open'
-          //   })
-          //   var reforco_ = response.data.items.filter(function(item) {
-          //     return item.op == 'reforco'
-          //   })
-          //   var sangria_ = response.data.items.filter(function(item) {
-          //     return item.op == 'sangria'
-          //   })
-          //   var t1 = {
-          //     open: (open_[0] ? open_[0].tot : 0),
-          //     reforco: (reforco_[0] ? reforco_[0].tot : 0),
-          //     sangria: (sangria_[0] ? sangria_[0].tot : 0)
-          //   }
-          //   var tt = t1.open + t1.reforco - t1.sangria
-          //   console.log('open_>:', tt)
-          //   // ret = response.data.items
-          //   // console.log('valor de abertura:', ret.value);
-
-          //   fetchList('vendas', { find: { session: self.caixaSession }}).then(response => {
-          //     console.log('response.data:', response.data)
-
-          //     // Calc de total
-          //     var amount = {
-          //       dinheiro(item) {
-          //         console.log(JSON.parse(item.pagamento).dinheiro)
-          //         return JSON.parse(item.pagamento).dinheiro
-          //       },
-          //       debito(item) {
-          //         console.log(JSON.parse(item.pagamento).debito)
-          //         return JSON.parse(item.pagamento).debito
-          //       },
-          //       credito(item) {
-          //         console.log(JSON.parse(item.pagamento).credito)
-          //         return JSON.parse(item.pagamento).credito
-          //       },
-          //       faturado(item) {
-          //         console.log(JSON.parse(item.pagamento).faturado)
-          //         return JSON.parse(item.pagamento).faturado
-          //       }
-          //     }
-          //     function sum(prev, next) { return prev + next }
-          //     function varExistTest(val) {
-          //       if (val) { return val } else { return [] }
-          //     }
-
-          //     var total = {
-          //       dinheiro: response.data.items.map(amount.dinheiro).reduce(sum, 0) + tt,
-          //       debito: response.data.items.map(amount.debito).reduce(sum, 0),
-          //       credito: response.data.items.map(amount.credito).reduce(sum, 0),
-          //       faturado: response.data.items.map(amount.faturado).reduce(sum, 0)
-          //     }
-
-          //     self.caixa_fechamento_value = {
-          //       dinheiro: total.dinheiro,
-          //       cartao: total.debito + total.credito,
-          //       faturado: total.faturado
-          //     }
-          //     console.log('self.caixa_op_value:', self.caixa_op_value)
+      // process data
+      // self.caixa_operation('sangria')
+      //Close modal
       
-          //   }).catch(function(error) {
-          //     console.log(error)
-          //   })
-          // }).catch(function(error) {
-          //   console.log(error)
-          // })
-          console.log('!!!!-!!!')
-        }
-
-        self.user = self.corrent_user_info.name
-        self.aux_caixa_op = op
-        self.$modal.show('modal_caixa_op')
-     
+      self.caixa_.id = getToken() + '|' + (+new Date())
+      self.caixa_.created = self.today_timestamp
+      self.caixa_.token = getToken()
+      self.caixa_.status = 'opened'
+      self.caixa_.op = 'sangria'
+      self.caixa_.session = self.caixa_.session
+      self.caixa_.value = self.modal_caixastatus.sangria.value * -1
+      self.caixa_.obs = self.modal_caixastatus.sangria.obs
+      console.log(self.caixa_)
+      //Insert in memory
+      self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+      //Insert in local storage
+      localStorage.removeItem(getToken()+'.caixastatus');
+      const parsed = JSON.stringify(self.caixastatus);
+      localStorage.setItem(getToken()+'.caixastatus', parsed);
+      //Cleanup form
+      self.modal_caixastatus.sangria = {}
+      this.$modal.hide('modal_caixastatus_sangria')
     },
-    caixa_op_ok(op) {
+    caixa_operation(op){
       var self = this
-      // var dataUpload_is_ok = true
-      console.log('!!!!-!!!>', self.aux_caixa_op)
-
-      var status = self.caixa_.status
-
-      if (self.aux_caixa_op == 'Abertura') {
-        //Zera caixastatus e vendas
-        self.vendas = []
-        localStorage.removeItem(getToken()+'.vendas');
-
-        self.caixastatus = []
-        localStorage.removeItem(getToken()+'.caixastatus');
-        
-        self.caixa_.value = self.caixa_open_value
-        self.caixaSession = getToken() + '-' + self.today_timestamp
-        self.aux_caixa_op = 'open'
-        status = 'opened'
-      }
-      if (self.aux_caixa_op == 'Reforço') {
-        self.caixa_.value = self.caixa_op_value
-        self.aux_caixa_op = 'reforco'
-        status = 'opened'
-      }
-      if (self.aux_caixa_op == 'Sangria') {
-        self.caixa_.value = self.caixa_op_value
-        self.aux_caixa_op = 'sangria'
-        status = 'opened'
-      }
-      if (self.aux_caixa_op == 'Fechamento') {
-        //Zera caixastatus e vendas
-        self.caixa_.value = JSON.stringify(self.caixa_fechamento_value)
-        self.aux_caixa_op = 'close'
-        status = 'closed'
-
-        console.log('vendas to upload:', this.vendas);
-        
-      }
-
       // process data
       self.caixa_.id = getToken() + '|' + (+new Date())
       self.caixa_.created = self.today_timestamp
       self.caixa_.token = getToken()
-      self.caixa_.status = status
-      self.caixa_.op = self.aux_caixa_op
-      self.caixa_.session = self.caixaSession
-      self.caixa_.obs = self.caixa_status_op_obs
-      console.log(self.caixa_)
-      self.caixa().set(self.caixa_)
-
-
-      if (this.aux_caixa_op == 'close') {
-        self.$modal.show('modal_data_upload')
-        // if (self.dataUpload()) {
-        //   this.$router.push('/')
-        // }else{
-        //   swal("Erro: Sem internet ou o servidor fora do ar, não é possível fechar o caixa, por favor aguarde.")
-        // }
+      self.caixa_.op = op
+      if (op == 'open'){
+        console.log('open!');
+        self.caixa_.session = getToken() + '-' + self.today_timestamp
       }else{
-        self.$modal.hide('modal_caixa_op')
+        // self.caixa_.session = self.caixa_.session
       }
+      if (op == 'close'){
+        self.caixa_.status = 'closed'
+      }else{
+        self.caixa_.status = 'opened'
+      }
+      if (op == 'sangria'){
+        self.caixa_.value = self.modal_caixastatus[op].value * -1
+      }else{
+        self.caixa_.value = self.modal_caixastatus[op].value
+      }
+      self.caixa_.obs = self.modal_caixastatus[op].obs
+      console.log(self.caixa_)
+      //Insert in memory
+      self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+      //Insert in local storage
+      localStorage.removeItem(getToken()+'.caixastatus');
+      const parsed = JSON.stringify(self.caixastatus);
+      localStorage.setItem(getToken()+'.caixastatus', parsed);
+    },
+    caixa_close(){
+      var self = this
+      swal({
+          title: "Confirma fechamento de caixa?",
+          text: "Depois de fechado o caixa só poderá ser reaberto em outra sessão",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((ok) => {
+          if (ok) {
+            var total_parcial = self.caixastatus.map(a => +a.value).reduce(function(t, c) {return t + c}, 0)
+            console.log('total_parcial:', total_parcial);
 
-      // if (dataUpload_is_ok) {
-      //   this.$modal.hide('modal_caixa_op')
-      // }else{
-      //   swal("Erro: Sem internet ou o servidor fora do ar, não é possível fechar o caixa, por favor aguarde.")
-      // }
+            var vendas_da_sessao = self.vendas.filter(x => x.session === self.caixa_.session)
+            console.log('vendas_da_sessao:', vendas_da_sessao);
+
+            var amountByPaymentType = {
+              dinheiro(item) {
+                console.log(+item.dinheiro)
+                // return JSON.parse(item.pagamento).dinheiro
+                return +item.dinheiro
+              },
+              debito(item) {
+                console.log(+item.debito)
+                // return JSON.parse(item.pagamento).debito
+                return +item.debito
+              },
+              credito(item) {
+                console.log(+item.credito)
+                // return JSON.parse(item.pagamento).credito
+                return +item.credito
+              },
+              faturado(item) {
+                console.log(+item.faturado)
+                // return JSON.parse(item.pagamento).faturado
+                return +item.faturado
+              }
+            }
+
+            var total_vendido = {
+              dinheiro: vendas_da_sessao.map(amountByPaymentType.dinheiro).reduce((a, b) => a + b, 0),
+              debito: vendas_da_sessao.map(amountByPaymentType.debito).reduce((a, b) => a + b, 0),
+              credito: vendas_da_sessao.map(amountByPaymentType.credito).reduce((a, b) => a + b, 0),
+              faturado: vendas_da_sessao.map(amountByPaymentType.faturado).reduce((a, b) => a + b, 0)
+            }
+
+            self.caixa_fechamento_value = {
+              dinheiro: total_vendido.dinheiro + total_parcial,
+              cartao: total_vendido.debito + total_vendido.credito,
+              faturado: total_vendido.faturado
+            }
+
+            // process data
+            // self.caixa_operation('close')
+            self.caixa_.id = getToken() + '|' + (+new Date())
+            self.caixa_.created = self.today_timestamp
+            self.caixa_.token = getToken()
+            self.caixa_.status = 'closed'
+            self.caixa_.op = 'fechamento'
+            self.caixa_.session = self.caixa_.session
+            self.caixa_.value = JSON.stringify(self.caixa_fechamento_value)
+            // self.caixa_.obs = self.caixa_status_op_obs
+            console.log(self.caixa_)
+            //Insert in memory
+            self.caixastatus.push(JSON.parse(JSON.stringify(self.caixa_)))
+            //Insert in local storage
+            localStorage.removeItem(getToken()+'.caixastatus');
+            const parsed = JSON.stringify(self.caixastatus);
+            localStorage.setItem(getToken()+'.caixastatus', parsed);
+            
+            //reset caixa_
+            //self.caixa_ = {}
+
+            //self.$modal.show('modal_data_upload')
+
+            swal("O caixa foi fechado com sucesso", {
+              icon: "success",
+            });
+          } else {
+            swal("Operação cancelada");
+          }
+        });
+    },
+    caixa_upload(){
+      this.$modal.show('modal_data_upload')
     },
     caixa_close_upload() {
       var self = this
@@ -1918,8 +1584,14 @@ export default {
           localStorage.removeItem(getToken()+'.caixastatus');
           localStorage.removeItem(getToken()+'.vendas');
          
-         //Redirect do home site (dashboard)
-          self.$router.push('/')
+         //Redirect to home site (dashboard)
+         swal({
+            title: "Tudo ok!",
+            text: "Os dados foram enviados com sucesso!",
+            icon: "success",
+            button: "ok!",
+          });
+          // self.$router.push('/')
         }else{
           swal("Erro: Sem internet ou o servidor fora do ar, não é possível fechar o caixa, por favor aguarde.")
         }
@@ -2296,16 +1968,17 @@ export default {
         //Save operation in databank
         console.log('this.caixastatus:', this.caixastatus);
         await create('caixa_status', this.caixastatus).then((ret) => {
-          console.log('caixa_status.ret:', ret)
+         self.dataUpload_is_ok = true
+         console.log('caixa_status.ret:', ret)
             vendaClose({ data: this.vendas }).then((ret) => {
             console.log('response:', ret)
-           
+            
             return true
           }).catch((error) => {
             console.warn('Not good man2 :(');
             return false
           })
-          self.dataUpload_is_ok = true
+          
         }).catch((error) => {
           self.dataUpload_status = "up load error"     
         })
