@@ -57,7 +57,7 @@
   .produto_button  {
     width: 98%;
     height: 83px;
-    background-color: #d4d3d3;
+    background-color: #AEADAD;
     /* background-color: white; */
     border: none;
     margin: 1px;
@@ -154,27 +154,22 @@
   <div class="app-container body">
     <div id="main">
       <el-row :gutter="10">
-         <!-- <el-card class="box-card" shadow="always" style="">
-          {{caixa_}}
-         </el-card> -->
-         <el-card v-if=card_caixa_status class="box-card" shadow="always" style="">
-            <h1 style="margin-top: 0px; margin-bottom: 0px;">Caixa: {{caixa_.status | caixa_op_filter}} | Usuário: {{user}} | Opções: 
-        <el-button-group style="margin-top: -5px;">
-          <el-button v-if="!caixa_.session" @click="modal_open('modal_caixastatus_open')"  type="primary">Abrir caixa</el-button> 
-          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="modal_open('modal_caixastatus_reforco')" type="primary">Reforçar</el-button> 
-          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="modal_open('modal_caixastatus_sangria')" type="primary">Sangrar</el-button>
-          <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_close" type="primary">Fechar</el-button>
-          <el-button v-if="caixa_.session && caixa_.status == 'closed'" @click="caixa_close_upload" type="info">Enviar dados para o servidor</el-button>
-          <!-- <el-button @click="teste" type="info">Teste</el-button> -->
-          <el-button v-if="caixa_.session" @click="flg_caixa_operations_table=!flg_caixa_operations_table" type="warning" icon="el-icon-more" circle style="padding-top: -115px;"></el-button>
-        
-        </el-button-group>
-       </h1>
-       
-            <el-table
+        <el-card v-if=card_caixa_status class="box-card" shadow="always" style="margin-bottom: 10px; background-color: #edebe9">
+          <h1 style="margin-top: 0px; margin-bottom: 0px;">Domínio: {{getToken().split('.')[0]}} | Posição do Caixa: {{caixa_.status | caixa_op_filter}} | 
+            <el-button-group style="margin-top: -5px;">
+              <el-button v-if="!caixa_.session" @click="modal_open('modal_caixastatus_open')"  type="primary">Abrir caixa</el-button> 
+              <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="modal_open('modal_caixastatus_reforco')" type="primary">Reforçar</el-button> 
+              <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="modal_open('modal_caixastatus_sangria')" type="primary">Sangrar</el-button>
+              <el-button v-if="caixa_.session && caixa_.status != 'closed'" @click="caixa_close" type="primary">Fechar</el-button>
+              <el-button v-if="caixa_.session && caixa_.status == 'closed'" @click="caixa_close_upload" type="info">Enviar dados para o servidor</el-button>
+              <!-- <el-button @click="teste" type="info">Teste</el-button> -->
+              <el-button v-if="caixa_.session" @click="flg_caixa_operations_table=!flg_caixa_operations_table" type="warning" icon="el-icon-more" circle style="padding-top: -115px;"></el-button>
+            </el-button-group>
+          </h1>
+          <el-table
             v-if="caixa_.session && flg_caixa_operations_table"
             :data="caixastatus"
-            style="width: 100%">
+            style="width: 100%; margin-top: 10px;">
             <el-table-column
               prop="id"
               label="id"
@@ -205,34 +200,22 @@
               label="value">
             </el-table-column>
           </el-table>
-        
-      <!-- <div style="overflow-y: auto; height: 200px; width:50%;">
-        <pre>
-        {{caixastatus}}
-        </pre>
-      </div> -->
-         </el-card><br>
+        </el-card>
       </el-row>
       <el-row v-if="caixa_.status == 'opened'" :gutter="10">
         <el-col :span="13">
           <el-row :gutter="20">
             <el-col :span="24">
               <!-- Produtos -->
-              <el-card class="box-card" shadow="always" style="height: 505px; background-color: #a3a3c2;">
+              <el-card class="box-card" shadow="always" style="height: 505px; background-color: #9898B5;">
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="20">
                     <el-col :span="5">
-                     
-                      Produtos<button @click="local_data_load">DB Local</button>
-                      <button @click="dataUpload">Vendas data upload</button>
-                      <button @click="server_data_load">DB Server</button>
-                      <button @click="caixastatus_plus">caixastatus +</button>
-                      
+                      Produtos
                     </el-col>
                     <el-col :span="9">
                       <input ref="EAN" v-model="EAN" style="width: 99%; height: 35px;" placeholder=" Código de barra" @keyup.enter="productSet_EAN">
                     </el-col>
-
                     <el-col :span="10">
                       <input ref="searchTerm_" v-model="source" placeholder=" Busca pelo nome" list="my-list-id" style="width: 99%; height: 35px;" @input="productSet">
                       <datalist id="my-list-id">
@@ -241,19 +224,11 @@
                     </el-col>
                   </el-row>
                 </div>
-
                 <el-row :gutter="0" style="margin-left: -16px; margin-right: -16px; margin-top: -17px;">
-                  <div style="overflow-y: scroll; height:300px; width: 100%">
-                        {{corrent_user_info}}<br>
-                        <pre>
-                         {{vendas}}
-                        </pre>
-                      </div> 
                   <el-col v-for="(item, rindex) in atalhos.itens" :key="rindex" :span="3">
                     <button class="produto_button" @click="productSet(item)"><img style="max-width: 90%; max-height: 90%;" :src="img_mini(item)" :alt="item"> </button>
                   </el-col>
                 </el-row>
-
               </el-card>
               <!-- /Produtos -->
             </el-col>
@@ -261,7 +236,7 @@
           <el-row>
             <el-col :span="24">
               <!-- Produto selected -->
-              <el-card class="box-card box_product_selected" shadow="always" style="height: 140px; background-color: #a3a3c2;">
+              <el-card class="box-card box_product_selected" shadow="always" style="height: 140px; background-color: #a3a3c2; margin-top: 4px;">
                 <!-- <div slot="header" class="clearfix cardtitle">
                   <div id="wrapper">
                     <div class="left" style="width: 70%">
@@ -278,7 +253,6 @@
                   <el-col :span="19">
                     <div>
                       <el-row :gutter="10" style="margin-top: -8px; margin-bottom: 10px;">
-
                         <el-col :span="24">
                           <span v-if="!product_selected.id" style="font-size:25px;">Selecione o produto acima</span>
                           <span v-if="product_selected.id" style="font-size:25px;">{{ product_selected.id }} {{ product_selected.descricao }} </span>
@@ -317,20 +291,20 @@
           <el-row :gutter="0">
             <el-col :span="24">
               <!-- Cupom -->
-              <el-card id="myelement_" class="box-card" shadow="always" style="height: 551px; background-color: #ffffe6; min-height: 450px">
+              <el-card id="myelement_" class="box-card" shadow="always" style="height: 554px; background-color: #F8F2C4; min-height: 450px">
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
-                    <el-col :span="9">
-                      <span>Cupom</span>: <span v-if="cupom" style="font-size:10px;">{{cupom.id}}</span> | <span>{{dataUpload_is_ok}}</span> <!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
+                    <el-col :span="12">
+                      <span>Cupom</span> <span v-if="cupom" style="font-size: 16px; background-color:#C7C19B; padding: 5px; " >{{cupom.id}}</span><!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
                     </el-col>
-                    <el-col :span="15" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
+                    <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                       {{ today }}
                     </el-col>
                   </el-row>
                   <el-row>
                     <el-col :span="12">
                       <span style="font-family: tahoma; font-size: 70%;">
-                        <span class="bold">Usuário:</span> <a @click="card_caixa_status=!card_caixa_status">{{ user }}</a><br>
+                        <span class="bold">Usuário:</span> <a @click="card_caixa_status=!card_caixa_status">{{corrent_user_info.name}}</a><br>
                       </span>
                     </el-col>
                     <el-col :span="12" style="text-align: right;">
@@ -354,7 +328,7 @@
                   <el-col :span="1" class="center"><i class="el-icon-view" /></el-col>
                 </el-row>
                 <el-divider v-if="cupom.itens.length > 0" />
-                <div id="container" class="cupom_table" style="margin-top:-15px; margin-bottom:-15px; width: 100%; max-height:325px; min-height: 325px; overflow-y: auto;">
+                <div id="container" class="cupom_table" style="margin-top:-10px; margin-bottom:-15px; width: 100%; max-height:332px; min-height: 325px; overflow-y: auto;">
                   <el-row v-for="(row, rindex) in cupom.itens" :key="rindex" :gutter="0" :style="{backgroundColor: (rindex % 2 === 0? '' : '#f9f9e0')}" style="width: 100%; margin-left:0px; margin-bottom: 3px; _padding: 5px; _font-size: 19px;">
                     <el-col :span="2" class="center">{{ rindex + 1 }}</el-col>
                     <el-col :span="2" class="center">{{ row.id.toString() }}</el-col>
@@ -379,10 +353,10 @@
               <!-- /Cupom -->
             </el-col>
           </el-row>
-          <el-row style="margin-top: 1px;">
+          <el-row style="margin-top: 4px;">
             <el-col :span="24">
               <!-- Venda Check-out -->
-              <el-card class="box-card cardtitle" shadow="always" style="height: 90px; font-family: arial;">
+              <el-card class="box-card cardtitle" shadow="always" style="height: 90px; font-family: arial; background-color: #E1E1E1;">
                 <div style="height: 200px;">
                   <el-row type="flex" class="row-bg">
                     <el-col :span="24">
@@ -849,7 +823,6 @@ export default {
         ]
       },
       value: null,
-      user: null,
       novoItem: true,
       today_timestamp: null,
       today: null,
@@ -1088,6 +1061,9 @@ export default {
     })
   },
   methods: {
+    getToken(){
+      return getToken()
+    },
     caixastatus_plus(val){
       this.caixastatus.push(JSON.parse(JSON.stringify(val)))
     },
@@ -1188,7 +1164,6 @@ export default {
           //Get current usuario data
           getInfo().then(function(x) {
             self.corrent_user_info = x.data
-            self.user = x.data.name
             console.log('self.corrent_user_info:', self.corrent_user_info);
             // Clean up register
             if (localStorage.getItem(getToken()+'.corrent_user_info')) {
@@ -1866,7 +1841,7 @@ export default {
       }
 
       const auxObj = {
-        id: getToken()+'|'+this.cupom.id,
+        id: this.cupom.id,
         date: +new Date(),
         date_ref: this.date_ref,
         session: this.caixa_.session,

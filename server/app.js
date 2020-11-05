@@ -410,7 +410,7 @@ app.get(environment + '/eansearch', function (req, res, next) {
         jsonStr = {
           "code": 20000, 
           "data": {
-            "user_id": row[0].user_id,
+            "id": row[0].id,
             "roles": [row[0].roles],
             "introduction": row[0].introduction,
             "avatar": row[0].avatar,
