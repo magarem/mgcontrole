@@ -214,10 +214,10 @@
                       Produtos
                     </el-col>
                     <el-col :span="9">
-                      <input ref="EAN" v-model="EAN" style="width: 99%; height: 35px;" placeholder=" Código de barra" @keyup.enter="productSet_EAN">
+                      <input ref="EAN" v-model="EAN" style="width: 99%; height: 35px; border-radius: 5px; border: 1px solid #5E6472; font-size: 18px;" placeholder=" Código de barra" @keyup.enter="productSet_EAN">
                     </el-col>
                     <el-col :span="10">
-                      <input ref="searchTerm_" v-model="source" placeholder=" Busca pelo nome" list="my-list-id" style="width: 99%; height: 35px;" @input="productSet">
+                      <input ref="searchTerm_" v-model="source" placeholder=" Busca pelo nome" list="my-list-id" style="width: 99%; height: 35px; border-radius: 5px; border: 1px solid #5E6472; font-size: 18px;" @input="productSet">
                       <datalist id="my-list-id">
                         <option v-for="(value, key) in produtos_" :key="key">{{ value.name }}</option>
                       </datalist>
@@ -295,7 +295,7 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
                     <el-col :span="12">
-                      <span>Cupom</span> <span v-if="cupom" style="font-size: 16px; background-color:#C7C19B; padding: 5px; " >{{cupom.id}}</span><!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
+                      <span>Cupom</span> <span v-if="cupom" style="font-size: 16px; background-color:#C7C19B; padding: 5px; border-radius: 5px; border: 0px solid #5E6472 " >{{cupom.id}}</span><!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
                     </el-col>
                     <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                       {{ today }}
@@ -1160,6 +1160,17 @@ export default {
       var self = this
       console.log(table);
       switch (table){
+        case 'cupom':
+          //Get info (if already exists)
+          if (localStorage.getItem(getToken()+'.cupom')) {
+            try {
+              self.cupom = JSON.parse(localStorage.getItem(getToken()+'.cupom'));
+              console.log('self.cupom:', self.cupom);
+            } catch(e) {
+              localStorage.removeItem(getToken()+'.cupom');
+            }
+          }
+          break;
         case 'corrent_user_info':
           //Get current usuario data
           getInfo().then(function(x) {
@@ -1255,6 +1266,7 @@ export default {
           })
           break;
         default:
+          self.server_data_load('cupom')
           self.server_data_load('corrent_user_info')
           self.server_data_load('info')
           //self.server_data_load('caixa_status')
@@ -1351,6 +1363,21 @@ export default {
 
       self.caixastatus = []
       localStorage.removeItem(getToken()+'.caixastatus');
+
+      //Reset cupom in local data
+      self.cupom = {
+        date: null,
+        cliente: {
+          id: 1,
+          nome: 'Cliente'
+        },
+        itens: [],
+        itens_n: 0,
+        subtotal: null,
+        desconto: null,
+        total: null
+      }
+      localStorage.removeItem(getToken()+'.cupom');
       
       // self.caixa_operation('open')
       
@@ -1532,6 +1559,7 @@ export default {
             const parsed = JSON.stringify(self.caixastatus);
             localStorage.setItem(getToken()+'.caixastatus', parsed);
             
+            
             //reset caixa_
             //self.caixa_ = {}
 
@@ -1662,6 +1690,11 @@ export default {
       console.log('row:', row)
       this.cupom.cliente.id = row.id
       this.cupom.cliente.nome = row.nome
+
+      //insert in local data
+      const parsed = JSON.stringify(this.cupom);
+      localStorage.setItem(getToken()+'.cupom', parsed);
+
       this.clientesListFlg = false
       this.msgMain = { txt: 'Venda em curso', color: '#886A08' }
       this.$nextTick(() => {
@@ -1688,13 +1721,21 @@ export default {
               total: this.product_selected.qnt * this.product_selected.pco_venda
             }
             // this.cupom.itens.unshift(auxObj)
-            if (!this.cupom.id) {this.cupom.id = +new Date()}
+            if (!this.cupom.id) {
+              this.cupom.id = this.corrent_user_info.id + '-' + (+new Date())
+            }
             this.cupom.itens.push(auxObj)
+             
+
             this.cupom.itens_n++
             this.cupom.subtotal += (parseFloat(this.product_selected.qnt) * parseFloat(this.product_selected.pco_venda)) // Calc row subtotal
 
             // Total Calc
             this.cupom.total = this.cupom.subtotal // += (parseFloat(this.qnt) * parseFloat(item.pco_venda))
+
+            //Include in local data
+            const parsed = JSON.stringify(this.cupom);
+            localStorage.setItem(getToken()+'.cupom', parsed);
 
             // Reset qnt
             this.product_selected = {}
@@ -1947,7 +1988,6 @@ export default {
          console.log('caixa_status.ret:', ret)
             vendaClose({ data: this.vendas }).then((ret) => {
             console.log('response:', ret)
-            
             return true
           }).catch((error) => {
             console.warn('Not good man2 :(');
