@@ -848,21 +848,28 @@ function updateSQL_string(table, id, obj){
 
 
   app.post(`${environment}/vendaClose`, function (req, res) {
+    
+    // Aux vars
+    // var data_ = []
 
     // Get domain
     let token = req.headers['x-token']
     let domain = token.split('.')[0]
 
     //Get form data
-    var data = JSON.parse(JSON.stringify(req.body.data))
+    console.log('req.body:', req.body);
+    var data = JSON.parse(JSON.stringify(req.body)).json_data
     console.log('data parse:', data)
 
+
+    // console.log('data_:', data_)
     //Def aux vars
     var sql = []
    
     //Begin vendas SQL build
-    // sql.push('BEGIN TRANSACTION;')
+    //sql.push('BEGIN TRANSACTION;')
     data.forEach(function(item){
+      console.log('forEasch-item:', item);
       if (!item.date_ref){item.date_ref = item.date} //Adjust ref_date by date
       // Insert Venda
       var aux_pagamento = JSON.stringify({dinheiro: item.dinheiro, debito: item.debito, credito: item.credito,faturado: item.faturado})

@@ -295,7 +295,7 @@
                 <div slot="header" class="clearfix cardtitle">
                   <el-row :gutter="5">
                     <el-col :span="12">
-                      <span>Cupom</span> <span v-if="cupom" style="font-size: 16px; background-color:#C7C19B; padding: 5px; border-radius: 5px; border: 0px solid #5E6472 " >{{cupom.id}}</span><!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
+                      <span>Cupom</span> <span v-if="cupom.id" style="font-size: 16px; background-color:#C7C19B; padding: 5px; border-radius: 5px; border: 0px solid #5E6472 " >{{cupom.id}}</span><!--el-button class="bold" @click="caixa().open()" size="mini" round>Sessão</el-button-->
                     </el-col>
                     <el-col :span="12" style="text-align: right; margin-top:3px; font-size: 70%; color: #856514">
                       {{ today }}
@@ -736,8 +736,9 @@ export default {
   directives: { waves, money: Money },
   filters: {
     caixa_op_filter(op) {
+      if (!op || op == '') return 'Fechada'
       if (op == 'opened') return 'Aberta'
-      if (op == 'closed') return 'Fechada'
+      if (!op || op == '' || op == 'closed') return 'Fechada'
     },
     money(value) {
       if (typeof value !== 'number') {
@@ -752,6 +753,9 @@ export default {
   },
   data() {
     return {
+      sound:{
+        vendaClose: new Audio(require('@/assets/audio/zapsplat_bell_small_reception_desk_bell_single_ring_003_15125.mp3'))
+      },
       modal_caixastatus: {
         open:{
           value: 0,
@@ -771,7 +775,7 @@ export default {
         },
       },
       flg_caixa_operations_table: false,
-      card_caixa_status: true,
+      card_caixa_status: false,
       modal_data_upload: false,
       dataUpload_is_ok: false,
       dataUpload_status: false,
@@ -990,69 +994,8 @@ export default {
     this.local_data_load('caixastatus')
     this.local_data_load('vendas')
   },
-  mounted_() {
-    //If online get the server databank values
-    if (navigator.onLine){
-       this.databank_load()
-      //  this.vai()
-      }else{  
-        //Get info (if already exists)
-        if (localStorage.getItem(getToken()+'.info')) {
-          try {
-            this.info = JSON.parse(localStorage.getItem(getToken()+'.info'));
-            this.info_data_adjustes()
-            console.log('localStorage, this.info:', this.info);
-          } catch(e) {
-            localStorage.removeItem(getToken()+'.info');
-          }
-        }
-        
-        //Get clientesList (if already exists)
-        if (localStorage.getItem(getToken()+'.clientesList')) {
-          try {
-            this.clientesList = JSON.parse(localStorage.getItem(getToken()+'.clientesList'));
-            this.produtos_data_adjustes()
-            console.log('localStorage, this.clientesList:', this.clientesList);
-         } catch(e) {
-            localStorage.removeItem(getToken()+'.clientesList');
-          }
-        }
-
-        //Check produtos (if already exists)
-        if (localStorage.getItem(getToken()+'.produtos')) {
-          try {
-            this.produtos = JSON.parse(localStorage.getItem(getToken()+'.produtos'));
-            console.log('localStorage, this.produtos:', this.produtos);
-          } catch(e) {
-            localStorage.removeItem(getToken()+'.produtos');
-          }
-        }
-
-         //Check vendas (if already exists)
-        if (localStorage.getItem(getToken()+'.vendas')) {
-          try {
-            this.vendas = JSON.parse(localStorage.getItem(getToken()+'.vendas'));
-            console.log('localStorage, this.vendas:', this.vendas);
-          } catch(e) {
-            localStorage.removeItem(getToken()+'.vendas');
-          }
-        }
-
-         //Check caixa status (if already exists)
-        if (localStorage.getItem(getToken()+'.caixastatus')) {
-          try {
-            this.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
-            console.log('localStorage, this.caixastatus:', this.caixastatus);
-          } catch(e) {
-            localStorage.removeItem(getToken()+'.caixastatus');
-          }
-        }
-    }
-  },
   created() {
     this.updateDateTime()
-    // this.getUser()
-    // this.caixa().get()
     window.addEventListener('keydown', (e) => {
       if (e.key == 'F2') {
         e.preventDefault()
@@ -1134,16 +1077,21 @@ export default {
           }
           break;
         case 'caixastatus':
-            console.log('>', table)
-            //Check caixa status (if already exists)
-            if (localStorage.getItem(getToken()+'.caixastatus')) {
+          console.log('>', table)
+          //Check caixa status (if already exists)
+          if (localStorage.getItem(getToken()+'.caixastatus')) {
             try {
               self.caixastatus = JSON.parse(localStorage.getItem(getToken()+'.caixastatus'));
               console.log('localStorage, self.caixastatus:', self.caixastatus);
               self.caixa_ = self.caixastatus[self.caixastatus.length-1]
+              console.log('self.caixa_.status:', self.caixa_.status);
+              self.card_caixa_status = (self.caixa_.status=='closed')?true:false
             } catch(e) {
+              self.card_caixa_status = true
               localStorage.removeItem(getToken()+'.caixastatus');
             }
+          }else{
+            self.card_caixa_status = true
           }
           break;
         default:
@@ -1403,8 +1351,13 @@ export default {
       self.modal_caixastatus.open = {}
 
       this.$modal.hide('modal_caixastatus_open')
+
+      //Turn off upload flag
+      self.dataUpload_is_ok = false
+
       //Close top panel
       self.card_caixa_status = false
+
     },
     caixa_reforco(){
       var self = this
@@ -1559,15 +1512,15 @@ export default {
             const parsed = JSON.stringify(self.caixastatus);
             localStorage.setItem(getToken()+'.caixastatus', parsed);
             
-            
+            self.caixa_close_upload()
             //reset caixa_
             //self.caixa_ = {}
 
             //self.$modal.show('modal_data_upload')
 
-            swal("O caixa foi fechado com sucesso", {
-              icon: "success",
-            });
+            // swal("O caixa foi fechado com sucesso", {
+            //   icon: "success",
+            // });
           } else {
             swal("Operação cancelada");
           }
@@ -1596,7 +1549,7 @@ export default {
           });
           // self.$router.push('/')
         }else{
-          swal("Erro: Sem internet ou o servidor fora do ar, não é possível fechar o caixa, por favor aguarde.")
+          swal("Erro: Sem internet ou o servidor fora do ar, não é possível enviar os dados, por favor aguarde.")
         }
       })
     },
@@ -1856,7 +1809,7 @@ export default {
       this.vendaCloseOkFim()
     },
     vendaClose() {
-      const sound = (new Audio(require('@/assets/audio/zapsplat_bell_small_reception_desk_bell_single_ring_003_15125.mp3'))).play()
+      this.sound.vendaClose.play()
       this.desconto = 0
       this.pago_dinheiro = 0
       this.pago_debito = 0
@@ -1867,6 +1820,7 @@ export default {
       this.vendaCloseFlg = true
     },
     vendaCloseOk() {
+      var self = this
       console.log('this.cupom', this.cupom)
       const sound = (new Audio(require('@/assets/audio/caixa_registradora.mp3'))).play()
       this.cupom.total = this.cupom.subtotal - this.desconto
@@ -1899,18 +1853,25 @@ export default {
       console.log('auxObj>>', auxObj)
       const auxJson = JSON.stringify(auxObj)
 
+
+      console.log('auxJson:', auxJson);
+      self.vendas.push(auxObj)
+      console.log('>self.vendas:', self.vendas);
       // Try save operation
       if (navigator.onLine){
         // // in server
-        // vendaClose({ json_data: auxJson }).then((ret) => {
-        //   console.log('response:', ret)
-        // })
+        vendaClose({ json_data: self.vendas }).then((ret) => {
+          console.log('response:', ret)
+          self.vendas = []
+          localStorage.removeItem(getToken()+'.vendas');
+        }).catch(function(x){
+          //in local storage
+          console.log('>x:', x);
+          localStorage.setItem(getToken()+'.vendas', JSON.stringify(self.vendas));
+        })
       }
 
-      //in local storage
-      console.log('>this.vendas:', this.vendas);
-      this.vendas.push(auxObj)
-      localStorage.setItem(getToken()+'.vendas', JSON.stringify(this.vendas));
+     
       
       // Close modal
       this.vendaCloseFlg = false
@@ -1973,6 +1934,10 @@ export default {
 
       // reset parametros board
       // this.parametros_flg = false
+
+      //Remove cupom from local storage
+      localStorage.removeItem(getToken()+'.cupom');
+
       this.$nextTick(() => {
         this.parametros_flg = true
       })
@@ -1986,21 +1951,16 @@ export default {
         await create('caixa_status', this.caixastatus).then((ret) => {
          self.dataUpload_is_ok = true
          console.log('caixa_status.ret:', ret)
-            vendaClose({ data: this.vendas }).then((ret) => {
+            vendaClose({ json_data: this.vendas }).then((ret) => {
             console.log('response:', ret)
             return true
           }).catch((error) => {
             console.warn('Not good man2 :(');
             return false
           })
-          
         }).catch((error) => {
           self.dataUpload_status = "up load error"     
         })
-
-        
-
-        
       }
     },
     vendaCancel() {
